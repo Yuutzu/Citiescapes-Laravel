@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ $title ?? 'Citiescapes — Rooms' }}</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
+</head>
+
+<body class="bg-gray-50">
+    {{-- Public top nav --}}
+    <header class="bg-white shadow-sm">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <a href="/" class="flex items-center gap-2">
+                    <div class="h-8 w-8 rounded-lg bg-brand-700 flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">CS</span>
+                    </div>
+                    <span class="font-bold text-brand-900 text-lg">Citiescapes</span>
+                </a>
+                <div class="flex items-center gap-4">
+                    <a href="/#rooms" class="text-sm font-medium text-gray-600 hover:text-gray-900">Rooms</a>
+                    <a href="/#inquire" class="text-sm font-medium text-gray-600 hover:text-gray-900">Inquire</a>
+                    <a href="{{ route('login') }}" class="btn-primary text-sm">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {{ $slot }}
+    </main>
+
+    <footer class="bg-brand-900 mt-16">
+        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-brand-300">
+                &copy; {{ date('Y') }} Citiescapes Apartment Rental &bull; Remedios St., Bajada, Davao City
+            </p>
+        </div>
+    </footer>
+    @livewireScripts
+</body>
+
+</html>
