@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-50">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
+
 <body class="h-full">
+    <a href="/" class="fixed top-6 right-6 btn-primary px-6 py-2 z-50">Return</a>
     <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <div class="flex justify-center">
@@ -27,10 +30,12 @@
             <div class="bg-white px-6 py-8 shadow-sm ring-1 ring-gray-950/5 sm:rounded-xl sm:px-10">
                 {{-- Flash messages --}}
                 @if(session('error'))
-                    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 border border-red-200">{{ session('error') }}</div>
+                    <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 border border-red-200">
+                        {{ session('error') }}</div>
                 @endif
                 @if(session('success'))
-                    <div class="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200">{{ session('success') }}</div>
+                    <div class="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200">
+                        {{ session('success') }}</div>
                 @endif
                 {{ $slot }}
             </div>
@@ -38,4 +43,5 @@
     </div>
     @livewireScripts
 </body>
+
 </html>
