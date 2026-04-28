@@ -14,7 +14,6 @@
 </head>
 
 <body class="h-full">
-    <a href="/" class="fixed top-6 right-6 btn-primary px-6 py-2 z-50">Return</a>
     <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
             <div class="flex justify-center">
@@ -32,11 +31,15 @@
                 
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('error')): ?>
                     <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 border border-red-200">
-                        <?php echo e(session('error')); ?></div>
+                        <?php echo e(session('error')); ?>
+
+                    </div>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(session('success')): ?>
                     <div class="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200">
-                        <?php echo e(session('success')); ?></div>
+                        <?php echo e(session('success')); ?>
+
+                    </div>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 <?php echo e($slot); ?>
 
