@@ -23,7 +23,7 @@ class Login extends Component
     public function login()
     {
         $this->validate([
-            'email' => 'required|email',
+            'email'    => 'required|email',
             'password' => 'required|min:6',
         ]);
 
@@ -59,8 +59,8 @@ class Login extends Component
                 foreach ($gms as $gm) {
                     \App\Models\NotificationLog::create([
                         'user_id' => $gm->id,
-                        'type' => 'account_locked',
-                        'source' => 'SS6',
+                        'type'    => 'account_locked',
+                        'source'  => 'SS6',
                         'message' => "Account for {$user->full_name} ({$user->email}) was locked after 5 failed attempts.",
                     ]);
                 }
@@ -97,11 +97,11 @@ class Login extends Component
     private function sendOtp(User $user): void
     {
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        $expiry = (int) config('citiescapes.auth.otp_expiry_minutes', 10);
+        $expiry = config('citiescapes.auth.otp_expiry_minutes', 10);
 
         OtpRecord::create([
-            'user_id' => $user->id,
-            'code' => Hash::make($code),
+            'user_id'    => $user->id,
+            'code'       => Hash::make($code),
             'expires_at' => now()->addMinutes($expiry),
         ]);
 

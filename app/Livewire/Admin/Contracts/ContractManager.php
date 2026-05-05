@@ -72,26 +72,26 @@ class ContractManager extends Component
     public function save()
     {
         $this->validate([
-            'tenant_id'      => 'required|exists:users,id',
-            'room_id'        => 'required|exists:rooms,id',
+            'tenant_id' => 'required|exists:users,id',
+            'room_id' => 'required|exists:rooms,id',
             'base_rent_rate' => 'required|numeric|min:0',
-            'start_date'     => 'required|date',
-            'end_date'       => 'required|date|after:start_date',
-            'penalty_rate'   => 'required|numeric|min:0',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'penalty_rate' => 'required|numeric|min:0',
         ]);
 
         $data = [
-            'tenant_id'         => $this->tenant_id,
-            'room_id'           => $this->room_id,
-            'base_rent_rate'    => $this->base_rent_rate,
-            'deposit'           => $this->deposit,
-            'room_key_fee'      => $this->room_key_fee,
-            'start_date'        => $this->start_date,
-            'end_date'          => $this->end_date,
-            'penalty_rate'      => $this->penalty_rate,
-            'penalty_grace_days'=> $this->penalty_grace_days,
-            'house_rules'       => $this->house_rules,
-            'created_by'        => auth()->id(),
+            'tenant_id' => $this->tenant_id,
+            'room_id' => $this->room_id,
+            'base_rent_rate' => $this->base_rent_rate,
+            'deposit' => $this->deposit,
+            'room_key_fee' => $this->room_key_fee,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'penalty_rate' => $this->penalty_rate,
+            'penalty_grace_days' => $this->penalty_grace_days,
+            'house_rules' => $this->house_rules,
+            'created_by' => auth()->id(),
         ];
 
         if ($this->scanFile) {
@@ -113,6 +113,26 @@ class ContractManager extends Component
         session()->flash('success', $this->editing ? 'Contract updated.' : 'Contract draft created.');
     }
 
+    public function activate(int $id)
+    {
+        $contract = Contract::with(['tenant', 'room'])->findOrFail($id);
+
+        $contract->update(['status' => 'active']);
+
+        // Mark room as occupied and link the tenant
+        if ($contract->room) {
+            $contract->room->update([
+                'status' => 'occupied',
+                'current_tenant_id' => $contract->tenant_id,
+                'last_updated_by' => auth()->id(),
+                'last_status_update' => now(),
+            ]);
+        }
+
+        AuditLog::record('contract_activated', auth()->id(), 'gm', 'SS4', "Contract #{$contract->id} activated — Room {$contract->room?->room_number} marked occupied");
+        session()->flash('success', 'Contract activated and room marked as occupied.');
+    }
+
     public function openTerminate(int $id)
     {
         $this->terminateId = $id;
@@ -126,20 +146,20 @@ class ContractManager extends Component
 
         $contract = Contract::with(['tenant', 'room'])->findOrFail($this->terminateId);
         $contract->update([
-            'status'             => 'terminated',
-            'terminated_at'      => now(),
+            'status' => 'terminated',
+            'terminated_at' => now(),
             'termination_reason' => $this->terminateReason,
         ]);
 
         // Archive to SS5
         Archive::create([
             'original_record_id' => $contract->id,
-            'record_type'        => 'contract',
-            'source_subsystem'   => 'SS4',
-            'archive_reason'     => 'Terminated by GM: ' . $this->terminateReason,
-            'data'               => $contract->toArray(),
-            'scan_file_path'     => $contract->scan_file_path,
-            'archived_by'        => auth()->id(),
+            'record_type' => 'contract',
+            'source_subsystem' => 'SS4',
+            'archive_reason' => 'Terminated by GM: ' . $this->terminateReason,
+            'data' => $contract->toArray(),
+            'scan_file_path' => $contract->scan_file_path,
+            'archived_by' => auth()->id(),
         ]);
 
         // Archive tenant (SS2)
@@ -164,12 +184,12 @@ class ContractManager extends Component
         // Archive old
         Archive::create([
             'original_record_id' => $old->id,
-            'record_type'        => 'contract',
-            'source_subsystem'   => 'SS4',
-            'archive_reason'     => 'Renewed — old contract archived',
-            'data'               => $old->toArray(),
-            'scan_file_path'     => $old->scan_file_path,
-            'archived_by'        => auth()->id(),
+            'record_type' => 'contract',
+            'source_subsystem' => 'SS4',
+            'archive_reason' => 'Renewed — old contract archived',
+            'data' => $old->toArray(),
+            'scan_file_path' => $old->scan_file_path,
+            'archived_by' => auth()->id(),
         ]);
         $old->update(['status' => 'expired']);
 

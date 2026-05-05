@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Reports & Archives</h1>
+    <h1 class="text-2xl font-bold text-brand-900 mb-6">Reports & Archives</h1>
 
     <div class="flex flex-wrap gap-3 mb-6">
         <select wire:model.live="filterType" class="form-input w-auto text-sm">
@@ -18,15 +18,15 @@
 
     <div class="card overflow-x-auto p-0">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-brand-900">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">ID</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Type</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Source</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Reason</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Archived</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Scan</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">ID</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Type</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Source</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Reason</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Archived</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Scan</th>
+                    <th class="px-4 py-3.5 text-right text-xs font-semibold text-brand-200 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">

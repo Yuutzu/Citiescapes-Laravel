@@ -1,9 +1,9 @@
 <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">System Settings</h1>
+    <h1 class="text-2xl font-bold text-brand-900 mb-6">System Settings</h1>
 
     <form wire:submit="save" class="max-w-xl space-y-6">
         <div class="card">
-            <h3 class="font-semibold text-gray-900 mb-4">Authentication & Security</h3>
+            <h3 class="text-base font-semibold text-gray-900 mb-4">Authentication & Security</h3>
             <div class="space-y-4">
                 <div>
                     <label class="form-label">Session Timeout (minutes)</label>
@@ -26,7 +26,7 @@
         </div>
 
         <div class="card">
-            <h3 class="font-semibold text-gray-900 mb-4">Billing Defaults</h3>
+            <h3 class="text-base font-semibold text-gray-900 mb-4">Billing Defaults</h3>
             <div class="space-y-4">
                 <div>
                     <label class="form-label">Penalty Grace Period (days)</label>

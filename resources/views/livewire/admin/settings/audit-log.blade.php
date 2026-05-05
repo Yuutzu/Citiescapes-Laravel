@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">System Audit Log</h1>
+    <h1 class="text-2xl font-bold text-brand-900 mb-6">System Audit Log</h1>
 
     <div class="flex flex-wrap gap-3 mb-6">
         <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search details or user..." class="form-input w-auto text-sm">
@@ -15,14 +15,14 @@
 
     <div class="card overflow-x-auto p-0">
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-brand-900">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Time</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">User</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Action</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">SS</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Details</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">IP</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Time</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">User</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Action</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">SS</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Details</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">IP</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">

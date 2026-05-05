@@ -1,5 +1,5 @@
 <div>
-    <h3 class="text-lg font-semibold text-gray-900 mb-2">Change your password</h3>
+    <h3 class="text-xl font-bold text-brand-900 mb-2">Change your password</h3>
     <p class="text-sm text-gray-500 mb-6">
         @if(auth()->user()->must_change_password)
             You must set a new password before continuing.

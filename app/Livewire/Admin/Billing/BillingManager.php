@@ -25,7 +25,11 @@ class BillingManager extends Component
     // Generate bill modal
     public bool $showGenerate = false;
     public ?int $genContractId = null;
-    public float $genUtilities = 0;
+    public float $genElectricity = 0;
+    public float $genWater = 0;
+    public float $genWifi = 0;
+    public float $genExtras = 0;
+    public string $genExtrasNote = '';
 
     // Record initial fees modal
     public bool $showInitial = false;
@@ -49,20 +53,24 @@ class BillingManager extends Component
 
     public function openGenerate()
     {
-        $this->reset(['genContractId', 'genUtilities']);
+        $this->reset(['genContractId', 'genElectricity', 'genWater', 'genWifi', 'genExtras', 'genExtrasNote']);
         $this->showGenerate = true;
     }
 
     public function generateBill()
     {
         $this->validate([
-            'genContractId' => 'required|exists:contracts,id',
-            'genUtilities'  => 'required|numeric|min:0',
+            'genContractId'  => 'required|exists:contracts,id',
+            'genElectricity' => 'required|numeric|min:0',
+            'genWater'       => 'required|numeric|min:0',
+            'genWifi'        => 'required|numeric|min:0',
+            'genExtras'      => 'required|numeric|min:0',
         ]);
 
-        $contract = Contract::with('room')->findOrFail($this->genContractId);
-        $period = now()->format('Y-m');
-        $total = $contract->base_rent_rate + $this->genUtilities;
+        $contract  = Contract::with('room')->findOrFail($this->genContractId);
+        $period    = now()->format('Y-m');
+        $utilities = $this->genElectricity + $this->genWater + $this->genWifi + $this->genExtras;
+        $total     = $contract->base_rent_rate + $utilities;
 
         Bill::create([
             'tenant_id'      => $contract->tenant_id,
@@ -71,7 +79,12 @@ class BillingManager extends Component
             'type'           => 'monthly',
             'billing_period' => $period,
             'base_rent'      => $contract->base_rent_rate,
-            'utilities'      => $this->genUtilities,
+            'utilities'      => $utilities,
+            'electricity'    => $this->genElectricity,
+            'water'          => $this->genWater,
+            'wifi'           => $this->genWifi,
+            'extras'         => $this->genExtras,
+            'extras_note'    => $this->genExtrasNote ?: null,
             'total_amount'   => $total,
             'due_date'       => now()->endOfMonth(),
         ]);
@@ -91,25 +104,25 @@ class BillingManager extends Component
     {
         $this->validate([
             'initContractId' => 'required|exists:contracts,id',
-            'initDeposit'    => 'required|numeric|min:0',
+            'initDeposit' => 'required|numeric|min:0',
             'initFirstMonth' => 'required|numeric|min:0',
-            'initKeyFee'     => 'required|numeric|min:0',
+            'initKeyFee' => 'required|numeric|min:0',
         ]);
 
         $contract = Contract::findOrFail($this->initContractId);
         $total = $this->initDeposit + $this->initFirstMonth + $this->initKeyFee;
 
         Bill::create([
-            'tenant_id'       => $contract->tenant_id,
-            'contract_id'     => $contract->id,
-            'room_id'         => $contract->room_id,
-            'type'            => 'initial',
-            'billing_period'  => 'initial',
-            'deposit_amount'  => $this->initDeposit,
-            'base_rent'       => $this->initFirstMonth,
-            'room_key_fee'    => $this->initKeyFee,
-            'total_amount'    => $total,
-            'due_date'        => now()->addDays(3),
+            'tenant_id' => $contract->tenant_id,
+            'contract_id' => $contract->id,
+            'room_id' => $contract->room_id,
+            'type' => 'initial',
+            'billing_period' => 'initial',
+            'deposit_amount' => $this->initDeposit,
+            'base_rent' => $this->initFirstMonth,
+            'room_key_fee' => $this->initKeyFee,
+            'total_amount' => $total,
+            'due_date' => now()->addDays(3),
         ]);
 
         AuditLog::record('initial_fees_recorded', auth()->id(), 'gm', 'SS3', "Initial fees for contract #{$contract->id}");
@@ -130,20 +143,20 @@ class BillingManager extends Component
     public function confirmPayment()
     {
         $this->validate([
-            'payAmount'    => 'required|numeric|min:0.01',
-            'payMethod'    => 'required',
+            'payAmount' => 'required|numeric|min:0.01',
+            'payMethod' => 'required',
         ]);
 
         $bill = Bill::findOrFail($this->payBillId);
 
         Payment::create([
-            'bill_id'          => $bill->id,
-            'tenant_id'        => $bill->tenant_id,
-            'amount'           => $this->payAmount,
-            'payment_method'   => $this->payMethod,
+            'bill_id' => $bill->id,
+            'tenant_id' => $bill->tenant_id,
+            'amount' => $this->payAmount,
+            'payment_method' => $this->payMethod,
             'reference_number' => $this->payReference,
-            'confirmed_by'     => auth()->id(),
-            'confirmed_at'     => now(),
+            'confirmed_by' => auth()->id(),
+            'confirmed_at' => now(),
         ]);
 
         $bill->update(['status' => 'paid', 'paid_at' => now(), 'days_overdue' => 0]);
@@ -173,16 +186,16 @@ class BillingManager extends Component
         $originalPenalty = $bill->penalty_amount;
 
         PenaltyOverride::create([
-            'bill_id'          => $bill->id,
-            'overridden_by'    => auth()->id(),
+            'bill_id' => $bill->id,
+            'overridden_by' => auth()->id(),
             'original_penalty' => $originalPenalty,
             'adjusted_penalty' => $this->overrideAmount,
-            'reason'           => $this->overrideReason,
+            'reason' => $this->overrideReason,
         ]);
 
         $bill->update([
             'penalty_amount' => $this->overrideAmount,
-            'total_amount'   => $bill->base_rent + $bill->utilities + $this->overrideAmount,
+            'total_amount' => $bill->base_rent + $bill->utilities + $this->overrideAmount,
         ]);
 
         AuditLog::record('penalty_override', auth()->id(), 'gm', 'SS3', "Penalty on bill #{$bill->id}: ₱{$originalPenalty} → ₱{$this->overrideAmount}. Reason: {$this->overrideReason}");
@@ -192,15 +205,17 @@ class BillingManager extends Component
 
     public function archiveBills(int $tenantId)
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Bill> $bills */
         $bills = Bill::where('tenant_id', $tenantId)->get();
         foreach ($bills as $bill) {
+            /** @var Bill $bill */
             Archive::create([
                 'original_record_id' => $bill->id,
-                'record_type'        => 'payment',
-                'source_subsystem'   => 'SS3',
-                'archive_reason'     => 'Lease ended — GM archived',
-                'data'               => $bill->toArray(),
-                'archived_by'        => auth()->id(),
+                'record_type' => 'payment',
+                'source_subsystem' => 'SS3',
+                'archive_reason' => 'Lease ended — GM archived',
+                'data' => $bill->toArray(),
+                'archived_by' => auth()->id(),
             ]);
             $bill->update(['status' => 'archived']);
         }
@@ -210,7 +225,9 @@ class BillingManager extends Component
     public function render()
     {
         $bills = Bill::with(['tenant', 'room', 'contract'])
-            ->when($this->search, fn($q) => $q->whereHas('tenant', fn($qq) =>
+            ->when($this->search, fn($q) => $q->whereHas(
+                'tenant',
+                fn($qq) =>
                 $qq->where('full_name', 'like', "%{$this->search}%")
             ))
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))

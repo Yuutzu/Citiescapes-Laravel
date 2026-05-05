@@ -35,7 +35,7 @@ class OtpVerify extends Component
 
         $record->update(['used' => true]);
         $user->update([
-            'status' => 'active',
+            'status'       => 'active',
             'activated_at' => now(),
         ]);
 
@@ -47,14 +47,13 @@ class OtpVerify extends Component
 
     public function resend()
     {
-
         $user = auth()->user();
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        $expiry = (int) config('citiescapes.auth.otp_expiry_minutes', 10);
+        $expiry = config('citiescapes.auth.otp_expiry_minutes', 10);
 
         OtpRecord::create([
-            'user_id' => $user->id,
-            'code' => Hash::make($code),
+            'user_id'    => $user->id,
+            'code'       => Hash::make($code),
             'expires_at' => now()->addMinutes($expiry),
         ]);
 

@@ -18,19 +18,19 @@ class Dashboard extends Component
     public function render()
     {
         return view('livewire.admin.dashboard', [
-            'totalRooms'      => Room::count(),
-            'availableRooms'  => Room::available()->count(),
-            'occupiedRooms'   => Room::occupied()->count(),
-            'maintenanceRooms'=> Room::underMaintenance()->count(),
-            'activeTenants'   => User::where('role', 'tenant')->where('status', 'active')->count(),
+            'totalRooms' => Room::count(),
+            'availableRooms' => Room::available()->count(),
+            'occupiedRooms' => Contract::active()->count(),
+            'maintenanceRooms' => Room::underMaintenance()->count(),
+            'activeTenants' => User::where('role', 'tenant')->where('status', 'active')->count(),
             'activeContracts' => Contract::active()->count(),
-            'expiringContracts'=> Contract::expiring(30)->count(),
-            'pendingInquiries'=> Inquiry::pending()->count(),
-            'unpaidBills'     => Bill::unpaid()->count(),
-            'overdueCount'    => Bill::whereIn('status', ['overdue','delinquent','eviction'])->count(),
+            'expiringContracts' => Contract::expiring(30)->count(),
+            'pendingInquiries' => Inquiry::pending()->count(),
+            'unpaidBills' => Bill::unpaid()->count(),
+            'overdueCount' => Bill::whereIn('status', ['overdue', 'delinquent', 'eviction'])->count(),
             'recentInquiries' => Inquiry::latest()->take(5)->get(),
-            'expiringList'    => Contract::expiring(30)->with('tenant','room')->take(5)->get(),
-            'rooms'           => Room::with('currentTenant')->orderBy('floor_level')->orderBy('room_number')->get(),
+            'expiringList' => Contract::expiring(30)->with('tenant', 'room')->take(5)->get(),
+            'rooms' => Room::with('currentTenant')->orderBy('floor_level')->orderBy('room_number')->get(),
         ]);
     }
 }

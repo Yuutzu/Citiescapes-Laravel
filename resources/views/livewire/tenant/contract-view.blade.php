@@ -1,12 +1,12 @@
 <div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">My Contract</h1>
+    <h1 class="text-2xl font-bold text-brand-900 mb-6">My Contract</h1>
 
     @if($contract)
         <div class="max-w-2xl space-y-6">
             {{-- Contract summary --}}
             <div class="card">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-gray-900">Contract Summary</h3>
+                    <h3 class="text-base font-semibold text-gray-900">Contract Summary</h3>
                     <span class="badge {{ match($contract->status){ 'draft'=>'bg-gray-100 text-gray-600','active'=>'bg-green-100 text-green-800', default=>'bg-gray-100 text-gray-600' } }}">{{ ucfirst($contract->status) }}</span>
                 </div>
                 <div class="grid grid-cols-2 gap-4 text-sm">
@@ -37,7 +37,7 @@
             {{-- Timer (active contracts) --}}
             @if($contract->status === 'active')
                 <div class="card">
-                    <h3 class="font-semibold text-gray-900 mb-3">Lease Timer</h3>
+                    <h3 class="text-base font-semibold text-gray-900 mb-3">Lease Timer</h3>
                     <div class="flex items-center gap-4 mb-2">
                         <span class="badge {{ $contract->timer_badge_css }} text-lg px-4 py-1">{{ $contract->days_remaining }} days remaining</span>
                         <span class="text-sm text-gray-500">Ends {{ $contract->end_date->format('M d, Y') }}</span>
