@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /c/laragon/bin/php/ 2>&1)",
+      "Read(//c/laragon/bin/php//**)",
+      "Bash(php -v)",
+      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe -m)",
+      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe --ini)",
+      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe artisan *)",
+      "Bash(ls /c/Users/lacro/.claude/projects/c--laragon-www-citiescapes/memory/ 2>&1)",
+      "Read(//c/Users/lacro/.claude/projects/c--laragon-www-citiescapes/memory//**)",
+      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe -r \"putenv\\('CITIESCAPES_LOCKOUT_MINUTES=15'\\); var_dump\\(env\\('CITIESCAPES_LOCKOUT_MINUTES', 15\\)\\);\")"
+    ]
+  }
+}

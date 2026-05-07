@@ -11,9 +11,9 @@ return [
     | Day 30: status escalates to Eviction
     */
     'penalty' => [
-        'grace_days'      => env('CITIESCAPES_PENALTY_GRACE_DAYS', 3),
-        'delinquent_day'  => env('CITIESCAPES_PENALTY_DELINQUENT_DAY', 14),
-        'eviction_day'    => env('CITIESCAPES_PENALTY_EVICTION_DAY', 30),
+        'grace_days'      => (int) env('CITIESCAPES_PENALTY_GRACE_DAYS', 3),
+        'delinquent_day'  => (int) env('CITIESCAPES_PENALTY_DELINQUENT_DAY', 14),
+        'eviction_day'    => (int) env('CITIESCAPES_PENALTY_EVICTION_DAY', 30),
         'default_daily_rate' => 100.00, // PHP
     ],
 
@@ -23,9 +23,9 @@ return [
     |--------------------------------------------------------------------------
     */
     'auth' => [
-        'lockout_threshold' => env('CITIESCAPES_LOCKOUT_THRESHOLD', 5),
-        'lockout_minutes'   => env('CITIESCAPES_LOCKOUT_MINUTES', 15),
-        'otp_expiry_minutes'=> env('CITIESCAPES_OTP_EXPIRY_MINUTES', 10),
+        'lockout_threshold' => (int) env('CITIESCAPES_LOCKOUT_THRESHOLD', 5),
+        'lockout_minutes'   => (int) env('CITIESCAPES_LOCKOUT_MINUTES', 15),
+        'otp_expiry_minutes'=> (int) env('CITIESCAPES_OTP_EXPIRY_MINUTES', 10),
     ],
 
     /*
