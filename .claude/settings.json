@@ -9,7 +9,19 @@
       "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe artisan *)",
       "Bash(ls /c/Users/lacro/.claude/projects/c--laragon-www-citiescapes/memory/ 2>&1)",
       "Read(//c/Users/lacro/.claude/projects/c--laragon-www-citiescapes/memory//**)",
-      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe -r \"putenv\\('CITIESCAPES_LOCKOUT_MINUTES=15'\\); var_dump\\(env\\('CITIESCAPES_LOCKOUT_MINUTES', 15\\)\\);\")"
+      "Bash(/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe -r \"putenv\\('CITIESCAPES_LOCKOUT_MINUTES=15'\\); var_dump\\(env\\('CITIESCAPES_LOCKOUT_MINUTES', 15\\)\\);\")",
+      "Bash(\"/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" artisan *)",
+      "WebFetch(domain:flareapp.io)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -r \"echo PHP_VERSION;\")",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Mail/TenantRequestMail.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Mail/RequestResponseMail.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Models/NotificationLog.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Livewire/NotificationBell.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Livewire/Admin/Rooms/InquiryManager.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" artisan *)",
+      "Bash(C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe artisan *)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Mail/InquiryReplyMail.php)",
+      "Bash(\"C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Livewire/Auth/Login.php)"
     ]
   }
 }

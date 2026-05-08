@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update on your {{ ucfirst($type) }}: {{ $subject }}</title>
+    <title>Update on your {{ ucfirst($type) }}: {{ $itemSubject }}</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -128,7 +128,7 @@
         <div class="body">
             <p style="font-size:15px;color:#374151;">Hello, <strong>{{ $tenantName }}</strong>,</p>
             <p style="font-size:14px;color:#6b7280;">The management has responded to your {{ $type }}.</p>
-            <h2 class="subject">{{ $subject }}</h2>
+            <h2 class="subject">{{ $itemSubject }}</h2>
             <p style="margin-bottom:8px;">
                 Status updated to:
                 <span

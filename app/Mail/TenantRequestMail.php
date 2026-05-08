@@ -15,14 +15,14 @@ class TenantRequestMail extends Mailable
     public function __construct(
         public string $tenantName,
         public string $type,
-        public string $subject,
+        public string $itemSubject,
         public string $body,
     ) {
     }
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Citiescapes — New ' . ucfirst($this->type) . ': ' . $this->subject);
+        return new Envelope(subject: 'Citiescapes — New ' . ucfirst($this->type) . ': ' . $this->itemSubject);
     }
 
     public function content(): Content

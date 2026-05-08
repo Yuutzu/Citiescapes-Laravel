@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New {{ ucfirst($type) }}: {{ $itemSubject }}</title>
+    <title><?php echo e($emailSubject); ?></title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -59,48 +59,32 @@
             padding: 32px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .badge-request {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .badge-complaint {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .subject {
-            font-size: 20px;
-            font-weight: 700;
-            color: #283246;
-            margin: 14px 0 8px;
+        .greeting {
+            font-size: 15px;
+            color: #374151;
+            margin-bottom: 16px;
         }
 
         .message-box {
             background: #f8fafc;
             border-left: 4px solid #283246;
             border-radius: 6px;
-            padding: 16px;
+            padding: 18px;
             font-size: 14px;
             color: #374151;
             line-height: 1.7;
             white-space: pre-line;
         }
 
-        .meta {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 20px;
+        .signature {
+            margin-top: 24px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .signature .name {
+            font-weight: 700;
+            color: #283246;
         }
 
         .divider {
@@ -127,18 +111,22 @@
             </div>
         </div>
         <div class="body">
-            <p style="font-size:15px;color:#374151;">A tenant has submitted a new <strong>{{ $type }}</strong>.</p>
-            <span class="badge badge-{{ $type }}">{{ ucfirst($type) }}</span>
-            <h2 class="subject">{{ $itemSubject }}</h2>
-            <div class="message-box">{{ $body }}</div>
-            <p class="meta">Submitted by: <strong>{{ $tenantName }}</strong></p>
+            <p class="greeting">Hello, <strong><?php echo e($recipientName); ?></strong>,</p>
+            <p style="font-size:14px;color:#6b7280;">Thank you for your interest in Citiescapes. Here is our reply to your inquiry:</p>
+            <div class="message-box"><?php echo e($body); ?></div>
+            <div class="signature">
+                <p style="margin:0;">Best regards,</p>
+                <p style="margin:4px 0 0;" class="name"><?php echo e($senderName); ?></p>
+                <p style="margin:0;font-size:13px;color:#6b7280;">Citiescapes Apartment Rental</p>
+            </div>
             <hr class="divider">
-            <p style="font-size:13px;color:#6b7280;">Log in to the admin panel to respond to this {{ $type }}.</p>
+            <p style="font-size:13px;color:#6b7280;">If you have any further questions, simply reply to this email or call us directly.</p>
         </div>
         <div class="footer">
-            &copy; {{ date('Y') }} Citiescapes Apartment Rental &bull; Remedios St., Bajada, Davao City
+            &copy; <?php echo e(date('Y')); ?> Citiescapes Apartment Rental &bull; Remedios St., Bajada, Davao City
         </div>
     </div>
 </body>
 
 </html>
+<?php /**PATH C:\laragon\www\citiescapes\resources\views/emails/inquiry-reply.blade.php ENDPATH**/ ?>

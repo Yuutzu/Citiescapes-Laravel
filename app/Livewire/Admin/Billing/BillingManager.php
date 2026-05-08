@@ -22,6 +22,20 @@ class BillingManager extends Component
     public string $search = '';
     public string $filterStatus = '';
 
+    // Sorting
+    public string $sortBy = 'created_at';
+    public string $sortDirection = 'desc';
+
+    public function sortBy($column)
+    {
+        if ($this->sortBy === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortBy = $column;
+            $this->sortDirection = 'asc';
+        }
+    }
+
     // Generate bill modal
     public bool $showGenerate = false;
     public ?int $genContractId = null;
@@ -60,33 +74,33 @@ class BillingManager extends Component
     public function generateBill()
     {
         $this->validate([
-            'genContractId'  => 'required|exists:contracts,id',
+            'genContractId' => 'required|exists:contracts,id',
             'genElectricity' => 'required|numeric|min:0',
-            'genWater'       => 'required|numeric|min:0',
-            'genWifi'        => 'required|numeric|min:0',
-            'genExtras'      => 'required|numeric|min:0',
+            'genWater' => 'required|numeric|min:0',
+            'genWifi' => 'required|numeric|min:0',
+            'genExtras' => 'required|numeric|min:0',
         ]);
 
-        $contract  = Contract::with('room')->findOrFail($this->genContractId);
-        $period    = now()->format('Y-m');
+        $contract = Contract::with('room')->findOrFail($this->genContractId);
+        $period = now()->format('Y-m');
         $utilities = $this->genElectricity + $this->genWater + $this->genWifi + $this->genExtras;
-        $total     = $contract->base_rent_rate + $utilities;
+        $total = $contract->base_rent_rate + $utilities;
 
         Bill::create([
-            'tenant_id'      => $contract->tenant_id,
-            'contract_id'    => $contract->id,
-            'room_id'        => $contract->room_id,
-            'type'           => 'monthly',
+            'tenant_id' => $contract->tenant_id,
+            'contract_id' => $contract->id,
+            'room_id' => $contract->room_id,
+            'type' => 'monthly',
             'billing_period' => $period,
-            'base_rent'      => $contract->base_rent_rate,
-            'utilities'      => $utilities,
-            'electricity'    => $this->genElectricity,
-            'water'          => $this->genWater,
-            'wifi'           => $this->genWifi,
-            'extras'         => $this->genExtras,
-            'extras_note'    => $this->genExtrasNote ?: null,
-            'total_amount'   => $total,
-            'due_date'       => now()->endOfMonth(),
+            'base_rent' => $contract->base_rent_rate,
+            'utilities' => $utilities,
+            'electricity' => $this->genElectricity,
+            'water' => $this->genWater,
+            'wifi' => $this->genWifi,
+            'extras' => $this->genExtras,
+            'extras_note' => $this->genExtrasNote ?: null,
+            'total_amount' => $total,
+            'due_date' => now()->endOfMonth(),
         ]);
 
         AuditLog::record('bill_generated', auth()->id(), 'gm', 'SS3', "Monthly bill for contract #{$contract->id}, period {$period}");
@@ -225,13 +239,12 @@ class BillingManager extends Component
     public function render()
     {
         $bills = Bill::with(['tenant', 'room', 'contract'])
-            ->when($this->search, fn($q) => $q->whereHas(
-                'tenant',
-                fn($qq) =>
-                $qq->where('full_name', 'like', "%{$this->search}%")
-            ))
-            ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
-            ->latest()
+            ->leftJoin('users', 'bills.tenant_id', '=', 'users.id')
+            ->when($this->search, fn($q) => $q->where('users.full_name', 'like', "%{$this->search}%"))
+            ->when($this->filterStatus, fn($q) => $q->where('bills.status', $this->filterStatus))
+            ->when($this->sortBy === 'tenant_name', fn($q) => $q->orderBy('users.full_name', $this->sortDirection))
+            ->when($this->sortBy !== 'tenant_name', fn($q) => $q->orderBy("bills.{$this->sortBy}", $this->sortDirection))
+            ->select('bills.*')
             ->paginate(15);
 
         $activeContracts = Contract::active()->with('tenant', 'room')->get();

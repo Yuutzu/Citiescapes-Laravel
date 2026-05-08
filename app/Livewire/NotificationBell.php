@@ -14,6 +14,23 @@ class NotificationBell extends Component
             ->update(['is_read' => true]);
     }
 
+    public function open(int $id)
+    {
+        $notif = NotificationLog::where('user_id', auth()->id())->find($id);
+        if (! $notif) {
+            return;
+        }
+
+        if (! $notif->is_read) {
+            $notif->update(['is_read' => true]);
+        }
+
+        $url = $notif->actionUrl(auth()->user()?->role);
+        if ($url) {
+            return $this->redirect($url, navigate: true);
+        }
+    }
+
     public function render()
     {
         $unreadCount = NotificationLog::where('user_id', auth()->id())

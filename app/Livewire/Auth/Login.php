@@ -39,7 +39,8 @@ class Login extends Component
         $user->autoUnlockIfExpired();
 
         if ($user->isLocked()) {
-            $mins = $user->locked_until->diffInMinutes(now());
+            $mins = (int) ceil(now()->diffInSeconds($user->locked_until, true) / 60);
+            $mins = max($mins, 1);
             $this->addError('email', "Account locked. Try again in {$mins} minute(s).");
             return;
         }

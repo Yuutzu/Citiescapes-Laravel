@@ -25,8 +25,9 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-brand-900">
                 <tr>
-                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">
-                        Tenant</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider cursor-pointer hover:text-white"
+                        wire:click="sortBy('tenant_name')">
+                        Tenant @if($sortBy === 'tenant_name') @if($sortDirection === 'asc') ↑ @else ↓ @endif @endif</th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Room
                     </th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">
@@ -206,7 +207,8 @@
                     </div>
                     <div><label class="form-label">Reason (required) *</label><textarea wire:model="overrideReason" rows="2"
                             class="form-input"></textarea>@error('overrideReason')<p class="text-xs text-red-600 mt-1">
-                            {{ $message }}</p>@enderror</div>
+                                {{ $message }}
+                            </p>@enderror</div>
                     <div class="flex justify-end gap-3 pt-2">
                         <button type="button" wire:click="$set('showOverride', false)" class="btn-secondary">Cancel</button>
                         <button type="submit" class="btn-primary">Save Override</button>

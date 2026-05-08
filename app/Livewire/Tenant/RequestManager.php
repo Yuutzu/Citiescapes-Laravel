@@ -63,7 +63,7 @@ class RequestManager extends Component
 
             if ($gm->email) {
                 Mail::to($gm->email)->send(
-                    new TenantRequestMail(auth()->user()->full_name, $this->type, $this->subject, $this->body)
+                    new TenantRequestMail(auth()->user()->full_name, $this->type, $this->subject, $this->body),
                 );
             }
         }

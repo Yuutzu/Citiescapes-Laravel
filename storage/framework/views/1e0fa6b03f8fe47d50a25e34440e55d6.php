@@ -16,10 +16,11 @@
         </div>
         <div class="max-h-72 overflow-y-auto divide-y divide-gray-50">
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $recent; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $notif): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <div class="px-4 py-3 <?php echo e($notif->is_read ? 'bg-white' : 'bg-blue-50/50'); ?>">
+                <button type="button" wire:click="open(<?php echo e($notif->id); ?>)"
+                        class="w-full text-left px-4 py-3 transition hover:bg-gray-50 focus:outline-none focus:bg-gray-50 <?php echo e($notif->is_read ? 'bg-white' : 'bg-blue-50/50'); ?>">
                     <p class="text-sm text-gray-800"><?php echo e($notif->message); ?></p>
                     <p class="text-xs text-gray-400 mt-1"><?php echo e($notif->created_at->diffForHumans()); ?> &bull; <?php echo e($notif->source); ?></p>
-                </div>
+                </button>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="px-4 py-6 text-center text-sm text-gray-400">No notifications yet.</div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>

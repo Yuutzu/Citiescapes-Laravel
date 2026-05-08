@@ -8,26 +8,25 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RequestResponseMail extends Mailable
+class InquiryReplyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $tenantName,
-        public string $type,
-        public string $itemSubject,
-        public string $status,
-        public string $adminResponse,
+        public string $recipientName,
+        public string $emailSubject,
+        public string $body,
+        public string $senderName,
     ) {
     }
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Citiescapes — Update on your ' . ucfirst($this->type) . ': ' . $this->itemSubject);
+        return new Envelope(subject: $this->emailSubject);
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.request-response');
+        return new Content(view: 'emails.inquiry-reply');
     }
 }
