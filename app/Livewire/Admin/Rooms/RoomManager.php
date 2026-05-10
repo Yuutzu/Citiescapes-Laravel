@@ -29,7 +29,7 @@ class RoomManager extends Component
     // Form fields
     public string $room_number = '';
     public int $floor_level = 1;
-    public string $room_type = 'small';
+    public string $room_type = 'compact';
     public float $rate = 3500;
     public int $max_occupants = 3;
     public string $status = 'available';
@@ -69,7 +69,7 @@ class RoomManager extends Component
         $this->validate([
             'room_number'  => 'required|max:10|unique:rooms,room_number,' . $this->editId,
             'floor_level'  => 'required|in:1,2,3',
-            'room_type'    => 'required|in:small,big',
+            'room_type'    => 'required|in:compact,spacious',
             'rate'         => 'required|numeric|min:0',
             'max_occupants'=> 'required|integer|min:1|max:10',
             'status'       => 'required|in:available,occupied,under_maintenance',
@@ -154,7 +154,7 @@ class RoomManager extends Component
         $this->editId = null;
         $this->room_number = '';
         $this->floor_level = 1;
-        $this->room_type = 'small';
+        $this->room_type = 'compact';
         $this->rate = 3500;
         $this->max_occupants = 3;
         $this->status = 'available';

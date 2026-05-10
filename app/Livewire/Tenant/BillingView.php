@@ -3,6 +3,7 @@
 namespace App\Livewire\Tenant;
 
 use App\Models\Bill;
+use App\Models\InitialPayment;
 use App\Models\Payment;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -19,6 +20,11 @@ class BillingView extends Component
             ->latest()
             ->get();
 
-        return view('livewire.tenant.billing-view', compact('bills'));
+        $initialPayment = InitialPayment::with('contract.room')
+            ->where('tenant_id', auth()->id())
+            ->latest()
+            ->first();
+
+        return view('livewire.tenant.billing-view', compact('bills', 'initialPayment'));
     }
 }

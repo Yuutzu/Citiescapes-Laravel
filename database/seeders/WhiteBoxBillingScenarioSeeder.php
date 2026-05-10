@@ -62,7 +62,7 @@ class WhiteBoxBillingScenarioSeeder extends Seeder
             $room = Room::create([
                 'room_number'        => 'W'.str_pad((string)$i, 2, '0', STR_PAD_LEFT),
                 'floor_level'        => 1,
-                'room_type'          => 'small',
+                'room_type'          => 'compact',
                 'rate'               => 10000,
                 'max_occupants'      => 2,
                 'status'             => 'occupied',
@@ -94,7 +94,6 @@ class WhiteBoxBillingScenarioSeeder extends Seeder
                 'electricity'    => 0,
                 'water'          => 0,
                 'wifi'           => 0,
-                'extras'         => 0,
                 'deposit_amount' => 0,
                 'room_key_fee'   => 0,
                 'penalty_amount' => 0,

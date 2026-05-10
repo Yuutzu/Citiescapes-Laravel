@@ -21,7 +21,7 @@
 
             {{-- ===== COMPACT (SMALL) ROOM ===== --}}
             <div class="bg-white rounded-2xl shadow-lg ring-1 ring-brand-200 overflow-hidden" x-data="{
-                     photos: @js($smallPhotos),
+                     photos: @js($compactPhotos),
                      current: 0,
                      timer: null,
                      next() { this.current = (this.current + 1) % this.photos.length; },
@@ -87,7 +87,7 @@
                         </div>
                         <div class="ml-4 shrink-0 text-right">
                             <p class="text-xl font-extrabold text-brand-900">
-                                ₱{{ number_format($smallRoom?->rate ?? 3500, 2) }}</p>
+                                ₱{{ number_format($compactRoom?->rate ?? 3500, 2) }}</p>
                             <p class="text-xs text-brand-400">per month</p>
                         </div>
                     </div>
@@ -96,11 +96,11 @@
                     <div class="flex flex-wrap items-center gap-3 text-xs text-brand-600 mb-5">
                         <span class="flex items-center gap-1">
                             <i class="fas fa-users text-brand-600"></i>
-                            Max {{ $smallRoom?->max_occupants ?? 3 }} persons
+                            Max {{ $compactRoom?->max_occupants ?? 3 }} persons
                         </span>
                         <span class="flex items-center gap-1 font-semibold text-green-700">
                             <i class="fas fa-circle-check"></i>
-                            {{ $smallCount }} available now
+                            {{ $compactCount }} available now
                         </span>
                     </div>
 
@@ -136,7 +136,7 @@
 
             {{-- ===== SPACIOUS (BIG) ROOM ===== --}}
             <div class="bg-white rounded-2xl shadow-lg ring-1 ring-brand-200 overflow-hidden" x-data="{
-                     photos: @js($bigPhotos),
+                     photos: @js($spaciousPhotos),
                      current: 0,
                      timer: null,
                      next() { this.current = (this.current + 1) % this.photos.length; },
@@ -195,7 +195,7 @@
                         </div>
                         <div class="ml-4 shrink-0 text-right">
                             <p class="text-xl font-extrabold text-brand-900">
-                                ₱{{ number_format($bigRoom?->rate ?? 5000, 2) }}</p>
+                                ₱{{ number_format($spaciousRoom?->rate ?? 5000, 2) }}</p>
                             <p class="text-xs text-brand-400">per month</p>
                         </div>
                     </div>
@@ -203,11 +203,11 @@
                     <div class="flex flex-wrap items-center gap-3 text-xs text-brand-600 mb-5">
                         <span class="flex items-center gap-1">
                             <i class="fas fa-users text-brand-600"></i>
-                            Max {{ $bigRoom?->max_occupants ?? 4 }} persons
+                            Max {{ $spaciousRoom?->max_occupants ?? 4 }} persons
                         </span>
                         <span class="flex items-center gap-1 font-semibold text-green-700">
                             <i class="fas fa-circle-check"></i>
-                            {{ $bigCount }} available now
+                            {{ $spaciousCount }} available now
                         </span>
                     </div>
 
@@ -304,8 +304,8 @@
                                     <label class="form-label">Preferred Room Type</label>
                                     <select wire:model="preferred_room_type" class="form-input">
                                         <option value="any">Any</option>
-                                        <option value="small">Small</option>
-                                        <option value="big">Big</option>
+                                        <option value="compact">Compact</option>
+                                        <option value="spacious">Spacious</option>
                                     </select>
                                 </div>
                             </div>

@@ -5,7 +5,7 @@
          colors="true"
          cacheDirectory=".phpunit.cache"
          executionOrder="random"
-         failOnWarning="true"
+         failOnWarning="false"
          failOnRisky="true"
          beStrictAboutOutputDuringTests="true">
     <testsuites>

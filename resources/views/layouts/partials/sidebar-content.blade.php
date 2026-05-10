@@ -20,7 +20,7 @@
                 Overview
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS1 — Rooms</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Rooms</p>
             <a href="{{ route('admin.rooms.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -38,7 +38,7 @@
                 Inquiries
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS2 — Tenants</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Tenants</p>
             <a href="{{ route('admin.tenants.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.tenants.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -48,7 +48,7 @@
                 Tenant Management
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS3 — Billing</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Billing</p>
             <a href="{{ route('admin.billing.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -58,7 +58,7 @@
                 Billing
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS4 — Contracts</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Contracts</p>
             <a href="{{ route('admin.contracts.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -68,7 +68,7 @@
                 Contracts
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS5 — Reports</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Reports</p>
             <a href="{{ route('admin.reports.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -94,7 +94,7 @@
                 Tenant Requests
             </a>
 
-            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">SS6 — System</p>
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">System</p>
             <a href="{{ route('admin.audit-log') }}"
                 class="sidebar-link {{ request()->routeIs('admin.audit-log') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

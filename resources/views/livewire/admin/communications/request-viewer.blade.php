@@ -130,7 +130,9 @@
                         <td class="px-6 py-4 text-sm text-gray-500">{{ $req->created_at->diffForHumans() }}</td>
                         <td class="px-6 py-4 text-right">
                             <button wire:click="view({{ $req->id }})"
-                                class="text-sm text-brand-700 hover:text-brand-900 font-medium">Respond</button>
+                                class="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                                <i class="fas fa-reply text-[10px]"></i> Respond
+                            </button>
                         </td>
                     </tr>
                 @empty

@@ -19,7 +19,7 @@
                     <i class="fas fa-chart-line"></i> Dashboard
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Rooms (SS1)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Rooms</p>
                 <a href="{{ route('admin.rooms.index') }}" class="sidebar-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-door-open"></i> Rooms Management
                 </a>
@@ -27,27 +27,27 @@
                     <i class="fas fa-inbox"></i> Inquiries
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Tenants (SS2)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Tenants</p>
                 <a href="{{ route('admin.tenants.index') }}" class="sidebar-link {{ request()->routeIs('admin.tenants.*') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-users"></i> Tenants Records
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Billing (SS3)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Billing</p>
                 <a href="{{ route('admin.billing.index') }}" class="sidebar-link {{ request()->routeIs('admin.billing.*') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-file-invoice-dollar"></i> Billing
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Contracts (SS4)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Contracts</p>
                 <a href="{{ route('admin.contracts.index') }}" class="sidebar-link {{ request()->routeIs('admin.contracts.*') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-file-contract"></i> Contracts
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Reports (SS5)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Reports</p>
                 <a href="{{ route('admin.reports.index') }}" class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-clipboard-list"></i> Reports & Archives
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">System (SS6)</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">System</p>
                 <a href="{{ route('admin.audit-log') }}" class="sidebar-link {{ request()->routeIs('admin.audit-log') ? 'active' : '' }}" wire:navigate>
                     <i class="fas fa-shield-alt"></i> Audit Log
                 </a>

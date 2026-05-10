@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Billing;
 use App\Models\AuditLog;
 use App\Models\Bill;
 use App\Models\Contract;
+use App\Models\InitialPayment;
 use App\Models\Payment;
 use App\Models\PenaltyOverride;
 use App\Models\Archive;
@@ -42,15 +43,16 @@ class BillingManager extends Component
     public float $genElectricity = 0;
     public float $genWater = 0;
     public float $genWifi = 0;
-    public float $genExtras = 0;
-    public string $genExtrasNote = '';
 
-    // Record initial fees modal
+    // Record initial payment modal — amounts auto-fill from contract (SS4)
     public bool $showInitial = false;
     public ?int $initContractId = null;
-    public float $initDeposit = 0;
-    public float $initFirstMonth = 0;
-    public float $initKeyFee = 0;
+    public string $initDateReceived = '';
+    public string $initPaymentMethod = 'cash';
+    public string $initReferenceNumber = '';
+
+    /** @var array<int, array{name: string, fee: float|string}> */
+    public array $initAmenities = [];
 
     // Confirm payment modal
     public bool $showPayment = false;
@@ -67,7 +69,7 @@ class BillingManager extends Component
 
     public function openGenerate()
     {
-        $this->reset(['genContractId', 'genElectricity', 'genWater', 'genWifi', 'genExtras', 'genExtrasNote']);
+        $this->reset(['genContractId', 'genElectricity', 'genWater', 'genWifi']);
         $this->showGenerate = true;
     }
 
@@ -78,12 +80,11 @@ class BillingManager extends Component
             'genElectricity' => 'required|numeric|min:0',
             'genWater' => 'required|numeric|min:0',
             'genWifi' => 'required|numeric|min:0',
-            'genExtras' => 'required|numeric|min:0',
         ]);
 
         $contract = Contract::with('room')->findOrFail($this->genContractId);
         $period = now()->format('Y-m');
-        $utilities = $this->genElectricity + $this->genWater + $this->genWifi + $this->genExtras;
+        $utilities = $this->genElectricity + $this->genWater + $this->genWifi;
         $total = $contract->base_rent_rate + $utilities;
 
         Bill::create([
@@ -97,8 +98,6 @@ class BillingManager extends Component
             'electricity' => $this->genElectricity,
             'water' => $this->genWater,
             'wifi' => $this->genWifi,
-            'extras' => $this->genExtras,
-            'extras_note' => $this->genExtrasNote ?: null,
             'total_amount' => $total,
             'due_date' => now()->endOfMonth(),
         ]);
@@ -110,38 +109,103 @@ class BillingManager extends Component
 
     public function openInitial()
     {
-        $this->reset(['initContractId', 'initDeposit', 'initFirstMonth', 'initKeyFee']);
+        $this->reset(['initContractId', 'initPaymentMethod', 'initReferenceNumber', 'initAmenities']);
+        $this->initDateReceived = now()->toDateString();
+        $this->initPaymentMethod = 'cash';
         $this->showInitial = true;
+    }
+
+    /**
+     * Selected contract for the initial-payment modal.
+     * The view reads amounts from this object — fields are read-only.
+     */
+    public function getInitContractProperty(): ?Contract
+    {
+        return $this->initContractId ? Contract::find($this->initContractId) : null;
+    }
+
+    /**
+     * When the GM picks a contract, prefill the amenities list with whatever
+     * was captured on the contract (SS4). The GM can still add/remove rows.
+     */
+    public function updatedInitContractId($value): void
+    {
+        $contract = $value ? Contract::find($value) : null;
+        $this->initAmenities = $contract?->requested_amenities ?? [];
+    }
+
+    public function addInitAmenity(): void
+    {
+        $this->initAmenities[] = ['name' => '', 'fee' => 0];
+    }
+
+    public function removeInitAmenity(int $index): void
+    {
+        unset($this->initAmenities[$index]);
+        $this->initAmenities = array_values($this->initAmenities);
+    }
+
+    public function getInitAmenitiesTotalProperty(): float
+    {
+        return collect($this->initAmenities)
+            ->sum(fn($row) => (float) ($row['fee'] ?? 0));
     }
 
     public function recordInitial()
     {
         $this->validate([
-            'initContractId' => 'required|exists:contracts,id',
-            'initDeposit' => 'required|numeric|min:0',
-            'initFirstMonth' => 'required|numeric|min:0',
-            'initKeyFee' => 'required|numeric|min:0',
+            'initContractId'         => 'required|exists:contracts,id',
+            'initDateReceived'       => 'required|date',
+            'initPaymentMethod'      => 'required|in:cash,bank_transfer,e_wallet',
+            'initReferenceNumber'    => 'nullable|string|max:100',
+            'initAmenities.*.name'   => 'nullable|string|max:80',
+            'initAmenities.*.fee'    => 'nullable|numeric|min:0',
         ]);
 
         $contract = Contract::findOrFail($this->initContractId);
-        $total = $this->initDeposit + $this->initFirstMonth + $this->initKeyFee;
 
-        Bill::create([
-            'tenant_id' => $contract->tenant_id,
-            'contract_id' => $contract->id,
-            'room_id' => $contract->room_id,
-            'type' => 'initial',
-            'billing_period' => 'initial',
-            'deposit_amount' => $this->initDeposit,
-            'base_rent' => $this->initFirstMonth,
-            'room_key_fee' => $this->initKeyFee,
-            'total_amount' => $total,
-            'due_date' => now()->addDays(3),
+        if ($contract->initialPayment()->exists()) {
+            session()->flash('error', 'Initial payment already recorded for this contract.');
+            return;
+        }
+
+        $cleanAmenities = collect($this->initAmenities)
+            ->map(fn($row) => [
+                'name' => trim((string) ($row['name'] ?? '')),
+                'fee'  => (float) ($row['fee'] ?? 0),
+            ])
+            ->filter(fn($row) => $row['name'] !== '')
+            ->values()
+            ->all();
+
+        $amenitiesTotal = collect($cleanAmenities)->sum('fee');
+
+        $deposit   = (float) $contract->deposit;
+        $firstRent = (float) ($contract->first_month_rent ?? $contract->base_rent_rate);
+        $keyFee    = (float) $contract->room_key_fee;
+        $total     = $deposit + $firstRent + $keyFee + $amenitiesTotal;
+
+        InitialPayment::create([
+            'tenant_id'        => $contract->tenant_id,
+            'contract_id'      => $contract->id,
+            'deposit_amount'   => $deposit,
+            'first_month_rent' => $firstRent,
+            'room_key_fee'     => $keyFee,
+            'amenities'        => $cleanAmenities ?: null,
+            'amenities_total'  => $amenitiesTotal,
+            'total_collected'  => $total,
+            'date_received'    => $this->initDateReceived,
+            'payment_method'   => $this->initPaymentMethod,
+            'reference_number' => $this->initReferenceNumber ?: null,
+            'recorded_by'      => auth()->id(),
         ]);
 
-        AuditLog::record('initial_fees_recorded', auth()->id(), 'gm', 'SS3', "Initial fees for contract #{$contract->id}");
+        AuditLog::record('initial_payment_recorded', auth()->id(), 'gm', 'SS3',
+            "Initial payment for contract #{$contract->id}: ₱" . number_format($total, 2)
+            . " ({$this->initPaymentMethod})");
+
         $this->showInitial = false;
-        session()->flash('success', 'Initial fees recorded.');
+        session()->flash('success', 'Initial payment recorded.');
     }
 
     public function openPayment(int $billId)
@@ -249,6 +313,15 @@ class BillingManager extends Component
 
         $activeContracts = Contract::active()->with('tenant', 'room')->get();
 
-        return view('livewire.admin.billing.billing-manager', compact('bills', 'activeContracts'));
+        // Contracts eligible for initial payment recording: draft or active,
+        // and no initial payment yet.
+        $contractsAwaitingInitial = Contract::with('tenant', 'room')
+            ->whereIn('status', ['draft', 'active'])
+            ->whereDoesntHave('initialPayment')
+            ->get();
+
+        return view('livewire.admin.billing.billing-manager', compact(
+            'bills', 'activeContracts', 'contractsAwaitingInitial'
+        ));
     }
 }

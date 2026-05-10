@@ -54,25 +54,42 @@
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $room->currentTenant?->full_name ?? '—' }}</td>
                         <td class="px-4 py-3 text-right">
-                            <div class="flex items-center justify-end gap-1" x-data="{ open: false }">
+                            <div class="flex items-center justify-end gap-2" x-data="{ open: false }">
+                                {{-- Edit pill (brand) --}}
                                 <button wire:click="edit({{ $room->id }})"
-                                    class="text-brand-600 hover:text-brand-800 text-xs font-medium">Edit</button>
+                                    class="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                                    <i class="fas fa-pen text-[10px]"></i> Edit
+                                </button>
+
+                                {{-- Status pill (gray, opens dropdown) --}}
                                 <div class="relative">
-                                    <button @click="open = !open" class="text-gray-400 hover:text-gray-600 text-xs">Status
-                                        ▾</button>
-                                    <div x-show="open" @click.away="open = false"
+                                    <button @click="open = !open" type="button"
+                                        class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 transition">
+                                        Status <span class="text-gray-400">▾</span>
+                                    </button>
+                                    <div x-show="open" @click.away="open = false" x-cloak
                                         class="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg ring-1 ring-gray-200 py-1 z-20">
                                         <button wire:click="updateStatus({{ $room->id }}, 'available')" @click="open=false"
-                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-green-700">Available</button>
+                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-green-700">
+                                            <i class="fas fa-circle text-[7px] mr-1.5"></i> Available
+                                        </button>
                                         <button wire:click="updateStatus({{ $room->id }}, 'occupied')" @click="open=false"
-                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-blue-700">Occupied</button>
+                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-blue-700">
+                                            <i class="fas fa-circle text-[7px] mr-1.5"></i> Occupied
+                                        </button>
                                         <button wire:click="updateStatus({{ $room->id }}, 'under_maintenance')"
                                             @click="open=false"
-                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-amber-700">Maintenance</button>
+                                            class="block w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 text-amber-700">
+                                            <i class="fas fa-circle text-[7px] mr-1.5"></i> Maintenance
+                                        </button>
                                     </div>
                                 </div>
+
+                                {{-- Archive pill (red outline) --}}
                                 <button wire:click="archiveRoom({{ $room->id }})" wire:confirm="Archive this room record?"
-                                    class="text-gray-400 hover:text-red-600 text-xs">Archive</button>
+                                    class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-inset ring-red-300 hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                    <i class="fas fa-box-archive text-[10px]"></i> Archive
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -108,8 +125,8 @@
                         <div>
                             <label class="form-label">Type *</label>
                             <select wire:model="room_type" class="form-input">
-                                <option value="small">Small</option>
-                                <option value="big">Big</option>
+                                <option value="compact">Compact</option>
+                                <option value="spacious">Spacious</option>
                             </select>
                         </div>
                         <div>

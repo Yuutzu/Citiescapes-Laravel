@@ -42,9 +42,17 @@
                             <a href="{{ asset('storage/' . $a->scan_file_path) }}" target="_blank" class="text-xs text-brand-600 hover:underline">View</a>
                         @else — @endif
                     </td>
-                    <td class="px-4 py-3 text-right space-x-1">
-                        <button wire:click="restore({{ $a->id }})" wire:confirm="Restore this record?" class="text-xs text-green-600 hover:text-green-800">Restore</button>
-                        <button wire:click="permanentDelete({{ $a->id }})" wire:confirm="PERMANENTLY delete? Cannot be undone." class="text-xs text-red-500 hover:text-red-700">Delete</button>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button wire:click="restore({{ $a->id }})" wire:confirm="Restore this record?"
+                                class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                <i class="fas fa-rotate-left text-[10px]"></i> Restore
+                            </button>
+                            <button wire:click="permanentDelete({{ $a->id }})" wire:confirm="PERMANENTLY delete? Cannot be undone."
+                                class="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <i class="fas fa-trash text-[10px]"></i> Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

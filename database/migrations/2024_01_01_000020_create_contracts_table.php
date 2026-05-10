@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('room_id')->constrained('rooms')->cascadeOnDelete();
             $table->decimal('base_rent_rate', 10, 2);
             $table->decimal('deposit', 10, 2)->default(0);
+            $table->decimal('first_month_rent', 10, 2)->nullable();
             $table->decimal('room_key_fee', 10, 2)->default(0);
             $table->date('start_date');
             $table->date('end_date');

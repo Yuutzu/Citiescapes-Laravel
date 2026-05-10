@@ -23,6 +23,15 @@
             <label for="password_confirmation" class="form-label">Confirm New Password</label>
             <input wire:model="password_confirmation" type="password" id="password_confirmation" class="form-input">
         </div>
-        <button type="submit" class="btn-primary w-full justify-center">Update Password</button>
+        <div class="flex flex-col gap-2 pt-2">
+            <button type="submit" class="btn-primary w-full justify-center">Update Password</button>
+            @unless(auth()->user()->must_change_password)
+                <a href="{{ auth()->user()->isGm() ? route('admin.dashboard') : route('tenant.dashboard') }}"
+                    wire:navigate
+                    class="w-full inline-flex items-center justify-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-gray-600 hover:text-brand-700 hover:bg-gray-50 transition">
+                    <i class="fas fa-arrow-left text-[11px]"></i> Return to {{ auth()->user()->isGm() ? 'Admin Dashboard' : 'My Portal' }}
+                </a>
+            @endunless
+        </div>
     </form>
 </div>

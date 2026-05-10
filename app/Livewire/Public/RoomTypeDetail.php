@@ -9,12 +9,12 @@ use Livewire\Component;
 #[Layout('layouts.public')]
 class RoomTypeDetail extends Component
 {
-    public string $type = 'big';
+    public string $type = 'spacious';
 
     public function mount(string $type): void
     {
-        abort_unless(in_array($type, ['large', 'small']), 404);
-        $this->type = $type === 'large' ? 'big' : 'small';
+        abort_unless(in_array($type, ['spacious', 'compact']), 404);
+        $this->type = $type;
     }
 
     public function render()
@@ -24,7 +24,7 @@ class RoomTypeDetail extends Component
             ->orderBy('room_number')
             ->get();
 
-        $label      = $this->type === 'big' ? 'Large' : 'Small';
+        $label      = $this->type === 'spacious' ? 'Spacious' : 'Compact';
         $available  = $rooms->where('status', 'available')->count();
         $allPhotos  = $rooms->pluck('photos')->filter()->flatten()->values()->toArray();
         $amenities  = $rooms->pluck('amenities')->filter()->flatten()->unique()->values()->toArray();

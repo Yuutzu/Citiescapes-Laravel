@@ -66,19 +66,29 @@
                                     class="text-xs text-brand-600 hover:underline">View</a>
                             @else <span class="text-xs text-gray-400">—</span> @endif
                         </td>
-                        <td class="px-4 py-3 text-right space-x-1">
-                            <button wire:click="edit({{ $c->id }})"
-                                class="text-xs text-brand-600 hover:text-brand-800">Edit</button>
-                            @if($c->status === 'draft')
-                                <button wire:click="activate({{ $c->id }})"
-                                    class="text-xs text-green-600 hover:text-green-800 font-medium">Activate</button>
-                            @endif
-                            @if($c->status === 'active')
-                                <button wire:click="renew({{ $c->id }})"
-                                    class="text-xs text-green-600 hover:text-green-800">Renew</button>
-                                <button wire:click="openTerminate({{ $c->id }})"
-                                    class="text-xs text-red-500 hover:text-red-700">Terminate</button>
-                            @endif
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-2 flex-wrap">
+                                <button wire:click="edit({{ $c->id }})"
+                                    class="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                                    <i class="fas fa-pen text-[10px]"></i> Edit
+                                </button>
+                                @if($c->status === 'draft')
+                                    <button wire:click="activate({{ $c->id }})"
+                                        class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                        <i class="fas fa-bolt text-[10px]"></i> Activate
+                                    </button>
+                                @endif
+                                @if($c->status === 'active')
+                                    <button wire:click="renew({{ $c->id }})"
+                                        class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-300 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+                                        <i class="fas fa-rotate-right text-[10px]"></i> Renew
+                                    </button>
+                                    <button wire:click="openTerminate({{ $c->id }})"
+                                        class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-inset ring-red-300 hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                        <i class="fas fa-ban text-[10px]"></i> Terminate
+                                    </button>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @endforeach
@@ -119,6 +129,31 @@
                         <div><label class="form-label">Key Fee (₱)</label><input wire:model="room_key_fee" type="number"
                                 step="0.01" class="form-input"></div>
                     </div>
+
+                    {{-- Requested Amenities — billed once at move-in via SS3 initial payment --}}
+                    <div class="rounded-md border border-gray-200 p-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Requested Amenities</p>
+                                <p class="text-[11px] text-gray-500">One-time fees added to the move-in payment. Leave blank if the tenant didn't request any.</p>
+                            </div>
+                            <button type="button" wire:click="addAmenity" class="text-xs text-brand-600 hover:text-brand-800 font-medium">+ Add</button>
+                        </div>
+
+                        @forelse($amenities as $i => $a)
+                            <div class="grid grid-cols-12 gap-2 items-center" wire:key="amenity-{{ $i }}">
+                                <input wire:model="amenities.{{ $i }}.name" type="text" placeholder="e.g. Aircon"
+                                    class="form-input col-span-7 text-sm">
+                                <input wire:model="amenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (₱)"
+                                    class="form-input col-span-4 text-sm">
+                                <button type="button" wire:click="removeAmenity({{ $i }})"
+                                    class="col-span-1 text-red-500 hover:text-red-700 text-lg leading-none">&times;</button>
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-400 italic">No amenities requested.</p>
+                        @endforelse
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div><label class="form-label">Start Date *</label><input wire:model="start_date" type="date"
                                 class="form-input"></div>

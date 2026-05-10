@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Bill;
 use App\Models\Contract;
+use App\Models\InitialPayment;
 use App\Models\Inquiry;
 use App\Models\Payment;
 use App\Models\Room;
@@ -57,6 +58,9 @@ class Dashboard extends Component
             'totalRevenue'      => Payment::whereNotNull('confirmed_at')->sum('amount'),
             'recentInquiries'   => Inquiry::latest()->take(5)->get(),
             'expiringList'      => Contract::expiring(30)->with('tenant', 'room')->take(5)->get(),
+            'recentInitialPayments' => InitialPayment::with('tenant', 'contract.room')
+                ->latest('date_received')->take(5)->get(),
+            'totalInitialCollected' => InitialPayment::sum('total_collected'),
             'rooms'             => Room::with('currentTenant')->orderBy('floor_level')->orderBy('room_number')->get(),
             'revenueLabels'     => $months->keys()->map(fn($m) => \Carbon\Carbon::parse($m)->format('M Y'))->values(),
             'revenueValues'     => $months->values(),

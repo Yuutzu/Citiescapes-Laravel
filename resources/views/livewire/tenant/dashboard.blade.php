@@ -44,20 +44,98 @@
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unpaid Bills</p>
                 <p class="text-3xl font-bold {{ $unpaidCount > 0 ? 'text-red-600' : 'text-green-600' }} mt-2">
                     {{ $unpaidCount }}</p>
+                <a href="{{ route('tenant.billing') }}" wire:navigate
+                    class="mt-3 inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                    <i class="fas fa-receipt text-[10px]"></i> View My Bills
+                </a>
             </div>
-            @if($latestBill)
-                <div class="card border-t-4 border-brand-400">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Latest Bill</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">₱{{ number_format($latestBill->total_amount, 2) }}</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="badge {{ $latestBill->status_badge }}">{{ ucfirst($latestBill->status) }}</span>
+        </div>
+    </div>
+
+    {{-- Latest Bill --}}
+    <div class="card border-l-4 {{ $latestBill ? ($latestBill->status === 'paid' ? 'border-emerald-500' : ($latestBill->days_overdue > 0 ? 'border-red-500' : 'border-amber-500')) : 'border-gray-300' }} mb-6">
+        @if($latestBill)
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <p class="text-[11px] uppercase tracking-wide font-semibold {{ $latestBill->status === 'paid' ? 'text-emerald-700' : ($latestBill->days_overdue > 0 ? 'text-red-700' : 'text-amber-700') }}">
+                        Latest Bill
+                    </p>
+                    <p class="font-semibold text-gray-900">
+                        {{ $latestBill->type === 'initial' ? 'Initial Fees' : ($latestBill->billing_period ?? 'Monthly') }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        Room {{ $latestBill->room?->room_number ?? '—' }}
+                        &bull; Due {{ $latestBill->due_date->format('M d, Y') }}
                         @if($latestBill->days_overdue > 0 && $latestBill->status !== 'paid')
-                            <p class="text-xs text-red-500">{{ $latestBill->days_overdue }}d overdue</p>
+                            <span class="text-red-600 font-medium">&bull; {{ $latestBill->days_overdue }}d overdue</span>
                         @endif
-                    </div>
+                    </p>
+                </div>
+                <span class="badge {{ $latestBill->status_badge }}">{{ ucfirst($latestBill->status) }}</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                @if($latestBill->type === 'initial')
+                    <div><span class="text-gray-500">Deposit</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->deposit_amount, 2) }}</span></div>
+                    <div><span class="text-gray-500">First Month</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->base_rent, 2) }}</span></div>
+                    <div><span class="text-gray-500">Key Fee</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->room_key_fee, 2) }}</span></div>
+                @else
+                    <div><span class="text-gray-500">Base Rent</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->base_rent, 2) }}</span></div>
+                    <div><span class="text-gray-500">Electricity</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->electricity ?? 0, 2) }}</span></div>
+                    <div><span class="text-gray-500">Water</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->water ?? 0, 2) }}</span></div>
+                    <div><span class="text-gray-500">WiFi</span><br>
+                        <span class="font-medium">₱{{ number_format($latestBill->wifi ?? 0, 2) }}</span></div>
+                @endif
+            </div>
+
+            @if($latestBill->penalty_amount > 0)
+                <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-sm">
+                    <span class="text-gray-500">Penalty</span>
+                    <span class="font-medium text-red-600">₱{{ number_format($latestBill->penalty_amount, 2) }}</span>
                 </div>
             @endif
-        </div>
+
+            <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                <span class="text-sm text-gray-500">Total</span>
+                <span class="text-lg font-bold text-gray-900">₱{{ number_format($latestBill->total_amount, 2) }}</span>
+            </div>
+
+            @if($latestBill->payments->count())
+                <div class="mt-3 pt-3 border-t border-gray-100">
+                    <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Payment Records</p>
+                    @foreach($latestBill->payments as $p)
+                        <div class="flex items-center justify-between text-xs py-0.5">
+                            <span class="text-gray-600">₱{{ number_format($p->amount, 2) }} via
+                                {{ ucfirst(str_replace('_', ' ', $p->payment_method)) }}</span>
+                            <span class="text-gray-400">{{ $p->confirmed_at?->format('M d, Y') ?? 'Pending' }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            @if($latestBill->status !== 'paid' && $latestBill->days_overdue > 0)
+                <div class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+                    This bill is {{ $latestBill->days_overdue }} day(s) overdue. Please settle with the General Manager.
+                </div>
+            @endif
+
+            <div class="mt-3 pt-3 border-t border-gray-100">
+                <a href="{{ route('tenant.billing') }}" wire:navigate
+                    class="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                    <i class="fas fa-receipt text-[10px]"></i> View My Bills
+                </a>
+            </div>
+        @else
+            <p class="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">Latest Bill</p>
+            <p class="font-semibold text-gray-700 mt-1">No Bill Yet</p>
+            <p class="text-sm text-gray-400 mt-2">You don't have any bills yet. Once the General Manager generates one, it will appear here.</p>
+        @endif
     </div>
 
     {{-- Notifications --}}

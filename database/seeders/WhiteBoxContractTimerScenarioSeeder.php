@@ -63,7 +63,7 @@ class WhiteBoxContractTimerScenarioSeeder extends Seeder
             $room = Room::create([
                 'room_number'        => 'T'.str_pad((string)$i, 2, '0', STR_PAD_LEFT),
                 'floor_level'        => 1,
-                'room_type'          => 'small',
+                'room_type'          => 'compact',
                 'rate'               => 10000,
                 'max_occupants'      => 2,
                 'status'             => 'occupied',

@@ -96,6 +96,45 @@
         </div>
     </div>
 
+    {{-- Recent Initial Payments (move-in collections) --}}
+    <div class="card mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-base font-semibold text-gray-900">Recent Initial Payments</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Total collected to date:
+                    <span class="font-semibold text-emerald-700">₱{{ number_format($totalInitialCollected, 2) }}</span>
+                </p>
+            </div>
+            <a href="{{ route('admin.billing.index') }}" wire:navigate
+                class="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white hover:bg-brand-700 transition">
+                Manage Billing
+            </a>
+        </div>
+        @forelse($recentInitialPayments as $ip)
+            <div class="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-0">
+                <div>
+                    <p class="text-sm font-medium text-gray-800">{{ $ip->tenant?->full_name ?? '—' }}</p>
+                    <p class="text-xs text-gray-500">
+                        Contract #{{ $ip->contract_id }}
+                        @if($ip->contract?->room)
+                            &bull; Room {{ $ip->contract->room->room_number }}
+                        @endif
+                        &bull; {{ ucfirst(str_replace('_', ' ', $ip->payment_method)) }}
+                        &bull; {{ $ip->date_received->format('M d, Y') }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-bold text-emerald-700">₱{{ number_format($ip->total_collected, 2) }}</p>
+                    <p class="text-[11px] text-gray-400">deposit + 1st mo + key
+                        @if($ip->amenities_total > 0) + amenities @endif
+                    </p>
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-gray-400">No initial payments recorded yet.</p>
+        @endforelse
+    </div>
+
     {{-- Occupancy dashboard (all rooms at a glance) --}}
     <div class="card">
         <h3 class="text-base font-semibold text-gray-900 mb-4">Room Occupancy Overview</h3>

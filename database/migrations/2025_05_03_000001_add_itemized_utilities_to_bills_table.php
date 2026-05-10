@@ -11,15 +11,13 @@ return new class extends Migration {
             $table->decimal('electricity', 10, 2)->default(0)->after('utilities');
             $table->decimal('water', 10, 2)->default(0)->after('electricity');
             $table->decimal('wifi', 10, 2)->default(0)->after('water');
-            $table->decimal('extras', 10, 2)->default(0)->after('wifi');
-            $table->text('extras_note')->nullable()->after('extras');
         });
     }
 
     public function down(): void
     {
         Schema::table('bills', function (Blueprint $table) {
-            $table->dropColumn(['electricity', 'water', 'wifi', 'extras', 'extras_note']);
+            $table->dropColumn(['electricity', 'water', 'wifi']);
         });
     }
 };

@@ -26,21 +26,21 @@ class DatabaseSeeder extends Seeder
         // ── 22 Rooms: Floor 1 (6), Floor 2 (8), Floor 3 (8) ──
         $floors = config('citiescapes.building.floors', [1 => 6, 2 => 8, 3 => 8]);
 
-        $amenities_small = ['Air Conditioning', 'WiFi', 'Shared Bathroom'];
-        $amenities_big   = ['Air Conditioning', 'WiFi', 'Private Bathroom', 'Mini Fridge'];
+        $amenities_compact  = ['Air Conditioning', 'WiFi', 'Shared Bathroom'];
+        $amenities_spacious = ['Air Conditioning', 'WiFi', 'Private Bathroom', 'Mini Fridge'];
 
         foreach ($floors as $floor => $count) {
             for ($i = 1; $i <= $count; $i++) {
                 $roomNum = $floor . str_pad($i, 2, '0', STR_PAD_LEFT);
-                $type    = ($i <= intdiv($count, 2)) ? 'small' : 'big';
+                $type    = ($i <= intdiv($count, 2)) ? 'compact' : 'spacious';
 
                 Room::create([
                     'room_number'  => $roomNum,
                     'floor_level'  => $floor,
                     'room_type'    => $type,
-                    'amenities'    => $type === 'small' ? $amenities_small : $amenities_big,
-                    'rate'         => $type === 'small' ? 3500.00 : 5000.00,
-                    'max_occupants'=> $type === 'small' ? 3 : 4,
+                    'amenities'    => $type === 'compact' ? $amenities_compact : $amenities_spacious,
+                    'rate'         => $type === 'compact' ? 3500.00 : 5000.00,
+                    'max_occupants'=> $type === 'compact' ? 3 : 4,
                     'status'       => 'available',
                     'description'  => ucfirst($type) . " room on floor {$floor}",
                     'photos'       => [],

@@ -17,8 +17,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string      $electricity
  * @property string      $water
  * @property string      $wifi
- * @property string      $extras
- * @property string|null $extras_note
  * @property string      $deposit_amount
  * @property string      $room_key_fee
  * @property string      $penalty_amount
@@ -44,8 +42,6 @@ class Bill extends Model
         'electricity',
         'water',
         'wifi',
-        'extras',
-        'extras_note',
         'deposit_amount',
         'room_key_fee',
         'penalty_amount',
@@ -66,7 +62,6 @@ class Bill extends Model
             'electricity'    => 'decimal:2',
             'water'          => 'decimal:2',
             'wifi'           => 'decimal:2',
-            'extras'         => 'decimal:2',
             'deposit_amount' => 'decimal:2',
             'room_key_fee'   => 'decimal:2',
             'penalty_amount' => 'decimal:2',

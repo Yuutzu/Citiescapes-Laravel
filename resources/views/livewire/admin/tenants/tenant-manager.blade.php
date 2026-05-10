@@ -36,11 +36,19 @@
                         </span>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-500">{{ $t->created_at->format('M d, Y') }}</td>
-                    <td class="px-4 py-3 text-right space-x-1">
-                        @if($t->status !== 'archived')
-                            <button wire:click="archiveTenant({{ $t->id }})" wire:confirm="Archive this tenant?" class="text-xs text-gray-500 hover:text-red-600">Archive</button>
-                        @endif
-                        <button wire:click="deleteTenant({{ $t->id }})" wire:confirm="PERMANENTLY delete this tenant? This cannot be undone." class="text-xs text-red-500 hover:text-red-700">Delete</button>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            @if($t->status !== 'archived')
+                                <button wire:click="archiveTenant({{ $t->id }})" wire:confirm="Archive this tenant?"
+                                    class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-300 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-400 transition">
+                                    <i class="fas fa-box-archive text-[10px]"></i> Archive
+                                </button>
+                            @endif
+                            <button wire:click="deleteTenant({{ $t->id }})" wire:confirm="PERMANENTLY delete this tenant? This cannot be undone."
+                                class="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                <i class="fas fa-trash text-[10px]"></i> Delete
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

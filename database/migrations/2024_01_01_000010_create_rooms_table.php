@@ -14,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->string('room_number')->unique(); // e.g. "101", "201"
             $table->unsignedTinyInteger('floor_level'); // 1, 2, or 3
-            $table->enum('room_type', ['small', 'big'])->default('small');
+            $table->enum('room_type', ['compact', 'spacious'])->default('compact');
             $table->json('photos')->nullable(); // array of file paths
             $table->json('amenities')->nullable(); // ["air-conditioning", "wifi", ...]
             $table->decimal('rate', 10, 2)->default(0);
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('sender_name');
             $table->string('contact_number');
             $table->string('email')->nullable();
-            $table->enum('preferred_room_type', ['small', 'big', 'any'])->default('any');
+            $table->enum('preferred_room_type', ['compact', 'spacious', 'any'])->default('any');
             $table->text('message');
             $table->enum('status', ['pending', 'responded', 'closed'])->default('pending');
             $table->text('gm_notes')->nullable();

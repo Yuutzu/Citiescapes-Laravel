@@ -46,7 +46,27 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ]
+        ],
+        "test": "@php artisan test",
+        "test:bbt": "@php artisan test --testsuite=Feature",
+        "test:wbt": "@php artisan test --testsuite=Unit",
+        "test:ss1": "@php artisan test --filter=SS1",
+        "test:ss2": "@php artisan test --filter=SS2",
+        "test:ss3": "@php artisan test --filter=SS3",
+        "test:ss4": "@php artisan test --filter=SS4",
+        "test:ss5": "@php artisan test --filter=SS5",
+        "test:ss6": "@php artisan test --filter=SS6"
+    },
+    "scripts-descriptions": {
+        "test":     "Run the entire test suite (BBT + WBT)",
+        "test:bbt": "Run all Black-Box tests (tests/Feature/*)",
+        "test:wbt": "Run all White-Box tests (tests/Unit/*)",
+        "test:ss1": "Run all SS1 tests (Public Listings & Inquiries)",
+        "test:ss2": "Run all SS2 tests (Tenant Management)",
+        "test:ss3": "Run all SS3 tests (Billing Management)",
+        "test:ss4": "Run all SS4 tests (Contract Management)",
+        "test:ss5": "Run all SS5 tests (Reports & Archives)",
+        "test:ss6": "Run all SS6 tests (System Administration / Auth)"
     },
     "extra": {
         "laravel": {

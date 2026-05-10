@@ -56,32 +56,32 @@ class RoomListings extends Component
 
     public function render()
     {
-        $smallRoom = Room::where('room_type', 'small')->where('status', 'available')->first()
-            ?? Room::where('room_type', 'small')->first();
-        $bigRoom = Room::where('room_type', 'big')->where('status', 'available')->first()
-            ?? Room::where('room_type', 'big')->first();
+        $compactRoom = Room::where('room_type', 'compact')->where('status', 'available')->first()
+            ?? Room::where('room_type', 'compact')->first();
+        $spaciousRoom = Room::where('room_type', 'spacious')->where('status', 'available')->first()
+            ?? Room::where('room_type', 'spacious')->first();
 
-        $smallPhotos = $smallRoom?->photos ?: [
+        $compactPhotos = $compactRoom?->photos ?: [
             'images/rooms/small-1.jpg',
             'images/rooms/small-2.jpg',
             'images/rooms/small-3.jpg',
         ];
-        $bigPhotos = $bigRoom?->photos ?: [
+        $spaciousPhotos = $spaciousRoom?->photos ?: [
             'images/rooms/big-1.jpg',
             'images/rooms/big-2.jpg',
             'images/rooms/big-3.jpg',
         ];
 
-        $smallCount = Room::where('room_type', 'small')->where('status', 'available')->count();
-        $bigCount = Room::where('room_type', 'big')->where('status', 'available')->count();
+        $compactCount = Room::where('room_type', 'compact')->where('status', 'available')->count();
+        $spaciousCount = Room::where('room_type', 'spacious')->where('status', 'available')->count();
 
         return view('livewire.public.room-listings', compact(
-            'smallRoom',
-            'bigRoom',
-            'smallPhotos',
-            'bigPhotos',
-            'smallCount',
-            'bigCount'
+            'compactRoom',
+            'spaciousRoom',
+            'compactPhotos',
+            'spaciousPhotos',
+            'compactCount',
+            'spaciousCount'
         ));
     }
 }

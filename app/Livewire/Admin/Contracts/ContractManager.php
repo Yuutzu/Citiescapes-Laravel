@@ -39,6 +39,9 @@ class ContractManager extends Component
     public string $house_rules = '';
     public $scanFile = null;
 
+    /** @var array<int, array{name: string, fee: float|string}> */
+    public array $amenities = [];
+
     // Terminate modal
     public bool $showTerminate = false;
     public ?int $terminateId = null;
@@ -60,6 +63,7 @@ class ContractManager extends Component
         $this->base_rent_rate = (float) $c->base_rent_rate;
         $this->deposit = (float) $c->deposit;
         $this->room_key_fee = (float) $c->room_key_fee;
+        $this->amenities = $c->requested_amenities ?? [];
         $this->start_date = $c->start_date->format('Y-m-d');
         $this->end_date = $c->end_date->format('Y-m-d');
         $this->penalty_rate = (float) $c->penalty_rate;
@@ -67,6 +71,17 @@ class ContractManager extends Component
         $this->house_rules = $c->house_rules ?? '';
         $this->showModal = true;
         $this->editing = true;
+    }
+
+    public function addAmenity(): void
+    {
+        $this->amenities[] = ['name' => '', 'fee' => 0];
+    }
+
+    public function removeAmenity(int $index): void
+    {
+        unset($this->amenities[$index]);
+        $this->amenities = array_values($this->amenities);
     }
 
     public function save()
@@ -78,7 +93,18 @@ class ContractManager extends Component
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'penalty_rate' => 'required|numeric|min:0',
+            'amenities.*.name' => 'nullable|string|max:80',
+            'amenities.*.fee'  => 'nullable|numeric|min:0',
         ]);
+
+        $cleanAmenities = collect($this->amenities)
+            ->map(fn($row) => [
+                'name' => trim((string) ($row['name'] ?? '')),
+                'fee'  => (float) ($row['fee'] ?? 0),
+            ])
+            ->filter(fn($row) => $row['name'] !== '')
+            ->values()
+            ->all();
 
         $data = [
             'tenant_id' => $this->tenant_id,
@@ -86,6 +112,7 @@ class ContractManager extends Component
             'base_rent_rate' => $this->base_rent_rate,
             'deposit' => $this->deposit,
             'room_key_fee' => $this->room_key_fee,
+            'requested_amenities' => $cleanAmenities ?: null,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'penalty_rate' => $this->penalty_rate,
@@ -200,6 +227,7 @@ class ContractManager extends Component
         $this->base_rent_rate = (float) $old->base_rent_rate;
         $this->deposit = (float) $old->deposit;
         $this->room_key_fee = (float) $old->room_key_fee;
+        $this->amenities = $old->requested_amenities ?? [];
         $this->penalty_rate = (float) $old->penalty_rate;
         $this->penalty_grace_days = $old->penalty_grace_days;
         $this->house_rules = $old->house_rules ?? '';
@@ -219,6 +247,7 @@ class ContractManager extends Component
         $this->base_rent_rate = 0;
         $this->deposit = 0;
         $this->room_key_fee = 200;
+        $this->amenities = [];
         $this->start_date = '';
         $this->end_date = '';
         $this->penalty_rate = 100;

@@ -52,7 +52,7 @@ class AutoArchiveExpiredContractsTest extends TestCase
         return Room::create(array_merge([
             'room_number'        => '1'.random_int(100, 999),
             'floor_level'        => 1,
-            'room_type'          => 'small',
+            'room_type'          => 'compact',
             'rate'               => 10000,
             'max_occupants'      => 2,
             'status'             => $currentTenantId ? 'occupied' : 'available',

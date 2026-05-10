@@ -12,7 +12,8 @@ class Contract extends Model
 
     protected $fillable = [
         'tenant_id', 'room_id', 'base_rent_rate', 'deposit',
-        'room_key_fee', 'start_date', 'end_date', 'status',
+        'first_month_rent', 'room_key_fee', 'requested_amenities',
+        'start_date', 'end_date', 'status',
         'penalty_rate', 'penalty_grace_days', 'house_rules',
         'penalty_schedule', 'scan_file_path', 'scan_file_name',
         'step1_acknowledged_at', 'step2_acknowledged_at',
@@ -27,7 +28,9 @@ class Contract extends Model
             'end_date'                => 'date',
             'base_rent_rate'          => 'decimal:2',
             'deposit'                 => 'decimal:2',
+            'first_month_rent'        => 'decimal:2',
             'room_key_fee'            => 'decimal:2',
+            'requested_amenities'     => 'array',
             'penalty_rate'            => 'decimal:2',
             'step1_acknowledged_at'   => 'datetime',
             'step2_acknowledged_at'   => 'datetime',
@@ -39,10 +42,19 @@ class Contract extends Model
     }
 
     /* ── Relationships ─────────────────── */
-    public function tenant()    { return $this->belongsTo(User::class, 'tenant_id'); }
-    public function room()      { return $this->belongsTo(Room::class); }
-    public function bills()     { return $this->hasMany(Bill::class); }
-    public function createdBy() { return $this->belongsTo(User::class, 'created_by'); }
+    public function tenant()         { return $this->belongsTo(User::class, 'tenant_id'); }
+    public function room()           { return $this->belongsTo(Room::class); }
+    public function bills()          { return $this->hasMany(Bill::class); }
+    public function initialPayment() { return $this->hasOne(InitialPayment::class); }
+    public function createdBy()      { return $this->belongsTo(User::class, 'created_by'); }
+
+    /**
+     * First month rent falls back to base rent rate when not set explicitly.
+     */
+    public function getEffectiveFirstMonthRentAttribute(): string
+    {
+        return $this->first_month_rent ?? $this->base_rent_rate;
+    }
 
     /* ── Computed: timer ──────────────── */
     public function getDaysRemainingAttribute(): int

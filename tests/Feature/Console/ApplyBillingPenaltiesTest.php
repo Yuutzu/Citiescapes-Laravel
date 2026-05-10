@@ -55,7 +55,7 @@ class ApplyBillingPenaltiesTest extends TestCase
         return Room::create([
             'room_number'        => '1'.random_int(100, 999),
             'floor_level'        => 1,
-            'room_type'          => 'small',
+            'room_type'          => 'compact',
             'rate'               => 10000,
             'max_occupants'      => 2,
             'status'             => $currentTenantId ? 'occupied' : 'available',
@@ -96,7 +96,6 @@ class ApplyBillingPenaltiesTest extends TestCase
             'electricity'    => 0,
             'water'          => 0,
             'wifi'           => 0,
-            'extras'         => 0,
             'deposit_amount' => 0,
             'room_key_fee'   => 0,
             'penalty_amount' => 0,
