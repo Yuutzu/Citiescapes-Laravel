@@ -62,8 +62,10 @@
                         </td>
                         <td class="px-4 py-3">
                             @if($c->scan_file_path)
-                                <a href="{{ asset('storage/' . $c->scan_file_path) }}" target="_blank"
-                                    class="text-xs text-brand-600 hover:underline">View</a>
+                                <button type="button" wire:click="viewScan({{ $c->id }})"
+                                    class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                                    <i class="fas fa-file-lines text-[10px]"></i> View
+                                </button>
                             @else <span class="text-xs text-gray-400">—</span> @endif
                         </td>
                         <td class="px-4 py-3 text-right">
@@ -114,16 +116,22 @@
                         </div>
                         <div>
                             <label class="form-label">Room *</label>
-                            <select wire:model="room_id" class="form-input">
+                            <select wire:model.live="room_id" class="form-input">
                                 <option value="">— Select —</option>
-                                @foreach($rooms as $r)<option value="{{ $r->id }}">{{ $r->room_number }}
-                                ({{ ucfirst($r->room_type) }})</option>@endforeach
+                                @foreach($rooms as $r)
+                                    <option value="{{ $r->id }}">
+                                        {{ $r->room_number }} ({{ ucfirst($r->room_type) }}) — ₱{{ number_format($r->rate, 2) }}/mo
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-4">
-                        <div><label class="form-label">Rent (₱/mo) *</label><input wire:model="base_rent_rate" type="number"
-                                step="0.01" class="form-input"></div>
+                        <div>
+                            <label class="form-label">Rent (₱/mo) *</label>
+                            <input wire:model="base_rent_rate" type="number" step="0.01" class="form-input">
+                            <p class="text-[11px] text-gray-500 mt-1">Auto-filled from room price. Editable.</p>
+                        </div>
                         <div><label class="form-label">Deposit (₱)</label><input wire:model="deposit" type="number"
                                 step="0.01" class="form-input"></div>
                         <div><label class="form-label">Key Fee (₱)</label><input wire:model="room_key_fee" type="number"
@@ -142,8 +150,12 @@
 
                         @forelse($amenities as $i => $a)
                             <div class="grid grid-cols-12 gap-2 items-center" wire:key="amenity-{{ $i }}">
-                                <input wire:model="amenities.{{ $i }}.name" type="text" placeholder="e.g. Aircon"
-                                    class="form-input col-span-7 text-sm">
+                                <select wire:model.live="amenities.{{ $i }}.name" class="form-input col-span-7 text-sm">
+                                    <option value="">— Select amenity —</option>
+                                    @foreach(\App\Livewire\Admin\Contracts\ContractManager::AMENITY_CATALOG as $opt)
+                                        <option value="{{ $opt['name'] }}">{{ $opt['name'] }} — ₱{{ number_format($opt['fee'], 2) }}</option>
+                                    @endforeach
+                                </select>
                                 <input wire:model="amenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (₱)"
                                     class="form-input col-span-4 text-sm">
                                 <button type="button" wire:click="removeAmenity({{ $i }})"
@@ -175,6 +187,39 @@
                         <button type="submit" class="btn-primary">{{ $editing ? 'Update' : 'Save Draft' }}</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- Scan Viewer Modal --}}
+    @php $scanContract = $viewingScanId ? $contracts->firstWhere('id', $viewingScanId) : null; @endphp
+    @if($scanContract && $scanContract->scan_file_path)
+        @php
+            $scanUrl = asset('storage/' . $scanContract->scan_file_path);
+            $ext = strtolower(pathinfo($scanContract->scan_file_path, PATHINFO_EXTENSION));
+            $isPdf = $ext === 'pdf';
+        @endphp
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" wire:click.self="closeScan">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+                    <h3 class="text-base font-semibold text-gray-900">
+                        Signed Contract — {{ $scanContract->tenant->full_name }}
+                        <span class="text-xs text-gray-500 font-normal">(Room {{ $scanContract->room->room_number }})</span>
+                    </h3>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ $scanUrl }}" target="_blank"
+                            class="text-xs text-brand-600 hover:underline">Open in new tab</a>
+                        <button type="button" wire:click="closeScan"
+                            class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto bg-gray-100 p-4">
+                    @if($isPdf)
+                        <iframe src="{{ $scanUrl }}" class="w-full h-full min-h-[70vh] bg-white rounded border border-gray-200"></iframe>
+                    @else
+                        <img src="{{ $scanUrl }}" alt="Signed contract scan" class="mx-auto max-w-full bg-white shadow-sm rounded">
+                    @endif
+                </div>
             </div>
         </div>
     @endif

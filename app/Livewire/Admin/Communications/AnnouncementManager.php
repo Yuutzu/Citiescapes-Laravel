@@ -20,7 +20,6 @@ class AnnouncementManager extends Component
     public string $body           = '';
     public string $recipientType  = 'all';
     public string $recipientId    = '';
-    public bool   $sendEmail      = false;
 
     // UI state
     public bool   $showForm       = false;
@@ -48,16 +47,16 @@ class AnnouncementManager extends Component
             'recipientId' => 'required_if:recipientType,specific|nullable|exists:users,id',
         ]);
 
-        $announcement = Announcement::create([
+        $recipients = $this->resolveRecipients();
+
+        Announcement::create([
             'title'          => $this->title,
             'body'           => $this->body,
             'recipient_type' => $this->recipientType,
             'recipient_id'   => $this->recipientType === 'specific' ? $this->recipientId : null,
             'sent_by'        => auth()->id(),
-            'email_sent'     => $this->sendEmail,
+            'email_sent'     => true,
         ]);
-
-        $recipients = $this->resolveRecipients();
 
         foreach ($recipients as $tenant) {
             NotificationLog::create([
@@ -67,7 +66,7 @@ class AnnouncementManager extends Component
                 'message' => "[Announcement] {$this->title}",
             ]);
 
-            if ($this->sendEmail && $tenant->email) {
+            if ($tenant->email) {
                 Mail::to($tenant->email)->send(
                     new AnnouncementMail($tenant->full_name, $this->title, $this->body)
                 );
@@ -75,7 +74,7 @@ class AnnouncementManager extends Component
         }
 
         $this->closeForm();
-        session()->flash('success', 'Announcement sent to ' . count($recipients) . ' tenant(s).');
+        session()->flash('success', 'Announcement sent to ' . \count($recipients) . ' tenant(s) (bell + email).');
     }
 
     private function resolveRecipients()
@@ -93,7 +92,6 @@ class AnnouncementManager extends Component
         $this->body          = '';
         $this->recipientType = 'all';
         $this->recipientId   = '';
-        $this->sendEmail     = false;
     }
 
     public function render()

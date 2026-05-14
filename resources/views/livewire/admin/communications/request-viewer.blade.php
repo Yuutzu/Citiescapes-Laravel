@@ -45,35 +45,57 @@
 
                     <hr class="border-gray-200">
 
-                    <div class="space-y-3">
-                        <div>
-                            <label class="form-label">Update Status</label>
-                            <select wire:model="newStatus" class="form-input">
-                                <option value="pending">Pending</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="resolved">Resolved</option>
-                            </select>
+                    @if($viewing->status === 'resolved')
+                        {{-- Resolved → locked, read-only view --}}
+                        <div class="rounded-lg bg-emerald-50 border border-emerald-200 p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <p class="text-sm font-semibold text-emerald-800">This request is Resolved &mdash; locked from further changes.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-emerald-700 font-semibold uppercase tracking-wide mb-1">Final Response</p>
+                                <p class="text-sm text-emerald-900 whitespace-pre-line leading-relaxed">{{ $viewing->admin_response ?: '— No written response —' }}</p>
+                            </div>
+                            @if($viewing->responded_at)
+                                <p class="text-xs text-emerald-700 mt-3">Responded by <span class="font-medium">{{ $viewing->respondedBy?->full_name }}</span> on {{ $viewing->responded_at->format('M d, Y g:i A') }}</p>
+                            @endif
                         </div>
-                        <div>
-                            <label class="form-label">Response / Notes</label>
-                            <textarea wire:model="adminReply" rows="4" class="form-input"
-                                placeholder="Write a response to the tenant..."></textarea>
-                            @error('adminReply') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    @else
+                        <div class="space-y-3">
+                            <div>
+                                <label class="form-label">Update Status</label>
+                                <select wire:model="newStatus" class="form-input">
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                                <p class="text-[11px] text-amber-700 mt-1">Setting to <strong>Resolved</strong> and saving will permanently lock this request from further response.</p>
+                            </div>
+                            <div>
+                                <label class="form-label">Response / Notes</label>
+                                <textarea wire:model="adminReply" rows="4" class="form-input"
+                                    placeholder="Write a response to the tenant..."></textarea>
+                                @error('adminReply') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            </div>
+                            @if($viewing->responded_at)
+                                <p class="text-xs text-gray-400">Last responded by <span
+                                        class="font-medium text-gray-600">{{ $viewing->respondedBy?->full_name }}</span> on
+                                    {{ $viewing->responded_at->format('M d, Y g:i A') }}</p>
+                            @endif
                         </div>
-                        @if($viewing->responded_at)
-                            <p class="text-xs text-gray-400">Last responded by <span
-                                    class="font-medium text-gray-600">{{ $viewing->respondedBy?->full_name }}</span> on
-                                {{ $viewing->responded_at->format('M d, Y g:i A') }}</p>
-                        @endif
-                    </div>
+                    @endif
                 </div>
                 <div
                     class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
-                    <button wire:click="closeView" class="btn-secondary">Cancel</button>
-                    <button wire:click="respond" wire:loading.attr="disabled" class="btn-primary">
-                        <span wire:loading.remove wire:target="respond">Save Response</span>
-                        <span wire:loading wire:target="respond">Saving...</span>
-                    </button>
+                    <button wire:click="closeView" class="btn-secondary">{{ $viewing->status === 'resolved' ? 'Close' : 'Cancel' }}</button>
+                    @if($viewing->status !== 'resolved')
+                        <button wire:click="respond" wire:loading.attr="disabled" class="btn-primary">
+                            <span wire:loading.remove wire:target="respond">Save Response</span>
+                            <span wire:loading wire:target="respond">Saving...</span>
+                        </button>
+                    @endif
                 </div>
             </div>
         </div>

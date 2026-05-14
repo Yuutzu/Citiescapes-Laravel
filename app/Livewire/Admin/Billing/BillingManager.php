@@ -320,8 +320,16 @@ class BillingManager extends Component
             ->whereDoesntHave('initialPayment')
             ->get();
 
+        // Recorded initial payments — show all so the GM has the same record the tenant sees.
+        $initialPayments = InitialPayment::with(['tenant', 'contract.room', 'recordedBy'])
+            ->when($this->search, fn($q) => $q->whereHas('tenant', fn($qq) =>
+                $qq->where('full_name', 'like', "%{$this->search}%")
+            ))
+            ->latest('date_received')
+            ->get();
+
         return view('livewire.admin.billing.billing-manager', compact(
-            'bills', 'activeContracts', 'contractsAwaitingInitial'
+            'bills', 'activeContracts', 'contractsAwaitingInitial', 'initialPayments'
         ));
     }
 }

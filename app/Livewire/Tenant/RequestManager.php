@@ -23,6 +23,8 @@ class RequestManager extends Component
     // UI state
     public bool $showForm = false;
     public ?int $viewingId = null;
+    public bool $showSubmittedModal = false;
+    public string $submittedType = '';
 
     public function openForm(): void
     {
@@ -68,8 +70,15 @@ class RequestManager extends Component
             }
         }
 
+        $this->submittedType = $this->type;
         $this->closeForm();
-        session()->flash('success', ucfirst($this->type) . ' submitted successfully.');
+        $this->showSubmittedModal = true;
+    }
+
+    public function closeSubmittedModal(): void
+    {
+        $this->showSubmittedModal = false;
+        $this->submittedType = '';
     }
 
     private function resetForm(): void

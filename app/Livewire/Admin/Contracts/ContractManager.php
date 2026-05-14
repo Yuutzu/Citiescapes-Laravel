@@ -42,10 +42,33 @@ class ContractManager extends Component
     /** @var array<int, array{name: string, fee: float|string}> */
     public array $amenities = [];
 
+    /** Fixed catalog of selectable amenities and their default one-time fees. */
+    public const AMENITY_CATALOG = [
+        ['name' => 'Air Conditioner',          'fee' => 10000.00],
+        ['name' => 'Extra Mattress',           'fee' => 500.00],
+        ['name' => 'Extra Double Deck Frame',  'fee' => 1500.00],
+        ['name' => 'Aircon Remote',            'fee' => 300.00],
+        ['name' => 'Extra Key',                'fee' => 200.00],
+        ['name' => 'Extra Pillow',             'fee' => 150.00],
+    ];
+
     // Terminate modal
     public bool $showTerminate = false;
     public ?int $terminateId = null;
     public string $terminateReason = '';
+
+    // Scan viewer modal
+    public ?int $viewingScanId = null;
+
+    public function viewScan(int $id): void
+    {
+        $this->viewingScanId = $id;
+    }
+
+    public function closeScan(): void
+    {
+        $this->viewingScanId = null;
+    }
 
     public function create()
     {
@@ -73,6 +96,17 @@ class ContractManager extends Component
         $this->editing = true;
     }
 
+    public function updatedRoomId($value): void
+    {
+        if (! $value) {
+            return;
+        }
+        $room = Room::find($value);
+        if ($room) {
+            $this->base_rent_rate = (float) $room->rate;
+        }
+    }
+
     public function addAmenity(): void
     {
         $this->amenities[] = ['name' => '', 'fee' => 0];
@@ -82,6 +116,22 @@ class ContractManager extends Component
     {
         unset($this->amenities[$index]);
         $this->amenities = array_values($this->amenities);
+    }
+
+    /**
+     * Auto-fill the fee when an amenity name is picked from the dropdown.
+     * Livewire 3 invokes this for nested array updates with $key like "0.name".
+     */
+    public function updatedAmenities($value, ?string $key = null): void
+    {
+        if (! $key || ! \str_ends_with($key, '.name')) {
+            return;
+        }
+        $index = (int) explode('.', $key)[0];
+        $match = \collect(self::AMENITY_CATALOG)->firstWhere('name', $value);
+        if ($match) {
+            $this->amenities[$index]['fee'] = $match['fee'];
+        }
     }
 
     public function save()

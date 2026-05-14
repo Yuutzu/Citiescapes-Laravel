@@ -42,9 +42,9 @@
                     <i class="fas fa-file-contract"></i> Contracts
                 </a>
 
-                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Reports</p>
+                <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">Archive</p>
                 <a href="{{ route('admin.reports.index') }}" class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" wire:navigate>
-                    <i class="fas fa-clipboard-list"></i> Reports & Archives
+                    <i class="fas fa-box-archive"></i> Archive
                 </a>
 
                 <p class="px-3 pt-4 pb-1.5 text-xs font-bold text-amber-300/60 uppercase tracking-wider">System</p>

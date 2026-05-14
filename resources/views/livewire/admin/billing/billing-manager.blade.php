@@ -27,6 +27,75 @@
         </select>
     </div>
 
+    {{-- ============ INITIAL PAYMENTS (Move-In) ============ --}}
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-semibold text-brand-900">
+                <i class="fas fa-receipt text-emerald-600 mr-1"></i> Initial Payments (Move-In)
+            </h2>
+            <span class="text-xs text-gray-500">{{ $initialPayments->count() }} recorded</span>
+        </div>
+
+        @if($initialPayments->isEmpty())
+            <div class="card text-sm text-gray-400 italic">No initial payments recorded yet.</div>
+        @else
+            <div class="card overflow-x-auto p-0">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-emerald-700">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Tenant</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Room / Contract</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Breakdown</th>
+                            <th class="px-4 py-3 text-right text-xs font-semibold text-emerald-100 uppercase tracking-wider">Total Collected</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Method</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-emerald-100 uppercase tracking-wider">Recorded By</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($initialPayments as $ip)
+                            <tr class="hover:bg-emerald-50/40">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $ip->tenant->full_name ?? '—' }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    Room {{ $ip->contract->room->room_number ?? '—' }}
+                                    <span class="text-xs text-gray-400">(#{{ $ip->contract_id }})</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ $ip->date_received->format('M d, Y') }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600 leading-snug">
+                                    <div>Deposit: <span class="font-medium text-gray-800">₱{{ number_format($ip->deposit_amount, 2) }}</span></div>
+                                    <div>1st Rent: <span class="font-medium text-gray-800">₱{{ number_format($ip->first_month_rent, 2) }}</span></div>
+                                    <div>Key Fee: <span class="font-medium text-gray-800">₱{{ number_format($ip->room_key_fee, 2) }}</span></div>
+                                    <div>Amenities: <span class="font-medium text-gray-800">₱{{ number_format($ip->amenities_total, 2) }}</span></div>
+                                    @if(!empty($ip->amenities))
+                                        <div class="mt-1 text-[11px] text-gray-500">
+                                            @foreach($ip->amenities as $a)
+                                                <span class="inline-block bg-gray-100 rounded px-1.5 py-0.5 mr-1 mb-1">{{ $a['name'] }} ₱{{ number_format((float) ($a['fee'] ?? 0), 2) }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-right text-sm font-bold text-emerald-700">₱{{ number_format($ip->total_collected, 2) }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-600">
+                                    {{ $ip->payment_method_label }}
+                                    @if($ip->reference_number)
+                                        <div class="text-[11px] text-gray-400">Ref: {{ $ip->reference_number }}</div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-xs text-gray-500">{{ $ip->recordedBy->full_name ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
+    {{-- ============ MONTHLY BILLS ============ --}}
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="text-base font-semibold text-brand-900">
+            <i class="fas fa-file-invoice text-brand-700 mr-1"></i> Monthly Bills
+        </h2>
+    </div>
     <div class="card overflow-x-auto p-0">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-brand-900">

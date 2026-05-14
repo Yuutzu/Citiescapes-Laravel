@@ -34,6 +34,9 @@ class NotificationLog extends Model
             'announcement'                                => $role === 'gm'
                 ? route('admin.announcements.index')
                 : route('tenant.dashboard'),
+            'profile_updated'                             => $role === 'gm'
+                ? route('admin.tenants.index')
+                : route('tenant.profile'),
             '30_day_warning', '7_day_warning'             => $role === 'gm'
                 ? route('admin.contracts.index')
                 : route('tenant.contract'),

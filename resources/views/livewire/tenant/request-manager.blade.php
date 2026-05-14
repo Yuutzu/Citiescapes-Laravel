@@ -84,6 +84,31 @@
         </div>
     @endif
 
+    {{-- Submitted Confirmation Modal --}}
+    @if($showSubmittedModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" wire:click.self="closeSubmittedModal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
+                <div class="px-6 py-6 text-center">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 mb-4">
+                        <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                        {{ ucfirst($submittedType ?: 'Request') }} Submitted
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        Your {{ $submittedType ?: 'submission' }} has been sent to the management.
+                        You'll be notified as soon as they respond.
+                    </p>
+                </div>
+                <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+                    <button wire:click="closeSubmittedModal" class="btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- View Detail Modal --}}
     @if($viewing)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">

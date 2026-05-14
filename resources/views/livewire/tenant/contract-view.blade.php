@@ -2,36 +2,61 @@
     <h1 class="text-2xl font-bold text-brand-900 mb-6">My Contract</h1>
 
     @if($contract)
-        <div class="max-w-2xl space-y-6">
-            {{-- Contract summary --}}
-            <div class="card">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base font-semibold text-gray-900">Contract Summary</h3>
-                    <span class="badge {{ match($contract->status){ 'draft'=>'bg-gray-100 text-gray-600','active'=>'bg-green-100 text-green-800', default=>'bg-gray-100 text-gray-600' } }}">{{ ucfirst($contract->status) }}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div><span class="text-gray-500">Room:</span> <span class="font-medium">{{ $contract->room->room_number }} ({{ ucfirst($contract->room->room_type) }})</span></div>
-                    <div><span class="text-gray-500">Floor:</span> <span class="font-medium">{{ $contract->room->floor_level }}</span></div>
-                    <div><span class="text-gray-500">Monthly Rent:</span> <span class="font-medium">₱{{ number_format($contract->base_rent_rate, 2) }}</span></div>
-                    <div><span class="text-gray-500">Deposit:</span> <span class="font-medium">₱{{ number_format($contract->deposit, 2) }}</span></div>
-                    <div><span class="text-gray-500">Key Fee:</span> <span class="font-medium">₱{{ number_format($contract->room_key_fee, 2) }}</span></div>
-                    <div><span class="text-gray-500">Penalty Rate:</span> <span class="font-medium text-red-600">₱{{ number_format($contract->penalty_rate, 2) }}/day</span></div>
-                    <div><span class="text-gray-500">Grace Period:</span> <span class="font-medium">{{ $contract->penalty_grace_days }} days</span></div>
-                    <div><span class="text-gray-500">Period:</span> <span class="font-medium">{{ $contract->start_date->format('M d, Y') }} — {{ $contract->end_date->format('M d, Y') }}</span></div>
+        <div class="space-y-6">
+            {{-- Contract summary + scan viewer side-by-side --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {{-- Left: Summary --}}
+                <div class="card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold text-gray-900">Contract Summary</h3>
+                        <span class="badge {{ match($contract->status){ 'draft'=>'bg-gray-100 text-gray-600','active'=>'bg-green-100 text-green-800', default=>'bg-gray-100 text-gray-600' } }}">{{ ucfirst($contract->status) }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><span class="text-gray-500">Room:</span> <span class="font-medium">{{ $contract->room->room_number }} ({{ ucfirst($contract->room->room_type) }})</span></div>
+                        <div><span class="text-gray-500">Floor:</span> <span class="font-medium">{{ $contract->room->floor_level }}</span></div>
+                        <div><span class="text-gray-500">Monthly Rent:</span> <span class="font-medium">₱{{ number_format($contract->base_rent_rate, 2) }}</span></div>
+                        <div><span class="text-gray-500">Deposit:</span> <span class="font-medium">₱{{ number_format($contract->deposit, 2) }}</span></div>
+                        <div><span class="text-gray-500">Key Fee:</span> <span class="font-medium">₱{{ number_format($contract->room_key_fee, 2) }}</span></div>
+                        <div><span class="text-gray-500">Penalty Rate:</span> <span class="font-medium text-red-600">₱{{ number_format($contract->penalty_rate, 2) }}/day</span></div>
+                        <div><span class="text-gray-500">Grace Period:</span> <span class="font-medium">{{ $contract->penalty_grace_days }} days</span></div>
+                        <div><span class="text-gray-500">Period:</span> <span class="font-medium">{{ $contract->start_date->format('M d, Y') }} — {{ $contract->end_date->format('M d, Y') }}</span></div>
+                    </div>
+
+                    @if($contract->house_rules)
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <p class="text-xs font-semibold text-gray-500 uppercase mb-1">House Rules</p>
+                            <p class="text-sm text-gray-700 whitespace-pre-line">{{ $contract->house_rules }}</p>
+                        </div>
+                    @endif
                 </div>
 
-                @if($contract->house_rules)
-                    <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <p class="text-xs font-semibold text-gray-500 uppercase mb-1">House Rules</p>
-                        <p class="text-sm text-gray-700 whitespace-pre-line">{{ $contract->house_rules }}</p>
+                {{-- Right: Scanned contract viewer (scrollable) --}}
+                <div class="card p-0 overflow-hidden flex flex-col">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                        <h3 class="text-base font-semibold text-gray-900">Signed Contract</h3>
+                        @if($contract->scan_file_path)
+                            <a href="{{ asset('storage/' . $contract->scan_file_path) }}" target="_blank"
+                                class="text-xs text-brand-600 hover:underline">Open in new tab</a>
+                        @endif
                     </div>
-                @endif
-
-                @if($contract->scan_file_path)
-                    <div class="mt-4">
-                        <a href="{{ asset('storage/' . $contract->scan_file_path) }}" target="_blank" class="btn-secondary text-sm">View Signed Contract (Scan)</a>
+                    <div class="bg-gray-100" style="height: 520px; overflow-y: auto;">
+                        @if($contract->scan_file_path)
+                            @php
+                                $tenantScanUrl = asset('storage/' . $contract->scan_file_path);
+                                $tenantExt = strtolower(pathinfo($contract->scan_file_path, PATHINFO_EXTENSION));
+                            @endphp
+                            @if($tenantExt === 'pdf')
+                                <iframe src="{{ $tenantScanUrl }}" class="w-full h-full bg-white" style="border:0;"></iframe>
+                            @else
+                                <img src="{{ $tenantScanUrl }}" alt="Signed contract" class="w-full block">
+                            @endif
+                        @else
+                            <div class="flex items-center justify-center h-full text-sm text-gray-400 italic">
+                                Scanned contract not yet uploaded.
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
 
             {{-- Timer (active contracts) --}}

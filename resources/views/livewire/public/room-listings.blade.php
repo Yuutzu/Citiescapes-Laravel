@@ -128,9 +128,9 @@
                         </div>
                     </div>
 
-                    <a href="#inquire" class="btn-primary w-full justify-center mt-5">
+                    <button type="button" wire:click="inquireAbout('compact')" class="btn-primary w-full justify-center mt-5">
                         <i class="fas fa-paper-plane mr-2"></i> Inquire About This Room
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -242,16 +242,18 @@
                         </div>
                     </div>
 
-                    <a href="#inquire" class="btn-primary w-full justify-center mt-5">
+                    <button type="button" wire:click="inquireAbout('spacious')" class="btn-primary w-full justify-center mt-5">
                         <i class="fas fa-paper-plane mr-2"></i> Inquire About This Room
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- Inquiry + Map --}}
-    <section id="inquire" class="bg-white border-t border-gray-200">
+    <section id="inquire" class="bg-white border-t border-gray-200"
+        x-data
+        x-on:scroll-to-inquiry.window="document.getElementById('inquire')?.scrollIntoView({behavior:'smooth', block:'start'})">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
             <div style="display:flex; flex-direction:row; gap:0; align-items:stretch;">
 

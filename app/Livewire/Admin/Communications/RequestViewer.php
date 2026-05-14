@@ -46,6 +46,14 @@ class RequestViewer extends Component
 
         $request = TenantRequest::findOrFail($this->viewingId);
 
+        // Once a request has been saved as Resolved, the response is locked.
+        // GM must reopen via a fresh request if anything needs to change.
+        if ($request->status === 'resolved') {
+            session()->flash('error', 'This request is already marked Resolved and can no longer be edited.');
+            $this->closeView();
+            return;
+        }
+
         $request->update([
             'status' => $this->newStatus,
             'admin_response' => $this->adminReply ?: null,

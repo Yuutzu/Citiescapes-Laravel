@@ -4,13 +4,14 @@ namespace App\Livewire\Admin\Reports;
 
 use App\Models\Archive;
 use App\Models\AuditLog;
+use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
-#[Title('Reports & Archives — Citiescapes')]
+#[Title('Archive — Citiescapes')]
 class ReportManager extends Component
 {
     use WithPagination;
@@ -23,6 +24,18 @@ class ReportManager extends Component
     public function restore(int $id)
     {
         $archive = Archive::findOrFail($id);
+
+        if ($archive->record_type === 'tenant_account') {
+            $user = User::find($archive->original_record_id);
+            if ($user) {
+                $user->update([
+                    'status'      => 'active',
+                    'archived_at' => null,
+                    'archived_by' => null,
+                ]);
+            }
+        }
+
         $archive->update(['restored' => true, 'restored_at' => now()]);
         AuditLog::record('record_restored', auth()->id(), 'gm', 'SS5', "Restored {$archive->record_type} #{$archive->original_record_id}");
         session()->flash('success', 'Record restored.');

@@ -3,6 +3,8 @@
 namespace App\Livewire\Tenant;
 
 use App\Models\AuditLog;
+use App\Models\NotificationLog;
+use App\Models\User;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -36,14 +38,36 @@ class Profile extends Component
             'emergency_contact' => 'nullable|max:100',
         ]);
 
-        auth()->user()->update([
+        $tenant = auth()->user();
+
+        $tenant->update([
             'full_name'         => $this->full_name,
             'contact_number'    => $this->contact_number,
             'address'           => $this->address,
             'emergency_contact' => $this->emergency_contact,
         ]);
 
-        AuditLog::record('profile_updated', auth()->id(), 'tenant', 'SS2');
+        AuditLog::record('profile_updated', $tenant->id, 'tenant', 'SS2');
+
+        // Notify the tenant themselves (bell confirmation).
+        NotificationLog::create([
+            'user_id' => $tenant->id,
+            'type'    => 'profile_updated',
+            'source'  => 'SS2',
+            'message' => 'Your profile has been updated successfully.',
+        ]);
+
+        // Notify every active GM so they're aware of tenant-side profile changes.
+        $gms = User::where('role', 'gm')->where('status', 'active')->get();
+        foreach ($gms as $gm) {
+            NotificationLog::create([
+                'user_id' => $gm->id,
+                'type'    => 'profile_updated',
+                'source'  => 'SS2',
+                'message' => "{$tenant->full_name} updated their profile.",
+            ]);
+        }
+
         session()->flash('success', 'Profile updated.');
     }
 

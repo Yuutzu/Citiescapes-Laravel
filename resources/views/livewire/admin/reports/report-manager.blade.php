@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-2xl font-bold text-brand-900 mb-6">Reports & Archives</h1>
+    <h1 class="text-2xl font-bold text-brand-900 mb-6">Archive</h1>
 
     <div class="flex flex-wrap gap-3 mb-6">
         <select wire:model.live="filterType" class="form-input w-auto text-sm">

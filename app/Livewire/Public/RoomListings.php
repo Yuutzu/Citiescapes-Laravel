@@ -22,6 +22,15 @@ class RoomListings extends Component
     public string $message = '';
     public bool $inquirySent = false;
 
+    public function inquireAbout(string $type): void
+    {
+        if (\in_array($type, ['compact', 'spacious', 'any'], true)) {
+            $this->preferred_room_type = $type;
+            $this->inquirySent = false;
+            $this->dispatch('scroll-to-inquiry');
+        }
+    }
+
     public function submitInquiry()
     {
         $this->validate([

@@ -59,13 +59,14 @@
                         @error('body') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
 
-                    {{-- Email option --}}
-                    <div class="flex items-center gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                        <input wire:model="sendEmail" type="checkbox" id="sendEmail" class="h-4 w-4 rounded border-gray-300 text-brand-600">
-                        <label for="sendEmail" class="text-sm text-blue-800">
-                            <span class="font-medium">Also send via email</span>
-                            <span class="text-blue-600 ml-1">— delivers to tenant email address(es)</span>
-                        </label>
+                    {{-- Delivery summary (always sent via bell + email) --}}
+                    <div class="flex items-start gap-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <svg class="h-5 w-5 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                        </svg>
+                        <p class="text-sm text-blue-800 leading-snug">
+                            Every announcement is delivered automatically via the in-app bell <em>and</em> email to the chosen recipient(s).
+                        </p>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
