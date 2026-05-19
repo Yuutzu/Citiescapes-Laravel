@@ -23,6 +23,13 @@ use App\Livewire\Tenant\Profile as TenantProfile;
 use App\Livewire\Tenant\ContractView;
 use App\Livewire\Tenant\BillingView;
 use App\Livewire\Tenant\RequestManager as TenantRequestManager;
+use App\Http\Controllers\PatchedLivewireUploadController;
+
+// Override Livewire's upload endpoint with a Windows/Laragon-safe version
+// (stops "Path must not be empty" / "failed to upload" on this machine).
+Route::post('/livewire/upload-file', [PatchedLivewireUploadController::class, 'handle'])
+    ->middleware('web')
+    ->name('livewire.upload-file');
 
 /*
 |--------------------------------------------------------------------------

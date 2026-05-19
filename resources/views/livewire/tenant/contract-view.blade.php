@@ -30,29 +30,73 @@
                     @endif
                 </div>
 
-                {{-- Right: Scanned contract viewer (scrollable) --}}
+                {{-- Right: Scanned contract viewer (gated by GM approval) --}}
                 <div class="card p-0 overflow-hidden flex flex-col">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                         <h3 class="text-base font-semibold text-gray-900">Signed Contract</h3>
-                        @if($contract->scan_file_path)
+                        @if($contract->scan_file_path && $contract->scan_view_status === 'approved')
                             <a href="{{ asset('storage/' . $contract->scan_file_path) }}" target="_blank"
                                 class="text-xs text-brand-600 hover:underline">Open in new tab</a>
                         @endif
                     </div>
                     <div class="bg-gray-100" style="height: 520px; overflow-y: auto;">
-                        @if($contract->scan_file_path)
+                        @if(!$contract->scan_file_path)
+                            <div class="flex items-center justify-center h-full text-sm text-gray-400 italic px-6 text-center">
+                                Scanned contract not yet uploaded.
+                            </div>
+                        @elseif($contract->scan_view_status === 'approved')
                             @php
                                 $tenantScanUrl = asset('storage/' . $contract->scan_file_path);
                                 $tenantExt = strtolower(pathinfo($contract->scan_file_path, PATHINFO_EXTENSION));
                             @endphp
                             @if($tenantExt === 'pdf')
                                 <iframe src="{{ $tenantScanUrl }}" class="w-full h-full bg-white" style="border:0;"></iframe>
-                            @else
+                            @elseif(in_array($tenantExt, ['jpg','jpeg','png','webp','gif']))
                                 <img src="{{ $tenantScanUrl }}" alt="Signed contract" class="w-full block">
+                            @else
+                                <div class="flex flex-col items-center justify-center h-full text-sm text-gray-600 gap-3">
+                                    <i class="fas fa-file-word text-4xl text-brand-700"></i>
+                                    <p>This file type cannot be previewed in the browser.</p>
+                                    <a href="{{ $tenantScanUrl }}" target="_blank" class="btn-primary text-xs">
+                                        <i class="fas fa-download mr-1"></i> Download {{ strtoupper($tenantExt) }}
+                                    </a>
+                                </div>
                             @endif
+                        @elseif($contract->scan_view_status === 'pending')
+                            <div class="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
+                                <i class="fas fa-hourglass-half text-4xl text-amber-500"></i>
+                                <p class="text-sm font-semibold text-gray-800">Request pending</p>
+                                <p class="text-xs text-gray-500">
+                                    Submitted on {{ $contract->scan_view_requested_at?->format('M d, Y h:i A') }}.
+                                    Awaiting General Manager approval.
+                                </p>
+                            </div>
+                        @elseif($contract->scan_view_status === 'denied')
+                            <div class="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
+                                <i class="fas fa-ban text-4xl text-red-500"></i>
+                                <p class="text-sm font-semibold text-gray-800">Request denied</p>
+                                @if($contract->scan_view_decision_note)
+                                    <p class="text-xs text-gray-600 italic max-w-xs">
+                                        "{{ $contract->scan_view_decision_note }}"
+                                    </p>
+                                @endif
+                                <button wire:click="requestScanAccess" wire:confirm="Submit a new request to view the signed contract?"
+                                    class="btn-secondary text-xs mt-2">
+                                    Request again
+                                </button>
+                            </div>
                         @else
-                            <div class="flex items-center justify-center h-full text-sm text-gray-400 italic">
-                                Scanned contract not yet uploaded.
+                            <div class="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
+                                <i class="fas fa-lock text-4xl text-gray-400"></i>
+                                <p class="text-sm font-semibold text-gray-800">Approval required</p>
+                                <p class="text-xs text-gray-500 max-w-xs">
+                                    For your security, viewing the signed contract requires General Manager approval.
+                                    Send a request below and we'll unlock it for you.
+                                </p>
+                                <button wire:click="requestScanAccess" wire:confirm="Send a request to view your signed contract?"
+                                    class="btn-primary text-xs mt-2">
+                                    <i class="fas fa-paper-plane mr-1"></i> Request access
+                                </button>
                             </div>
                         @endif
                     </div>

@@ -1,9 +1,10 @@
 {{-- Sidebar content — shared between mobile & desktop --}}
-<div class="flex h-16 items-center gap-2 px-6 border-b border-brand-800">
-    <div class="h-8 w-8 rounded-lg bg-brand-600 flex items-center justify-center">
-        <span class="text-white font-bold text-sm">CS</span>
+<div class="flex h-16 items-center gap-3 px-5 border-b border-brand-800/60 bg-brand-900/40">
+    <img src="/storage/building/logo.png" alt="Citiescapes" class="h-9 w-9 rounded-lg object-cover ring-1 ring-marigold-400/40">
+    <div class="leading-tight">
+        <span class="block font-serif font-bold text-paper-50 text-lg">Citiescapes</span>
+        <span class="block text-[10px] uppercase tracking-[0.18em] text-marigold-300">Apartment Rental</span>
     </div>
-    <span class="font-bold text-white text-lg">Citiescapes</span>
 </div>
 
 <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -77,6 +78,8 @@
                 </svg>
                 Archive
             </a>
+
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Announcements</p>
             <a href="{{ route('admin.announcements.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -85,6 +88,8 @@
                 </svg>
                 Announcements
             </a>
+
+            <p class="px-3 pt-4 pb-1 text-xs font-semibold text-brand-400 uppercase tracking-wider">Tenant Requests</p>
             <a href="{{ route('admin.requests.index') }}"
                 class="sidebar-link {{ request()->routeIs('admin.requests.*') ? 'active' : '' }}" wire:navigate>
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

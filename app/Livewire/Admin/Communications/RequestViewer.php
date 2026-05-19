@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Communications;
 
 use App\Mail\RequestResponseMail;
+use App\Models\AuditLog;
 use App\Models\NotificationLog;
 use App\Models\TenantRequest;
 use Illuminate\Support\Facades\Mail;
@@ -80,6 +81,9 @@ class RequestViewer extends Component
                 );
             }
 
+        AuditLog::record('tenant_request_responded', auth()->id(), 'gm', 'SS7',
+            "{$request->type} #{$request->id} \"{$request->subject}\" → {$this->newStatus}");
+
         $this->closeView();
         session()->flash('success', 'Response saved.');
     }
@@ -89,10 +93,17 @@ class RequestViewer extends Component
         $requests = TenantRequest::with('tenant')
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
             ->when($this->filterType, fn($q) => $q->where('type', $this->filterType))
-            ->when($this->search, fn($q) => $q->where(function ($q) {
-                $q->where('subject', 'like', "%{$this->search}%")
-                    ->orWhereHas('tenant', fn($q) => $q->where('full_name', 'like', "%{$this->search}%"));
-            }))
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('subject', 'like', $term)
+                       ->orWhere('message', 'like', $term)
+                       ->orWhere('type', 'like', $term)
+                       ->orWhere('status', 'like', $term)
+                       ->orWhere('response', 'like', $term)
+                       ->orWhereHas('tenant', fn($t) => $t->where('full_name', 'like', $term)->orWhere('email', 'like', $term));
+                });
+            })
             ->latest()
             ->paginate(15);
 

@@ -1,20 +1,37 @@
 <div>
-    {{-- Hero --}}
-    <section class="bg-brand-900 text-white py-16">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-bold tracking-tight">Welcome to Citiescapes</h1>
-            <p class="mt-3 text-lg text-brand-200">Comfortable, quality, and affordable room rentals in Bajada, Davao
-                City</p>
-            <p class="mt-1 text-sm text-brand-300">Remedios St., Bajada, Davao City &bull; 22 Rooms &bull; 3 Floors</p>
+    {{-- Hero with building photo backdrop --}}
+    <section class="relative text-white overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image:url('/storage/building/hero.jpg');"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-950/85 via-brand-900/75 to-brand-800/70"></div>
+        <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
+            <span class="cs-anim-fade-down inline-block text-[11px] uppercase tracking-[0.32em] text-marigold-300 font-semibold mb-5">Bajada · Davao City</span>
+            <h1 class="cs-anim-fade-up cs-delay-100 font-serif text-5xl sm:text-6xl font-semibold tracking-tight">Welcome to <span class="text-marigold-300">Citiescapes</span></h1>
+            <p class="cs-anim-fade-up cs-delay-200 mt-5 text-lg text-paper-100/90 max-w-2xl mx-auto">Comfortable, quality, and affordable room rentals — a quiet warm-tiled apartment just off Remedios Street.</p>
+            <div class="cs-anim-fade-up cs-delay-300 mt-7 inline-flex items-center gap-6 text-xs uppercase tracking-[0.24em] text-paper-200/80">
+                <span><i class="fas fa-building text-marigold-300 mr-1.5"></i> 22 Rooms</span>
+                <span class="h-3 w-px bg-paper-200/30"></span>
+                <span><i class="fas fa-layer-group text-marigold-300 mr-1.5"></i> 3 Floors</span>
+                <span class="h-3 w-px bg-paper-200/30"></span>
+                <span><i class="fas fa-shield-halved text-marigold-300 mr-1.5"></i> 24/7 Secure</span>
+            </div>
+            <div class="cs-anim-fade-up cs-delay-400 mt-10 flex items-center justify-center gap-3">
+                <a href="#rooms" class="inline-flex items-center gap-2 rounded-md bg-marigold-400 hover:bg-marigold-300 text-brand-950 text-sm font-semibold px-5 py-2.5 shadow-md transition cs-anim-pulse-soft">
+                    Browse Rooms <i class="fas fa-arrow-down text-xs"></i>
+                </a>
+                <a href="#inquire" class="inline-flex items-center gap-2 rounded-md border border-paper-200/40 hover:bg-white/10 text-paper-50 text-sm font-medium px-5 py-2.5 transition">
+                    Send an Inquiry
+                </a>
+            </div>
         </div>
     </section>
 
     {{-- ============ ROOMS SPECIFICATIONS ============ --}}
-    <section id="rooms" class="py-16 bg-brand-100">
+    <section id="rooms" class="py-20 bg-paper-100">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-brand-900">Rooms Specifications</h2>
-            <div class="mt-3 mx-auto h-1 w-16 rounded-full bg-brand-700"></div>
-            <p class="mt-4 text-sm text-brand-600">Choose the room type that fits your needs</p>
+            <span class="inline-block text-[11px] uppercase tracking-[0.32em] text-brand-600 font-semibold mb-3">Choose your space</span>
+            <h2 class="font-serif text-4xl font-semibold text-brand-900">Room Specifications</h2>
+            <div class="mt-4 mx-auto h-0.5 w-16 rounded-full bg-marigold-400"></div>
+            <p class="mt-4 text-sm text-brand-700/80">Two room types to fit students, professionals, or sharing families.</p>
         </div>
 
         <div class="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -49,8 +66,8 @@
                     {{-- Room-type badge --}}
                     <div class="absolute top-3 left-3 z-10">
                         <span
-                            class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-brand-800 shadow-sm backdrop-blur-sm">
-                            <i class="fas fa-door-closed text-brand-700"></i> Compact Room
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-brand-800 shadow-sm">
+                            <i class="fas fa-door-closed text-brand-700"></i> {{ $cards['compact']['title'] }}
                         </span>
                     </div>
 
@@ -82,12 +99,12 @@
                     {{-- Title + Price --}}
                     <div class="flex items-start justify-between mb-4">
                         <div>
-                            <h3 class="text-xl font-bold text-brand-900">Compact Room</h3>
-                            <p class="mt-0.5 text-xs text-brand-500">Solo professionals &amp; students</p>
+                            <h3 class="text-xl font-bold text-brand-900">{{ $cards['compact']['title'] }}</h3>
+                            <p class="mt-0.5 text-xs text-brand-500">{{ $cards['compact']['subtitle'] }}</p>
                         </div>
                         <div class="ml-4 shrink-0 text-right">
                             <p class="text-xl font-extrabold text-brand-900">
-                                ₱{{ number_format($compactRoom?->rate ?? 3500, 2) }}</p>
+                                ₱{{ number_format($compactRoom?->rate ?? $cards['compact']['price'], 2) }}</p>
                             <p class="text-xs text-brand-400">per month</p>
                         </div>
                     </div>
@@ -96,7 +113,7 @@
                     <div class="flex flex-wrap items-center gap-3 text-xs text-brand-600 mb-5">
                         <span class="flex items-center gap-1">
                             <i class="fas fa-users text-brand-600"></i>
-                            Max {{ $compactRoom?->max_occupants ?? 3 }} persons
+                            Max {{ $compactRoom?->max_occupants ?? $cards['compact']['max_occupants'] }} persons
                         </span>
                         <span class="flex items-center gap-1 font-semibold text-green-700">
                             <i class="fas fa-circle-check"></i>
@@ -106,25 +123,14 @@
 
                     {{-- Amenities --}}
                     <div class="border-t border-brand-100 pt-4">
-                        <p class="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-brand-400">Amenities
-                        </p>
+                        <p class="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-brand-400">Amenities</p>
                         <div class="flex flex-wrap gap-2">
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-snowflake"></i> Air Conditioner
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-wifi"></i> WiFi
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-table"></i> Tables
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-chair"></i> Chairs
-                            </span>
+                            @foreach ($cards['compact']['amenities'] ?? [] as $am)
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
+                                    <i class="fas {{ $am['icon'] ?? 'fa-circle' }}"></i> {{ $am['label'] ?? '' }}
+                                </span>
+                            @endforeach
                         </div>
                     </div>
 
@@ -161,8 +167,8 @@
 
                     <div class="absolute top-3 left-3 z-10">
                         <span
-                            class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-brand-800 shadow-sm backdrop-blur-sm">
-                            <i class="fas fa-bed text-brand-700"></i> Spacious Room
+                            class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-brand-800 shadow-sm">
+                            <i class="fas fa-bed text-brand-700"></i> {{ $cards['spacious']['title'] }}
                         </span>
                     </div>
 
@@ -190,12 +196,12 @@
                 <div class="p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
-                            <h3 class="text-xl font-bold text-brand-900">Spacious Room</h3>
-                            <p class="mt-0.5 text-xs text-brand-500">Couples, families &amp; sharing</p>
+                            <h3 class="text-xl font-bold text-brand-900">{{ $cards['spacious']['title'] }}</h3>
+                            <p class="mt-0.5 text-xs text-brand-500">{{ $cards['spacious']['subtitle'] }}</p>
                         </div>
                         <div class="ml-4 shrink-0 text-right">
                             <p class="text-xl font-extrabold text-brand-900">
-                                ₱{{ number_format($spaciousRoom?->rate ?? 5000, 2) }}</p>
+                                ₱{{ number_format($spaciousRoom?->rate ?? $cards['spacious']['price'], 2) }}</p>
                             <p class="text-xs text-brand-400">per month</p>
                         </div>
                     </div>
@@ -203,7 +209,7 @@
                     <div class="flex flex-wrap items-center gap-3 text-xs text-brand-600 mb-5">
                         <span class="flex items-center gap-1">
                             <i class="fas fa-users text-brand-600"></i>
-                            Max {{ $spaciousRoom?->max_occupants ?? 4 }} persons
+                            Max {{ $spaciousRoom?->max_occupants ?? $cards['spacious']['max_occupants'] }} persons
                         </span>
                         <span class="flex items-center gap-1 font-semibold text-green-700">
                             <i class="fas fa-circle-check"></i>
@@ -212,33 +218,14 @@
                     </div>
 
                     <div class="border-t border-brand-100 pt-4">
-                        <p class="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-brand-400">Amenities
-                        </p>
+                        <p class="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-brand-400">Amenities</p>
                         <div class="flex flex-wrap gap-2">
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-snowflake"></i> Air Conditioner
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-wifi"></i> WiFi
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-table"></i> Tables
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-chair"></i> Chairs
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-layer-group"></i> Extra Double Deck Frame
-                            </span>
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
-                                <i class="fas fa-bed"></i> Extra Mattress
-                            </span>
+                            @foreach ($cards['spacious']['amenities'] ?? [] as $am)
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-300">
+                                    <i class="fas {{ $am['icon'] ?? 'fa-circle' }}"></i> {{ $am['label'] ?? '' }}
+                                </span>
+                            @endforeach
                         </div>
                     </div>
 

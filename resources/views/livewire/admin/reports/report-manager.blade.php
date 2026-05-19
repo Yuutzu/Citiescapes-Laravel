@@ -1,19 +1,41 @@
 <div>
-    <h1 class="text-2xl font-bold text-brand-900 mb-6">Archive</h1>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-brand-900">Archive</h1>
+        <div class="flex items-center gap-2">
+            <button wire:click="exportCsv" type="button"
+                class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+        </div>
+    </div>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-        <select wire:model.live="filterType" class="form-input w-auto text-sm">
-            <option value="">All Types</option>
-            <option value="room">Room</option><option value="tenant_account">Tenant</option>
-            <option value="payment">Payment</option><option value="contract">Contract</option>
-        </select>
-        <select wire:model.live="filterSubsystem" class="form-input w-auto text-sm">
-            <option value="">All Sources</option>
-            <option value="SS1">SS1 — Rooms</option><option value="SS2">SS2 — Tenants</option>
-            <option value="SS3">SS3 — Billing</option><option value="SS4">SS4 — Contracts</option>
-        </select>
-        <input wire:model.live="dateFrom" type="date" class="form-input w-auto text-sm" placeholder="From">
-        <input wire:model.live="dateTo" type="date" class="form-input w-auto text-sm" placeholder="To">
+    <div class="space-y-3 mb-6">
+        @php
+            $typeBtn = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterType === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+            $ssBtn   = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterSubsystem === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Type:</span>
+            <button wire:click="$set('filterType','')" class="{{ $typeBtn('') }}">All</button>
+            <button wire:click="$set('filterType','room')" class="{{ $typeBtn('room') }}">Room</button>
+            <button wire:click="$set('filterType','tenant_account')" class="{{ $typeBtn('tenant_account') }}">Tenant</button>
+            <button wire:click="$set('filterType','payment')" class="{{ $typeBtn('payment') }}">Payment</button>
+            <button wire:click="$set('filterType','contract')" class="{{ $typeBtn('contract') }}">Contract</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Source:</span>
+            <button wire:click="$set('filterSubsystem','')" class="{{ $ssBtn('') }}">All</button>
+            <button wire:click="$set('filterSubsystem','SS1')" class="{{ $ssBtn('SS1') }}">Rooms</button>
+            <button wire:click="$set('filterSubsystem','SS2')" class="{{ $ssBtn('SS2') }}">Tenants</button>
+            <button wire:click="$set('filterSubsystem','SS3')" class="{{ $ssBtn('SS3') }}">Billing</button>
+            <button wire:click="$set('filterSubsystem','SS4')" class="{{ $ssBtn('SS4') }}">Contracts</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Date range:</span>
+            <input wire:model.live="dateFrom" type="date" class="form-input w-auto text-sm" placeholder="From">
+            <span class="text-xs text-gray-400">to</span>
+            <input wire:model.live="dateTo" type="date" class="form-input w-auto text-sm" placeholder="To">
+        </div>
     </div>
 
     <div class="card overflow-x-auto p-0">
@@ -44,6 +66,12 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         <div class="flex items-center justify-end gap-2">
+                            @if($a->record_type === 'contract')
+                                <button wire:click="exportContractPdf({{ $a->id }})"
+                                    class="inline-flex items-center gap-1 rounded-full bg-rose-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-400 transition">
+                                    <i class="fas fa-file-pdf text-[10px]"></i> PDF
+                                </button>
+                            @endif
                             <button wire:click="restore({{ $a->id }})" wire:confirm="Restore this record?"
                                 class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
                                 <i class="fas fa-rotate-left text-[10px]"></i> Restore

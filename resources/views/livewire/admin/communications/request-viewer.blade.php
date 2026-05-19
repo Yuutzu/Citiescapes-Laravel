@@ -8,8 +8,8 @@
 
     {{-- View / Respond Modal --}}
     @if($viewing)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900">{{ $viewing->subject }}</h2>
@@ -102,20 +102,29 @@
     @endif
 
     {{-- Filters --}}
-    <div class="flex flex-wrap gap-3 mb-4">
-        <input wire:model.live.debounce.300ms="search" type="text" class="form-input w-full sm:w-64"
-            placeholder="Search tenant or subject...">
-        <select wire:model.live="filterType" class="form-input w-auto">
-            <option value="">All Types</option>
-            <option value="request">Request</option>
-            <option value="complaint">Complaint</option>
-        </select>
-        <select wire:model.live="filterStatus" class="form-input w-auto">
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-        </select>
+    <div class="space-y-3 mb-4">
+        <div class="relative max-w-md">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input wire:model.live.debounce.300ms="search" type="text"
+                placeholder="Search tenant, subject, message, type, status, response..."
+                class="form-input w-full pl-9 text-sm">
+        </div>
+        @php
+            $rBtn = fn($v, $field) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . (($field === 'type' ? $filterType : $filterStatus) === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Type:</span>
+            <button wire:click="$set('filterType','')" class="{{ $rBtn('', 'type') }}">All</button>
+            <button wire:click="$set('filterType','request')" class="{{ $rBtn('request', 'type') }}">Request</button>
+            <button wire:click="$set('filterType','complaint')" class="{{ $rBtn('complaint', 'type') }}">Complaint</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Status:</span>
+            <button wire:click="$set('filterStatus','')" class="{{ $rBtn('', 'status') }}">All</button>
+            <button wire:click="$set('filterStatus','pending')" class="{{ $rBtn('pending', 'status') }}">Pending</button>
+            <button wire:click="$set('filterStatus','in_progress')" class="{{ $rBtn('in_progress', 'status') }}">In Progress</button>
+            <button wire:click="$set('filterStatus','resolved')" class="{{ $rBtn('resolved', 'status') }}">Resolved</button>
+        </div>
     </div>
 
     {{-- Table --}}

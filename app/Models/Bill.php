@@ -90,6 +90,30 @@ class Bill extends Model
         return $this->hasMany(PenaltyOverride::class);
     }
 
+    /**
+     * Total of confirmed payments against this bill.
+     * Sum of all rows in `payments` linked to this bill.
+     */
+    public function getPaidAmountAttribute(): float
+    {
+        return (float) ($this->payments_sum_amount ?? $this->payments()->sum('amount'));
+    }
+
+    /**
+     * Outstanding balance (total_amount minus confirmed payments).
+     * Used by the partial-payment flow to decide if the bill is fully paid.
+     */
+    public function getBalanceAttribute(): float
+    {
+        $balance = (float) $this->total_amount - $this->paid_amount;
+        return $balance < 0 ? 0.0 : $balance;
+    }
+
+    public function getIsFullyPaidAttribute(): bool
+    {
+        return $this->balance <= 0.001; // tolerate floating-point noise
+    }
+
     public function getStatusBadgeAttribute(): string
     {
         return match ($this->status) {

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Tenant;
 
+use App\Models\AuditLog;
 use App\Models\TenantRequest;
 use App\Models\NotificationLog;
 use App\Models\User;
@@ -46,12 +47,15 @@ class RequestManager extends Component
             'body' => 'required|max:2000',
         ]);
 
-        TenantRequest::create([
+        $tr = TenantRequest::create([
             'tenant_id' => auth()->id(),
             'type' => $this->type,
             'subject' => $this->subject,
             'body' => $this->body,
         ]);
+
+        AuditLog::record('tenant_request_submitted', auth()->id(), 'tenant', 'SS7',
+            ucfirst($this->type) . " #{$tr->id} \"{$this->subject}\" submitted");
 
         // Notify all GMs
         $gms = User::where('role', 'gm')->where('status', 'active')->get();

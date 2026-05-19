@@ -60,6 +60,62 @@ class ContractManager extends Component
     // Scan viewer modal
     public ?int $viewingScanId = null;
 
+    // Scan-access decision modal
+    public bool $showScanDecision = false;
+    public ?int $scanDecisionContractId = null;
+    public string $scanDecisionAction = 'approve'; // approve | deny
+    public string $scanDecisionNote = '';
+
+    public function openScanDecision(int $contractId, string $action): void
+    {
+        if (!in_array($action, ['approve', 'deny'], true)) return;
+        $this->scanDecisionContractId = $contractId;
+        $this->scanDecisionAction = $action;
+        $this->scanDecisionNote = '';
+        $this->showScanDecision = true;
+    }
+
+    public function submitScanDecision(): void
+    {
+        $this->validate([
+            'scanDecisionNote' => $this->scanDecisionAction === 'deny' ? 'required|string|max:500' : 'nullable|string|max:500',
+        ]);
+
+        $contract = Contract::findOrFail($this->scanDecisionContractId);
+        $status = $this->scanDecisionAction === 'approve' ? 'approved' : 'denied';
+
+        $contract->update([
+            'scan_view_status'        => $status,
+            'scan_view_decided_at'    => now(),
+            'scan_view_decided_by'    => auth()->id(),
+            'scan_view_decision_note' => $this->scanDecisionNote ?: null,
+        ]);
+
+        AuditLog::record(
+            $status === 'approved' ? 'contract_scan_view_approved' : 'contract_scan_view_denied',
+            auth()->id(), 'gm', 'SS4',
+            "Contract #{$contract->id} scan access {$status} for tenant #{$contract->tenant_id}"
+        );
+
+        $this->showScanDecision = false;
+        $this->scanDecisionContractId = null;
+        session()->flash('success', "Scan access {$status}.");
+    }
+
+    public function revokeScanAccess(int $contractId): void
+    {
+        $contract = Contract::findOrFail($contractId);
+        $contract->update([
+            'scan_view_status'        => null,
+            'scan_view_requested_at'  => null,
+            'scan_view_decided_at'    => null,
+            'scan_view_decided_by'    => null,
+            'scan_view_decision_note' => null,
+        ]);
+        AuditLog::record('contract_scan_view_revoked', auth()->id(), 'gm', 'SS4', "Contract #{$contract->id} scan access revoked");
+        session()->flash('success', 'Scan access revoked.');
+    }
+
     public function viewScan(int $id): void
     {
         $this->viewingScanId = $id;
@@ -92,6 +148,7 @@ class ContractManager extends Component
         $this->penalty_rate = (float) $c->penalty_rate;
         $this->penalty_grace_days = $c->penalty_grace_days;
         $this->house_rules = $c->house_rules ?? '';
+        $this->scanFile = null;
         $this->showModal = true;
         $this->editing = true;
     }
@@ -145,6 +202,7 @@ class ContractManager extends Component
             'penalty_rate' => 'required|numeric|min:0',
             'amenities.*.name' => 'nullable|string|max:80',
             'amenities.*.fee'  => 'nullable|numeric|min:0',
+            'scanFile'   => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp,doc,docx|max:10240',
         ]);
 
         $cleanAmenities = collect($this->amenities)
@@ -173,6 +231,10 @@ class ContractManager extends Component
 
         if ($this->scanFile) {
             $path = $this->scanFile->store('contracts', 'public');
+            if (!$path) {
+                $this->addError('scanFile', 'Could not save uploaded scan to disk. Check storage permissions.');
+                return;
+            }
             $data['scan_file_path'] = $path;
             $data['scan_file_name'] = $this->scanFile->getClientOriginalName();
         }
@@ -194,16 +256,41 @@ class ContractManager extends Component
     {
         $contract = Contract::with(['tenant', 'room'])->findOrFail($id);
 
-        $contract->update(['status' => 'active']);
+        // Guard: only drafts can be activated.
+        if ($contract->status !== 'draft') {
+            session()->flash('error', 'Only draft contracts can be activated.');
+            return;
+        }
 
-        // Mark room as occupied and link the tenant
-        if ($contract->room) {
-            $contract->room->update([
-                'status' => 'occupied',
-                'current_tenant_id' => $contract->tenant_id,
-                'last_updated_by' => auth()->id(),
-                'last_status_update' => now(),
-            ]);
+        // Guard: room must exist and not already be occupied by a different tenant.
+        if (!$contract->room) {
+            session()->flash('error', 'Contract has no linked room.');
+            return;
+        }
+        if (
+            $contract->room->current_tenant_id
+            && $contract->room->current_tenant_id !== $contract->tenant_id
+        ) {
+            session()->flash('error', "Room {$contract->room->room_number} is already occupied by another tenant. Resolve that first.");
+            return;
+        }
+
+        // Activate contract + occupy room atomically-ish.
+        $contract->update([
+            'status'       => 'active',
+            'activated_at' => $contract->activated_at ?? now(),
+        ]);
+
+        $contract->room->update([
+            'status'             => 'occupied',
+            'current_tenant_id'  => $contract->tenant_id,
+            'last_updated_by'    => auth()->id(),
+            'last_status_update' => now(),
+        ]);
+
+        // Ensure the tenant user is marked active (drafts often link to pending_activation tenants).
+        if ($contract->tenant && $contract->tenant->status === 'pending_activation') {
+            $contract->tenant->update(['status' => 'active']);
         }
 
         AuditLog::record('contract_activated', auth()->id(), 'gm', 'SS4', "Contract #{$contract->id} activated — Room {$contract->room?->room_number} marked occupied");
@@ -309,7 +396,17 @@ class ContractManager extends Component
     public function render()
     {
         $contracts = Contract::with(['tenant', 'room'])
-            ->when($this->search, fn($q) => $q->whereHas('tenant', fn($qq) => $qq->where('full_name', 'like', "%{$this->search}%")))
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->whereHas('tenant', fn($t) => $t->where('full_name', 'like', $term)->orWhere('email', 'like', $term))
+                       ->orWhereHas('room', fn($r) => $r->where('room_number', 'like', $term)->orWhere('room_type', 'like', $term))
+                       ->orWhere('status', 'like', $term)
+                       ->orWhere('house_rules', 'like', $term)
+                       ->orWhere('base_rent_rate', 'like', $term)
+                       ->orWhere('termination_reason', 'like', $term);
+                });
+            })
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
             ->latest()
             ->paginate(15);

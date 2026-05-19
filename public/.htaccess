@@ -3,6 +3,18 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <IfModule mod_php.c>
+        php_value upload_tmp_dir "C:/laragon/www/citiescapes/storage/php-uploads"
+        php_value upload_max_filesize 50M
+        php_value post_max_size 60M
+    </IfModule>
+    <IfModule mod_php7.c>
+        php_value upload_tmp_dir "C:/laragon/www/citiescapes/storage/php-uploads"
+    </IfModule>
+    <IfModule mod_php8.c>
+        php_value upload_tmp_dir "C:/laragon/www/citiescapes/storage/php-uploads"
+    </IfModule>
+
     RewriteEngine On
 
     # Handle Authorization Header

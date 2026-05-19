@@ -228,20 +228,152 @@ class BillingManager extends Component
         $bill = Bill::findOrFail($this->payBillId);
 
         Payment::create([
-            'bill_id' => $bill->id,
-            'tenant_id' => $bill->tenant_id,
-            'amount' => $this->payAmount,
-            'payment_method' => $this->payMethod,
+            'bill_id'          => $bill->id,
+            'tenant_id'        => $bill->tenant_id,
+            'amount'           => $this->payAmount,
+            'payment_method'   => $this->payMethod,
             'reference_number' => $this->payReference,
-            'confirmed_by' => auth()->id(),
-            'confirmed_at' => now(),
+            'confirmed_by'     => auth()->id(),
+            'confirmed_at'     => now(),
         ]);
 
-        $bill->update(['status' => 'paid', 'paid_at' => now(), 'days_overdue' => 0]);
-        AuditLog::record('payment_confirmed', auth()->id(), 'gm', 'SS3', "Payment of ₱{$this->payAmount} for bill #{$bill->id}");
+        // Partial-payment aware: only flip to "paid" once the sum of all
+        // confirmed payments covers the bill total. Otherwise leave the
+        // existing status alone — a tenant in eviction who pays 30%
+        // is still in eviction until the balance reaches zero.
+        $bill->refresh();
+        if ($bill->is_fully_paid) {
+            $bill->update([
+                'status'       => 'paid',
+                'paid_at'      => now(),
+                'days_overdue' => 0,
+            ]);
+            AuditLog::record('payment_confirmed', auth()->id(), 'gm', 'SS3',
+                "Payment of ₱{$this->payAmount} settled bill #{$bill->id} in full");
+        } else {
+            AuditLog::record('payment_partial', auth()->id(), 'gm', 'SS3',
+                "Partial payment of ₱{$this->payAmount} on bill #{$bill->id} (balance: ₱" . number_format($bill->balance, 2) . ")");
+        }
 
         $this->showPayment = false;
-        session()->flash('success', 'Payment confirmed.');
+        session()->flash('success', $bill->is_fully_paid
+            ? 'Payment confirmed — bill marked as paid.'
+            : 'Partial payment recorded. Remaining balance: ₱' . number_format($bill->balance, 2));
+    }
+
+    /**
+     * Apply the contract's security deposit (or whatever remains) as a credit
+     * against an outstanding bill — typical move for a tenant exiting in
+     * default. Creates a payment row tagged as `deposit_applied` so the
+     * audit trail is intact, and bumps the contract's `deposit_applied_amount`
+     * so the same deposit isn't applied twice.
+     */
+    public function applyDepositToArrears(int $billId): void
+    {
+        $bill = Bill::with('contract')->findOrFail($billId);
+        $contract = $bill->contract;
+
+        if (!$contract) {
+            session()->flash('error', 'Bill has no linked contract.');
+            return;
+        }
+
+        $depositRemaining = (float) $contract->deposit - (float) $contract->deposit_applied_amount;
+        if ($depositRemaining <= 0) {
+            session()->flash('error', 'No deposit remains on this contract.');
+            return;
+        }
+
+        $balance = $bill->balance;
+        if ($balance <= 0) {
+            session()->flash('error', 'This bill is already fully paid.');
+            return;
+        }
+
+        // Apply up to the remaining balance OR the remaining deposit — whichever is smaller.
+        $applied = min($depositRemaining, $balance);
+
+        Payment::create([
+            'bill_id'          => $bill->id,
+            'tenant_id'        => $bill->tenant_id,
+            'amount'           => $applied,
+            'payment_method'   => 'deposit_applied',
+            'reference_number' => "Contract #{$contract->id} deposit credit",
+            'confirmed_by'     => auth()->id(),
+            'confirmed_at'     => now(),
+        ]);
+
+        $contract->update([
+            'deposit_applied_amount' => (float) $contract->deposit_applied_amount + $applied,
+            'deposit_applied_at'     => now(),
+        ]);
+
+        $bill->refresh();
+        if ($bill->is_fully_paid) {
+            $bill->update([
+                'status'       => 'paid',
+                'paid_at'      => now(),
+                'days_overdue' => 0,
+            ]);
+        }
+
+        AuditLog::record('deposit_applied_to_bill', auth()->id(), 'gm', 'SS3',
+            "Applied ₱" . number_format($applied, 2) . " of deposit (contract #{$contract->id}) to bill #{$bill->id}");
+
+        session()->flash('success', "Applied ₱" . number_format($applied, 2) . " from security deposit to bill #{$bill->id}.");
+    }
+
+    /**
+     * Eviction → contract termination shortcut. Reuses the same logic as
+     * ContractManager::terminate(): marks contract terminated, archives it
+     * to SS5 with reason, flips tenant to archived, frees the room.
+     */
+    public function terminateForArrears(int $billId): void
+    {
+        $bill = Bill::with('contract.tenant', 'contract.room')->findOrFail($billId);
+        $contract = $bill->contract;
+
+        if (!$contract) {
+            session()->flash('error', 'Bill has no linked contract.');
+            return;
+        }
+        if ($contract->status === 'terminated') {
+            session()->flash('error', 'Contract is already terminated.');
+            return;
+        }
+
+        $reason = "Tenant default after eviction — Bill #{$bill->id} (period {$bill->billing_period}, balance ₱" . number_format($bill->balance, 2) . ")";
+
+        $contract->update([
+            'status'             => 'terminated',
+            'terminated_at'      => now(),
+            'termination_reason' => $reason,
+        ]);
+
+        Archive::create([
+            'original_record_id' => $contract->id,
+            'record_type'        => 'contract',
+            'source_subsystem'   => 'SS4',
+            'archive_reason'     => $reason,
+            'data'               => $contract->toArray(),
+            'scan_file_path'     => $contract->scan_file_path,
+            'archived_by'        => auth()->id(),
+        ]);
+
+        if ($contract->tenant && $contract->tenant->status === 'active') {
+            $contract->tenant->update(['status' => 'archived', 'archived_at' => now()]);
+        }
+        if ($contract->room && $contract->room->current_tenant_id === $contract->tenant_id) {
+            $contract->room->update([
+                'current_tenant_id'  => null,
+                'status'             => 'available',
+                'last_status_update' => now(),
+            ]);
+        }
+
+        AuditLog::record('contract_terminated_arrears', auth()->id(), 'gm', 'SS3',
+            "Contract #{$contract->id} terminated via eviction shortcut from bill #{$bill->id}");
+        session()->flash('success', "Contract #{$contract->id} terminated and archived. Room freed.");
     }
 
     public function openOverride(int $billId)
@@ -281,30 +413,22 @@ class BillingManager extends Component
         session()->flash('success', 'Penalty overridden.');
     }
 
-    public function archiveBills(int $tenantId)
-    {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Bill> $bills */
-        $bills = Bill::where('tenant_id', $tenantId)->get();
-        foreach ($bills as $bill) {
-            /** @var Bill $bill */
-            Archive::create([
-                'original_record_id' => $bill->id,
-                'record_type' => 'payment',
-                'source_subsystem' => 'SS3',
-                'archive_reason' => 'Lease ended — GM archived',
-                'data' => $bill->toArray(),
-                'archived_by' => auth()->id(),
-            ]);
-            $bill->update(['status' => 'archived']);
-        }
-        session()->flash('success', 'Payment records archived.');
-    }
-
     public function render()
     {
         $bills = Bill::with(['tenant', 'room', 'contract'])
             ->leftJoin('users', 'bills.tenant_id', '=', 'users.id')
-            ->when($this->search, fn($q) => $q->where('users.full_name', 'like', "%{$this->search}%"))
+            ->leftJoin('rooms', 'bills.room_id', '=', 'rooms.id')
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('users.full_name', 'like', $term)
+                       ->orWhere('users.email', 'like', $term)
+                       ->orWhere('rooms.room_number', 'like', $term)
+                       ->orWhere('bills.status', 'like', $term)
+                       ->orWhere('bills.billing_period', 'like', $term)
+                       ->orWhere('bills.total_amount', 'like', $term);
+                });
+            })
             ->when($this->filterStatus, fn($q) => $q->where('bills.status', $this->filterStatus))
             ->when($this->sortBy === 'tenant_name', fn($q) => $q->orderBy('users.full_name', $this->sortDirection))
             ->when($this->sortBy !== 'tenant_name', fn($q) => $q->orderBy("bills.{$this->sortBy}", $this->sortDirection))

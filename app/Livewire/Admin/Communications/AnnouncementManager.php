@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Communications;
 
 use App\Mail\AnnouncementMail;
 use App\Models\Announcement;
+use App\Models\AuditLog;
 use App\Models\NotificationLog;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -73,6 +74,12 @@ class AnnouncementManager extends Component
             }
         }
 
+        $recipientLabel = $this->recipientType === 'all'
+            ? 'all active tenants (' . \count($recipients) . ')'
+            : ('tenant #' . $this->recipientId);
+        AuditLog::record('announcement_sent', auth()->id(), 'gm', 'SS7',
+            "Announcement \"{$this->title}\" sent to {$recipientLabel}");
+
         $this->closeForm();
         session()->flash('success', 'Announcement sent to ' . \count($recipients) . ' tenant(s) (bell + email).');
     }
@@ -97,10 +104,16 @@ class AnnouncementManager extends Component
     public function render()
     {
         $announcements = Announcement::with(['sentBy', 'recipient'])
-            ->when($this->search, fn($q) => $q->where(function ($q) {
-                $q->where('title', 'like', "%{$this->search}%")
-                  ->orWhere('body', 'like', "%{$this->search}%");
-            }))
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('title', 'like', $term)
+                       ->orWhere('body', 'like', $term)
+                       ->orWhere('recipient_type', 'like', $term)
+                       ->orWhereHas('sentBy', fn($u) => $u->where('full_name', 'like', $term))
+                       ->orWhereHas('recipient', fn($u) => $u->where('full_name', 'like', $term)->orWhere('email', 'like', $term));
+                });
+            })
             ->latest()
             ->paginate(15);
 

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Rooms;
 use App\Models\Archive;
 use App\Models\AuditLog;
 use App\Models\Room;
+use App\Models\SystemSetting;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -34,12 +35,231 @@ class RoomManager extends Component
     public int $max_occupants = 3;
     public string $status = 'available';
     public string $description = '';
-    public $newPhotos = [];
     public array $amenitiesInput = [];
 
     protected $availableAmenities = ['Air Conditioning', 'WiFi', 'Private Bathroom', 'Shared Bathroom', 'Mini Fridge', 'Study Desk', 'Wardrobe', 'Hot Shower'];
 
     public function getAvailableAmenitiesProperty() { return $this->availableAmenities; }
+
+    // ====================================================================
+    // PUBLIC ROOM TYPE CARDS (SS1) — admin edits the two cards (compact /
+    // spacious) shown on the public landing page: title, subtitle, default
+    // price, max occupants, amenity chips and photo paths. Persisted as
+    // JSON in system_settings under key `room_type_cards`.
+    // ====================================================================
+    public array $roomCards = [];
+    public bool $showCardsEditor = false;
+    // Single-slot upload buffer for the cards editor.
+    // The view sets $cardPhotoSlot ("compact.0") immediately before the user
+    // picks a file, then $cardPhotoFile is a TemporaryUploadedFile bound to
+    // wire:model. The "updatedCardPhotoFile" hook persists it into the matching slot.
+    public $cardPhotoFile = null;
+    public ?string $cardPhotoSlot = null;
+
+    public array $iconOptions = [
+        'fa-snowflake'      => 'Air Conditioner',
+        'fa-wifi'           => 'WiFi',
+        'fa-table'          => 'Tables',
+        'fa-chair'          => 'Chairs',
+        'fa-bed'            => 'Bed',
+        'fa-layer-group'    => 'Double Deck',
+        'fa-shower'         => 'Shower',
+        'fa-toilet'         => 'Toilet',
+        'fa-tv'             => 'TV',
+        'fa-fan'            => 'Fan',
+        'fa-mug-hot'        => 'Kitchenette',
+        'fa-shield-halved'  => 'Security',
+    ];
+
+    public function mount(): void
+    {
+        $this->roomCards = static::loadRoomCards();
+    }
+
+    public static function defaultRoomCards(): array
+    {
+        return [
+            'compact' => [
+                'title' => 'Compact Room',
+                'subtitle' => 'Solo professionals & students',
+                'price' => 3500,
+                'max_occupants' => 3,
+                'amenities' => [
+                    ['icon' => 'fa-snowflake', 'label' => 'Air Conditioner'],
+                    ['icon' => 'fa-wifi',      'label' => 'WiFi'],
+                    ['icon' => 'fa-table',     'label' => 'Tables'],
+                    ['icon' => 'fa-chair',     'label' => 'Chairs'],
+                ],
+                'photos' => [
+                    '/storage/room-types/compact-cover.jpg',
+                    '/storage/room-types/compact-1.jpg',
+                ],
+            ],
+            'spacious' => [
+                'title' => 'Spacious Room',
+                'subtitle' => 'Couples, families & sharing',
+                'price' => 5000,
+                'max_occupants' => 4,
+                'amenities' => [
+                    ['icon' => 'fa-snowflake',   'label' => 'Air Conditioner'],
+                    ['icon' => 'fa-wifi',        'label' => 'WiFi'],
+                    ['icon' => 'fa-table',       'label' => 'Tables'],
+                    ['icon' => 'fa-chair',       'label' => 'Chairs'],
+                    ['icon' => 'fa-layer-group', 'label' => 'Extra Double Deck Frame'],
+                    ['icon' => 'fa-bed',         'label' => 'Extra Mattress'],
+                ],
+                'photos' => [
+                    '/storage/room-types/spacious-cover.jpg',
+                    '/storage/room-types/spacious-1.jpg',
+                ],
+            ],
+        ];
+    }
+
+    public static function loadRoomCards(): array
+    {
+        $raw = SystemSetting::getValue('room_type_cards', null);
+        if (\is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (\is_array($decoded)) $raw = $decoded;
+        }
+        $defaults = static::defaultRoomCards();
+        if (!\is_array($raw)) return $defaults;
+
+        // Merge scalar/text fields with defaults, but take photos and amenities
+        // verbatim from saved data — otherwise array_replace_recursive would
+        // graft default photos back over an admin's deletions/replacements.
+        foreach (['compact', 'spacious'] as $t) {
+            $saved = $raw[$t] ?? [];
+
+            $merged = $defaults[$t]; // start from defaults
+            foreach (['title', 'subtitle', 'price', 'max_occupants'] as $scalar) {
+                if (array_key_exists($scalar, $saved)) {
+                    $merged[$scalar] = $saved[$scalar];
+                }
+            }
+
+            // Photos: use saved exactly if the saved key exists (even if empty).
+            // Only fall back to defaults when the admin has never touched this card.
+            $merged['photos'] = array_key_exists('photos', $saved)
+                ? array_values(array_filter(
+                    (array) $saved['photos'],
+                    fn($p) => \is_string($p) && trim($p) !== ''
+                ))
+                : $defaults[$t]['photos'];
+
+            // Same logic for amenities.
+            $merged['amenities'] = array_key_exists('amenities', $saved)
+                ? array_values((array) $saved['amenities'])
+                : $defaults[$t]['amenities'];
+
+            $raw[$t] = $merged;
+        }
+        return $raw;
+    }
+
+    public function toggleCardsEditor(): void
+    {
+        $this->showCardsEditor = !$this->showCardsEditor;
+    }
+
+    public function addCardAmenity(string $type): void
+    {
+        if (!isset($this->roomCards[$type])) return;
+        $this->roomCards[$type]['amenities'][] = ['icon' => 'fa-snowflake', 'label' => 'New Amenity'];
+    }
+
+    public function removeCardAmenity(string $type, int $index): void
+    {
+        if (!isset($this->roomCards[$type]['amenities'][$index])) return;
+        array_splice($this->roomCards[$type]['amenities'], $index, 1);
+    }
+
+    public function addCardPhoto(string $type): void
+    {
+        if (!isset($this->roomCards[$type])) return;
+        $this->roomCards[$type]['photos'][] = '';
+    }
+
+    public function removeCardPhoto(string $type, int $index): void
+    {
+        if (!isset($this->roomCards[$type]['photos'][$index])) return;
+        array_splice($this->roomCards[$type]['photos'], $index, 1);
+    }
+
+    /**
+     * Persist an inline-uploaded card image into the slot recorded in
+     * $cardPhotoSlot ("compact.0" / "spacious.2"). The view sets the slot
+     * via wire:click on the upload label, then wire:model="cardPhotoFile"
+     * uploads the file and this hook stores it.
+     */
+    public function setCardPhotoSlot(string $slot): void
+    {
+        $this->cardPhotoSlot = $slot;
+    }
+
+    public function updatedCardPhotoFile($value): void
+    {
+        if ($value === null || $this->cardPhotoSlot === null) return;
+
+        $parts = explode('.', $this->cardPhotoSlot, 2);
+        if (\count($parts) !== 2) { $this->cardPhotoFile = null; $this->cardPhotoSlot = null; return; }
+        [$type, $idxRaw] = $parts;
+        if (!\in_array($type, ['compact', 'spacious'], true)) { $this->cardPhotoFile = null; $this->cardPhotoSlot = null; return; }
+        $index = (int) $idxRaw;
+
+        $this->validate([
+            'cardPhotoFile' => 'file|image|mimes:jpg,jpeg,png,webp|max:8192',
+        ]);
+
+        $stored = $value->store('room-type-cards', 'public');
+        if (!$stored) {
+            session()->flash('error', 'Image upload failed.');
+            $this->cardPhotoFile = null;
+            $this->cardPhotoSlot = null;
+            return;
+        }
+
+        if (!isset($this->roomCards[$type]['photos'])) {
+            $this->roomCards[$type]['photos'] = [];
+        }
+        $this->roomCards[$type]['photos'][$index] = 'storage/' . $stored;
+
+        $this->cardPhotoFile = null;
+        $this->cardPhotoSlot = null;
+        session()->flash('success', 'Photo uploaded. Click "Save Public Cards" to keep it.');
+    }
+
+    public function saveRoomCards(): void
+    {
+        $this->validate([
+            'roomCards.compact.title'         => 'required|string|max:60',
+            'roomCards.compact.subtitle'      => 'nullable|string|max:120',
+            'roomCards.compact.price'         => 'required|numeric|min:0',
+            'roomCards.compact.max_occupants' => 'required|integer|min:1|max:20',
+            'roomCards.compact.amenities.*.icon'  => 'required|string|max:40',
+            'roomCards.compact.amenities.*.label' => 'required|string|max:60',
+            'roomCards.compact.photos.*'      => 'nullable|string|max:255',
+            'roomCards.spacious.title'         => 'required|string|max:60',
+            'roomCards.spacious.subtitle'      => 'nullable|string|max:120',
+            'roomCards.spacious.price'         => 'required|numeric|min:0',
+            'roomCards.spacious.max_occupants' => 'required|integer|min:1|max:20',
+            'roomCards.spacious.amenities.*.icon'  => 'required|string|max:40',
+            'roomCards.spacious.amenities.*.label' => 'required|string|max:60',
+            'roomCards.spacious.photos.*'      => 'nullable|string|max:255',
+        ]);
+
+        $cards = $this->roomCards;
+        foreach (['compact', 'spacious'] as $t) {
+            $cards[$t]['photos'] = array_values(array_filter(
+                $cards[$t]['photos'] ?? [],
+                fn($p) => \is_string($p) && trim($p) !== ''
+            ));
+        }
+        SystemSetting::setValue('room_type_cards', json_encode($cards), auth()->id());
+        AuditLog::record('room_cards_updated', auth()->id(), 'gm', 'SS1', 'Public room type cards updated');
+        session()->flash('success', 'Public room type cards saved.');
+    }
 
     public function create()
     {
@@ -88,16 +308,6 @@ class RoomManager extends Component
             'last_status_update'=> now(),
         ];
 
-        // Handle photo uploads
-        if (!empty($this->newPhotos)) {
-            $photos = [];
-            foreach ($this->newPhotos as $photo) {
-                $photos[] = $photo->store('rooms', 'public');
-            }
-            $existing = $this->editing ? (Room::find($this->editId)?->photos ?? []) : [];
-            $data['photos'] = array_merge($existing, $photos);
-        }
-
         if ($this->editing) {
             Room::findOrFail($this->editId)->update($data);
             AuditLog::record('room_updated', auth()->id(), 'gm', 'SS1', "Room {$this->room_number} updated");
@@ -114,6 +324,15 @@ class RoomManager extends Component
     public function updateStatus(int $id, string $newStatus)
     {
         $room = Room::findOrFail($id);
+
+        // Block status change while a tenant is occupying the room.
+        // The tenant must be moved out (contract terminated / room cleared) before
+        // the GM can flip the room back to available or under_maintenance.
+        if ($room->current_tenant_id && $newStatus !== 'occupied') {
+            session()->flash('error', "Room {$room->room_number} is currently occupied by a tenant. Terminate or transfer the active contract before changing its status.");
+            return;
+        }
+
         $old = $room->status;
         $room->update([
             'status'             => $newStatus,
@@ -131,7 +350,7 @@ class RoomManager extends Component
             'original_record_id' => $room->id,
             'record_type'        => 'room',
             'source_subsystem'   => 'SS1',
-            'archive_reason'     => 'Manual archive by GM',
+            'archive_reason'     => 'Removed from active inventory by management',
             'data'               => $room->toArray(),
             'archived_by'        => auth()->id(),
         ]);
@@ -160,13 +379,23 @@ class RoomManager extends Component
         $this->status = 'available';
         $this->description = '';
         $this->amenitiesInput = [];
-        $this->newPhotos = [];
     }
 
     public function render()
     {
         $rooms = Room::query()
-            ->when($this->search, fn($q) => $q->where('room_number', 'like', "%{$this->search}%"))
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('room_number', 'like', $term)
+                       ->orWhere('room_type', 'like', $term)
+                       ->orWhere('status', 'like', $term)
+                       ->orWhere('description', 'like', $term)
+                       ->orWhere('rate', 'like', $term)
+                       ->orWhere('floor_level', 'like', $term)
+                       ->orWhereHas('currentTenant', fn($t) => $t->where('full_name', 'like', $term));
+                });
+            })
             ->when($this->filterFloor, fn($q) => $q->where('floor_level', $this->filterFloor))
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
             ->with('currentTenant')

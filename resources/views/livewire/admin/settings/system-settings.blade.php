@@ -40,6 +40,12 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div class="rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <button type="submit" class="btn-primary">Save Settings</button>
     </form>
 </div>

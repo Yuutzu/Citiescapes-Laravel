@@ -12,13 +12,23 @@
         </div>
     @endif
 
-    <div class="flex gap-3 mb-6">
-        <select wire:model.live="filterStatus" class="form-input w-auto text-sm">
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="responded">Responded</option>
-            <option value="closed">Closed</option>
-        </select>
+    <div class="space-y-3 mb-6">
+        <div class="relative max-w-md">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input wire:model.live.debounce.300ms="search" type="text"
+                placeholder="Search name, email, contact, message, room type, status..."
+                class="form-input w-full pl-9 text-sm">
+        </div>
+        @php
+            $iBtn = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterStatus === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Status:</span>
+            <button wire:click="$set('filterStatus','')" class="{{ $iBtn('') }}">All</button>
+            <button wire:click="$set('filterStatus','pending')" class="{{ $iBtn('pending') }}">Pending</button>
+            <button wire:click="$set('filterStatus','responded')" class="{{ $iBtn('responded') }}">Responded</button>
+            <button wire:click="$set('filterStatus','closed')" class="{{ $iBtn('closed') }}">Closed</button>
+        </div>
     </div>
 
     <div class="space-y-4">

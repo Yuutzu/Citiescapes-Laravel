@@ -1,6 +1,57 @@
 <div>
     <h1 class="text-2xl font-bold text-brand-900 mb-6">My Bills & Payment History</h1>
 
+    @if(session('success'))
+        <div class="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 border border-red-200">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- ============ EVICTION / DELINQUENT BANNER (SS3) ============ --}}
+    @php
+        $criticalBills = $bills->filter(fn($b) => in_array($b->status, ['delinquent', 'eviction'], true));
+    @endphp
+    @if($criticalBills->isNotEmpty())
+        <div class="mb-6 rounded-lg border-2 border-red-300 bg-red-50 p-4">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl mt-0.5"></i>
+                <div class="flex-1">
+                    <h2 class="text-base font-bold text-red-900">
+                        Urgent — Your account is in {{ $criticalBills->first()->status }} status
+                    </h2>
+                    <p class="text-sm text-red-800 mt-1">
+                        You have {{ $criticalBills->count() }} bill(s) past the deadline. Settle the balance immediately,
+                        or send a request to the General Manager to discuss a payment plan.
+                        Failure to act may result in lease termination.
+                    </p>
+                    <div class="mt-3 space-y-2">
+                        @foreach($criticalBills as $cb)
+                            <div class="flex flex-wrap items-center gap-2 bg-white border border-red-200 rounded p-2.5">
+                                <span class="text-sm font-semibold text-gray-900">
+                                    Bill #{{ $cb->id }} &mdash; {{ $cb->billing_period ?? 'Initial Fees' }}
+                                </span>
+                                <span class="text-xs text-red-700 font-medium">
+                                    ₱{{ number_format($cb->total_amount, 2) }}
+                                    @if($cb->days_overdue) &bull; {{ $cb->days_overdue }}d overdue @endif
+                                </span>
+                                <button wire:click="requestPaymentPlan({{ $cb->id }})"
+                                    wire:confirm="Send a payment-plan request to the General Manager about this bill?"
+                                    class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-brand-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-800">
+                                    <i class="fas fa-paper-plane"></i> Request payment plan
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($initialPayment)
         <div class="card border-l-4 border-emerald-500 mb-6">
             <div class="flex items-start justify-between mb-3">

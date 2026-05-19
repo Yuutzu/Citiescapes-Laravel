@@ -1,0 +1,1434 @@
+# Copyright (C) 2026 classictemplate
+# This file is distributed under the GNU General Public License v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Apartment Rental Services 0.3.5\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/apartment-rental-services\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-02-18T14:33:36+05:30\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: apartment-rental-services\n"
+
+#. Theme Name of the theme
+#: style.css
+msgid "Apartment Rental Services"
+msgstr ""
+
+#. Theme URI of the theme
+#: style.css
+msgid "https://www.theclassictemplates.com/products/free-apartment-wordpress-theme"
+msgstr ""
+
+#. Description of the theme
+#: style.css
+msgid "The Apartment Rental Services theme is a powerful, modern, and versatile solution crafted for real estate businesses, property managers, landlords, rental agencies, vacation rental operators, and housing service providers, incorporating relevant search terms such as rental property website template, apartment listing theme, vacation rental portal, property management layout, residential rental site, lease management system, luxury apartment showcase, and affordable housing platform. It is ideal for real estate listings, property leasing, vacation rentals, apartment leasing, housing services, residential rentals, and property management, helping you present everything from affordable housing and senior apartments to luxury rental units, condos, serviced apartments, and short-term rentals across city, house, and service-based property offerings. With a sleek, modern design and an intuitive interface, it streamlines property showcasing, online booking, rent collection, lease management, maintenance request handling, and tenant communication. Its responsive, retina-ready layout ensures smooth performance across desktops, tablets, and smartphones. The theme integrates seamlessly with powerful plugins like WP Property, Booking Calendar, WooCommerce, and Contact Form 7, offering options for scheduling property visits, collecting deposits, managing rental inquiries, and processing online payments. Built with SEO-optimized and clean code, it helps increase visibility in search results and attract quality leads. With customizable layouts, call-to-action buttons, testimonial sections, banner sliders, property galleries, and featured listings, this theme makes it easy to build trust, convert visitors into tenants, and maintain a professional, polished, and high-performing online presence."
+msgstr ""
+
+#. Author of the theme
+#: style.css
+msgid "classictemplate"
+msgstr ""
+
+#. Author URI of the theme
+#: style.css
+msgid "https://www.theclassictemplates.com/"
+msgstr ""
+
+#: 404.php:15
+#: inc/customizer.php:933
+msgid "404 Not Found"
+msgstr ""
+
+#: 404.php:20
+#: inc/customizer.php:950
+msgid "Looks like you have taken a wrong turn.....Don't worry... it happens to the best of us."
+msgstr ""
+
+#: 404.php:24
+msgid "Homepage"
+msgstr ""
+
+#: comments.php:67
+msgid "Comments are closed."
+msgstr ""
+
+#: content-page.php:17
+#: template-parts/post/content-audio.php:91
+#: template-parts/post/content-gallery.php:89
+#: template-parts/post/content-image.php:96
+#: template-parts/post/content-single.php:88
+#: template-parts/post/content-video.php:91
+#: template-parts/post/content.php:97
+#: templates/template-full-width.php:26
+msgid "Pages:"
+msgstr ""
+
+#: content-page.php:21
+#: template-parts/post/content-single.php:95
+msgid "Edit"
+msgstr ""
+
+#: footer.php:36
+msgid "footer1"
+msgstr ""
+
+#: footer.php:37
+msgid "Categories"
+msgstr ""
+
+#: footer.php:50
+msgid "footer2"
+msgstr ""
+
+#: footer.php:51
+#: sidebar.php:12
+msgid "Archives"
+msgstr ""
+
+#: footer.php:64
+msgid "footer3"
+msgstr ""
+
+#: footer.php:65
+#: sidebar.php:18
+msgid "Meta"
+msgstr ""
+
+#: footer.php:80
+msgid "footer4"
+msgstr ""
+
+#: footer.php:81
+msgid "Search"
+msgstr ""
+
+#: footer.php:103
+msgid "Apartment WordPress Theme"
+msgstr ""
+
+#: footer.php:131
+#: inc/customizer.php:1191
+msgid "TOP"
+msgstr ""
+
+#: functions.php:43
+msgid "Primary Menu"
+msgstr ""
+
+#: functions.php:102
+msgid "Blog Sidebar"
+msgstr ""
+
+#: functions.php:103
+msgid "Appears on blog page sidebar"
+msgstr ""
+
+#: functions.php:112
+msgid "Page Sidebar"
+msgstr ""
+
+#: functions.php:114
+msgid "Add widgets here to appear in your sidebar on pages."
+msgstr ""
+
+#: functions.php:122
+msgid "Sidebar 3"
+msgstr ""
+
+#: functions.php:124
+msgid "Add widgets here to appear in your sidebar on blog posts and archive pages."
+msgstr ""
+
+#: functions.php:134
+msgid "Footer Widget "
+msgstr ""
+
+#: functions.php:253
+#: inc/upgrade-to-pro.php:10
+msgid "About Apartment Rental Services"
+msgstr ""
+
+#: functions.php:256
+msgid "https://www.theclassictemplates.com/products/apartment-rental-wordpress-theme"
+msgstr ""
+
+#: functions.php:259
+msgid "https://www.theclassictemplates.com/collections/best-wordpress-templates"
+msgstr ""
+
+#: functions.php:262
+msgid "https://wordpress.org/support/theme/apartment-rental-services/"
+msgstr ""
+
+#: functions.php:265
+msgid "https://wordpress.org/support/theme/apartment-rental-services/reviews/"
+msgstr ""
+
+#: functions.php:268
+msgid "https://live.theclassictemplates.com/apartment-rental-services-pro/"
+msgstr ""
+
+#: functions.php:271
+msgid "https://live.theclassictemplates.com/demo/docs/apartment-rental-services-free/"
+msgstr ""
+
+#: functions.php:274
+msgid "https://www.theclassictemplates.com/products/wordpress-theme-bundle"
+msgstr ""
+
+#. translators: 1: Theme name, 2: Theme version.
+#: functions.php:326
+msgid "Welcome to %1$s %2$s"
+msgstr ""
+
+#: functions.php:328
+msgid "Get Started With Theme By Clicking On Getting Started."
+msgstr ""
+
+#: functions.php:330
+#: inc/upgrade-to-pro.php:23
+msgid "Upgrade Pro"
+msgstr ""
+
+#: functions.php:331
+msgid "Get started"
+msgstr ""
+
+#: functions.php:332
+msgid "Free Doc"
+msgstr ""
+
+#: functions.php:333
+#: inc/addon.php:127
+msgid "View Demo"
+msgstr ""
+
+#: header.php:32
+msgid "Skip to content"
+msgstr ""
+
+#: header.php:65
+msgid "Menu"
+msgstr ""
+
+#: header.php:69
+msgid "Top Menu"
+msgstr ""
+
+#: header.php:78
+msgid "CLOSE"
+msgstr ""
+
+#. translators: 1: Theme name.
+#: inc/addon.php:23
+#: inc/addon.php:37
+msgid "Welcome to %1$s"
+msgstr ""
+
+#: inc/addon.php:24
+msgid "Theme Demo Import"
+msgstr ""
+
+#: inc/addon.php:40
+msgid "Do you want to configure this theme? Look no further, our easy-to-follow theme documentation will walk you through it."
+msgstr ""
+
+#: inc/addon.php:47
+#: inc/tgm/class-tgm-plugin-activation.php:2701
+msgid "Version"
+msgstr ""
+
+#: inc/addon.php:66
+msgid "Free Theme Documentation"
+msgstr ""
+
+#: inc/addon.php:67
+msgid "Need more details? Please check our full documentation for detailed theme setup."
+msgstr ""
+
+#: inc/addon.php:69
+msgid "Documentation"
+msgstr ""
+
+#: inc/addon.php:74
+msgid "Need Help?"
+msgstr ""
+
+#: inc/addon.php:75
+msgid "Go to our support forum to help you out in case of queries and doubts regarding our theme."
+msgstr ""
+
+#: inc/addon.php:77
+#: inc/demo-content.php:175
+msgid "Contact Us"
+msgstr ""
+
+#: inc/addon.php:85
+msgid "Pro version of our theme"
+msgstr ""
+
+#: inc/addon.php:86
+msgid "Are you excited for our theme? Then we will proceed for pro version of theme."
+msgstr ""
+
+#: inc/addon.php:88
+#: inc/addon.php:126
+msgid "Get Premium"
+msgstr ""
+
+#: inc/addon.php:93
+msgid "Leave us a review"
+msgstr ""
+
+#: inc/addon.php:94
+msgid "Are you enjoying our theme? We would love to hear your feedback."
+msgstr ""
+
+#: inc/addon.php:96
+msgid "Rate This Theme"
+msgstr ""
+
+#: inc/addon.php:107
+msgid "WordPress Theme Bundle"
+msgstr ""
+
+#: inc/addon.php:108
+msgid "Get access to a collection of 100+ stunning WordPress themes for just $99 — featuring designs for every business niche!"
+msgstr ""
+
+#: inc/addon.php:110
+msgid "Get Bundle at 20% OFF"
+msgstr ""
+
+#. translators: %s: Theme name.
+#: inc/addon.php:120
+msgid "Getting started with %s"
+msgstr ""
+
+#: inc/addon.php:128
+msgid "Bundle of 100+ Themes at $99"
+msgstr ""
+
+#. translators: 1: Theme name, 2: Author name, 3: Call to action text.
+#: inc/addon.php:143
+msgid "%1$s is proudly brought to you by %2$s. If you like this theme, %3$s :)"
+msgstr ""
+
+#: inc/addon.php:146
+msgid "Rate it"
+msgstr ""
+
+#: inc/addon.php:146
+msgctxt "If you like this theme, rate it"
+msgid "rate it"
+msgstr ""
+
+#: inc/customizer.php:37
+msgid "Enable Logo"
+msgstr ""
+
+#: inc/customizer.php:48
+msgid "Logo Width"
+msgstr ""
+
+#: inc/customizer.php:67
+msgid "Site Title Color"
+msgstr ""
+
+#: inc/customizer.php:78
+msgid "Enable Site Title"
+msgstr ""
+
+#: inc/customizer.php:91
+msgid "Site Tagline Color"
+msgstr ""
+
+#: inc/customizer.php:102
+msgid "Enable Site Tagline"
+msgstr ""
+
+#: inc/customizer.php:108
+msgid "WooCommerce Page Settings"
+msgstr ""
+
+#: inc/customizer.php:119
+msgid " Check To Enable Shop page sidebar"
+msgstr ""
+
+#: inc/customizer.php:130
+msgid "Shop Page Sidebar"
+msgstr ""
+
+#: inc/customizer.php:133
+#: inc/customizer.php:172
+msgid "Left Sidebar"
+msgstr ""
+
+#: inc/customizer.php:134
+#: inc/customizer.php:173
+msgid "Right Sidebar"
+msgstr ""
+
+#: inc/customizer.php:144
+msgid "Shop Page Products Navigation"
+msgstr ""
+
+#: inc/customizer.php:146
+msgid "Yes"
+msgstr ""
+
+#: inc/customizer.php:147
+msgid "No"
+msgstr ""
+
+#: inc/customizer.php:158
+msgid "Check To Enable Single Product Page Sidebar"
+msgstr ""
+
+#: inc/customizer.php:169
+msgid "Single product Page Sidebar"
+msgstr ""
+
+#: inc/customizer.php:183
+msgid "Check To Enable Related product"
+msgstr ""
+
+#: inc/customizer.php:193
+msgid "Product Img Border Radius"
+msgstr ""
+
+#: inc/customizer.php:210
+msgid "Products Per Row"
+msgstr ""
+
+#: inc/customizer.php:228
+msgid "Products Per Page"
+msgstr ""
+
+#: inc/customizer.php:244
+msgid "Product Sale Position"
+msgstr ""
+
+#: inc/customizer.php:247
+#: inc/customizer.php:297
+#: inc/customizer.php:765
+#: inc/customizer.php:877
+#: inc/customizer.php:909
+#: inc/customizer.php:1111
+#: inc/customizer.php:1185
+msgid "Left"
+msgstr ""
+
+#: inc/customizer.php:248
+#: inc/customizer.php:298
+#: inc/customizer.php:766
+#: inc/customizer.php:878
+#: inc/customizer.php:910
+#: inc/customizer.php:1112
+#: inc/customizer.php:1184
+msgid "Right"
+msgstr ""
+
+#: inc/customizer.php:256
+msgid "Theme Options Panel"
+msgstr ""
+
+#: inc/customizer.php:261
+msgid "Manage Site Layout Section "
+msgstr ""
+
+#: inc/customizer.php:262
+msgid "<p class=\"sec-title\">Manage Site Layout Section</p>"
+msgstr ""
+
+#: inc/customizer.php:273
+msgid "Check to Show preloader"
+msgstr ""
+
+#: inc/customizer.php:283
+msgid "Check to Show Box Layout"
+msgstr ""
+
+#: inc/customizer.php:294
+#: inc/customizer.php:906
+msgid "Theme Page Sidebar Position"
+msgstr ""
+
+#: inc/customizer.php:299
+#: inc/customizer.php:770
+#: inc/customizer.php:911
+msgid "No Sidebar"
+msgstr ""
+
+#: inc/customizer.php:315
+msgid "Manage Global Color Section"
+msgstr ""
+
+#: inc/customizer.php:324
+#: inc/customizer.php:334
+msgid "Theme Color"
+msgstr ""
+
+#: inc/customizer.php:351
+msgid "Manage Header Section"
+msgstr ""
+
+#: inc/customizer.php:352
+msgid "<p class=\"sec-title\">Manage Header Section</p>"
+msgstr ""
+
+#: inc/customizer.php:366
+msgid "Check To Enable Sticky Header"
+msgstr ""
+
+#: inc/customizer.php:378
+#: inc/customizer.php:548
+#: inc/customizer.php:570
+msgid "Add Button Text"
+msgstr ""
+
+#: inc/customizer.php:390
+msgid "Add Button URL"
+msgstr ""
+
+#: inc/customizer.php:403
+msgid "Menu Color"
+msgstr ""
+
+#: inc/customizer.php:416
+msgid "Menu Hover Color"
+msgstr ""
+
+#: inc/customizer.php:429
+msgid "SubMenu Color"
+msgstr ""
+
+#: inc/customizer.php:442
+msgid "SubMenu Hover Color"
+msgstr ""
+
+#: inc/customizer.php:454
+msgid "Menu Text Transform"
+msgstr ""
+
+#: inc/customizer.php:458
+msgid "None"
+msgstr ""
+
+#: inc/customizer.php:459
+msgid "Capitalize"
+msgstr ""
+
+#: inc/customizer.php:460
+msgid "Uppercase"
+msgstr ""
+
+#: inc/customizer.php:461
+msgid "Lowercase"
+msgstr ""
+
+#: inc/customizer.php:477
+msgid "Manage Slider Section"
+msgstr ""
+
+#: inc/customizer.php:479
+msgid "<p class=\"sec-title\">Manage Slider Section</p> Select Category from the Dropdowns for slider, Also use the given image dimension (1200 x 740)."
+msgstr ""
+
+#: inc/customizer.php:491
+msgid "Check To Enable This Section"
+msgstr ""
+
+#: inc/customizer.php:511
+#: inc/customizer.php:653
+msgid "Select Category to display Latest Post"
+msgstr ""
+
+#: inc/customizer.php:512
+msgid "<p class=\"sec-title\">Choose a category, then reload the page.</p>"
+msgstr ""
+
+#: inc/customizer.php:533
+msgid "Select Image %d for Post: %s"
+msgstr ""
+
+#: inc/customizer.php:557
+#: inc/customizer.php:579
+msgid "Add Button Link"
+msgstr ""
+
+#: inc/customizer.php:596
+msgid "Manage Service Section"
+msgstr ""
+
+#: inc/customizer.php:597
+msgid "<p class=\"sec-title\">Manage Service Section</p>"
+msgstr ""
+
+#: inc/customizer.php:610
+msgid "Check To Enable Section"
+msgstr ""
+
+#: inc/customizer.php:622
+msgid "Add Service Title"
+msgstr ""
+
+#: inc/customizer.php:634
+msgid "Add Service Text"
+msgstr ""
+
+#: inc/customizer.php:669
+msgid "Manage Post Section"
+msgstr ""
+
+#: inc/customizer.php:688
+msgid "Post Layouts"
+msgstr ""
+
+#: inc/customizer.php:706
+msgid "Check to Enable Date"
+msgstr ""
+
+#: inc/customizer.php:717
+msgid "Check to Enable Comments"
+msgstr ""
+
+#: inc/customizer.php:728
+msgid "Check to Enable Author"
+msgstr ""
+
+#: inc/customizer.php:739
+msgid "Check to Enable Time"
+msgstr ""
+
+#: inc/customizer.php:749
+#: inc/customizer.php:862
+msgid "Metabox Seperator"
+msgstr ""
+
+#: inc/customizer.php:750
+#: inc/customizer.php:863
+msgid "Ex: \"/\", \"|\", \"-\", ..."
+msgstr ""
+
+#: inc/customizer.php:761
+msgid "Theme Post Sidebar Position"
+msgstr ""
+
+#: inc/customizer.php:762
+msgid "This option work for blog page, archive page and search page."
+msgstr ""
+
+#: inc/customizer.php:767
+msgid "Three Columns"
+msgstr ""
+
+#: inc/customizer.php:768
+msgid "Four Columns"
+msgstr ""
+
+#: inc/customizer.php:769
+msgid "Grid Layout"
+msgstr ""
+
+#: inc/customizer.php:780
+msgid "Post Description Length"
+msgstr ""
+
+#: inc/customizer.php:783
+msgid "No Content"
+msgstr ""
+
+#: inc/customizer.php:784
+msgid "Excerpt Content"
+msgstr ""
+
+#: inc/customizer.php:785
+msgid "Full Content"
+msgstr ""
+
+#: inc/customizer.php:795
+msgid "Show / Hide Blog Post Thumbnail"
+msgstr ""
+
+#: inc/customizer.php:811
+msgid "Manage Single Post Section"
+msgstr ""
+
+#: inc/customizer.php:822
+msgid "Enable / Disable Date "
+msgstr ""
+
+#: inc/customizer.php:832
+msgid "Enable / Disable Author"
+msgstr ""
+
+#: inc/customizer.php:842
+msgid "Enable / Disable Comments"
+msgstr ""
+
+#: inc/customizer.php:852
+msgid "Enable / Disable Time"
+msgstr ""
+
+#: inc/customizer.php:873
+msgid "Single post sidebar layout"
+msgstr ""
+
+#: inc/customizer.php:876
+msgid "Full"
+msgstr ""
+
+#: inc/customizer.php:894
+msgid "Manage Page Section"
+msgstr ""
+
+#: inc/customizer.php:927
+msgid "Manage 404 Page Section"
+msgstr ""
+
+#: inc/customizer.php:937
+msgid "404 Heading"
+msgstr ""
+
+#: inc/customizer.php:948
+msgid "404 Text"
+msgstr ""
+
+#: inc/customizer.php:964
+msgid "404 Button"
+msgstr ""
+
+#: inc/customizer.php:980
+msgid "Manage No Results Page Section"
+msgstr ""
+
+#: inc/customizer.php:986
+#: no-results.php:12
+msgid "Nothing Found"
+msgstr ""
+
+#: inc/customizer.php:990
+msgid "Add Title"
+msgstr ""
+
+#: inc/customizer.php:1001
+msgid "Add Text"
+msgstr ""
+
+#: inc/customizer.php:1014
+msgid "Check To Enable Search"
+msgstr ""
+
+#: inc/customizer.php:1030
+msgid "Manage Animation Section"
+msgstr ""
+
+#: inc/customizer.php:1031
+msgid "<p class=\"sec-title\">Manage Animation Section</p>"
+msgstr ""
+
+#: inc/customizer.php:1044
+msgid "Check To Enable Animation"
+msgstr ""
+
+#: inc/customizer.php:1060
+msgid "Manage Footer Section"
+msgstr ""
+
+#: inc/customizer.php:1061
+msgid "<p class=\"sec-title\">Manage Footer Section</p>"
+msgstr ""
+
+#: inc/customizer.php:1073
+msgid "Check to Enable Footer Widget"
+msgstr ""
+
+#: inc/customizer.php:1086
+msgid "Footer Background Color"
+msgstr ""
+
+#: inc/customizer.php:1095
+msgid "Footer Background Image"
+msgstr ""
+
+#: inc/customizer.php:1106
+msgid "Footer Image Position"
+msgstr ""
+
+#: inc/customizer.php:1109
+#: inc/customizer.php:1186
+msgid "Center"
+msgstr ""
+
+#: inc/customizer.php:1110
+msgid "Top"
+msgstr ""
+
+#: inc/customizer.php:1113
+msgid "Bottom"
+msgstr ""
+
+#: inc/customizer.php:1122
+msgid "Copyright Line"
+msgstr ""
+
+#: inc/customizer.php:1133
+msgid "Copyright Link"
+msgstr ""
+
+#: inc/customizer.php:1147
+msgid "Title Color"
+msgstr ""
+
+#: inc/customizer.php:1160
+msgid "List Color"
+msgstr ""
+
+#: inc/customizer.php:1169
+msgid "Check To Show Scroll To Top"
+msgstr ""
+
+#: inc/customizer.php:1182
+msgid "Scroll To Top Positions"
+msgstr ""
+
+#: inc/customizer.php:1195
+msgid "Scroll To Top Button Text"
+msgstr ""
+
+#: inc/customizer.php:1205
+msgid "Scroll to Top Button Shape"
+msgstr ""
+
+#: inc/customizer.php:1210
+msgid "Box"
+msgstr ""
+
+#: inc/customizer.php:1211
+msgid "Curved"
+msgstr ""
+
+#: inc/customizer.php:1212
+msgid "Circle"
+msgstr ""
+
+#: inc/customizer.php:1223
+msgid "Footer widget area"
+msgstr ""
+
+#: inc/customizer.php:1225
+msgid "One"
+msgstr ""
+
+#: inc/customizer.php:1226
+msgid "Two"
+msgstr ""
+
+#: inc/customizer.php:1227
+msgid "Three"
+msgstr ""
+
+#: inc/customizer.php:1228
+msgid "Four"
+msgstr ""
+
+#: inc/customizer.php:1244
+msgid "Manage Footer Social Section"
+msgstr ""
+
+#: inc/customizer.php:1245
+msgid "<p class=\"sec-title\">Manage Footer Social Section</p>"
+msgstr ""
+
+#: inc/customizer.php:1258
+msgid "Facebook Link"
+msgstr ""
+
+#: inc/customizer.php:1270
+msgid "Instagram Link"
+msgstr ""
+
+#: inc/customizer.php:1282
+msgid "Pinterest Link"
+msgstr ""
+
+#: inc/customizer.php:1294
+msgid "Twitter Link"
+msgstr ""
+
+#: inc/customizer.php:1306
+msgid "Youtube Link"
+msgstr ""
+
+#: inc/customizer.php:1322
+msgid "Google Fonts"
+msgstr ""
+
+#: inc/customizer.php:1368
+msgid "Select your desired font for the headings."
+msgstr ""
+
+#: inc/customizer.php:1378
+msgid "Select your desired font for the body."
+msgstr ""
+
+#: inc/demo-content.php:13
+#: inc/demo-content.php:341
+msgid "You can now visit your site or customize it further."
+msgstr ""
+
+#: inc/demo-content.php:79
+msgid "Home"
+msgstr ""
+
+#: inc/demo-content.php:102
+msgid "Project"
+msgstr ""
+
+#: inc/demo-content.php:125
+msgid "Pages"
+msgstr ""
+
+#: inc/demo-content.php:151
+msgid "Blog"
+msgstr ""
+
+#: inc/select/category-dropdown-custom-control.php:27
+msgid "Select Category"
+msgstr ""
+
+#: inc/template-tags.php:90
+msgid "Apartment Rental Services logo"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:340
+msgid "Install Required Plugins"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:341
+msgid "Install Plugins"
+msgstr ""
+
+#. translators: %s: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:343
+msgid "Installing Plugin: %s"
+msgstr ""
+
+#. translators: %s: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:345
+msgid "Updating Plugin: %s"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:346
+msgid "Something went wrong with the plugin API."
+msgstr ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:348
+msgid "This theme requires the following plugin: %1$s."
+msgid_plural "This theme requires the following plugins: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:354
+msgid "This theme recommends the following plugin: %1$s."
+msgid_plural "This theme recommends the following plugins: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:360
+msgid "The following plugin needs to be updated to its latest version to ensure maximum compatibility with this theme: %1$s."
+msgid_plural "The following plugins need to be updated to their latest version to ensure maximum compatibility with this theme: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:366
+msgid "There is an update available for: %1$s."
+msgid_plural "There are updates available for the following plugins: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:372
+msgid "The following required plugin is currently inactive: %1$s."
+msgid_plural "The following required plugins are currently inactive: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name(s).
+#: inc/tgm/class-tgm-plugin-activation.php:378
+msgid "The following recommended plugin is currently inactive: %1$s."
+msgid_plural "The following recommended plugins are currently inactive: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:383
+msgid "Begin installing plugin"
+msgid_plural "Begin installing plugins"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:388
+msgid "Begin updating plugin"
+msgid_plural "Begin updating plugins"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:393
+msgid "Begin activating plugin"
+msgid_plural "Begin activating plugins"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:398
+msgid "Return to Required Plugins Installer"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:399
+msgid "Return to the Dashboard"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:400
+#: inc/tgm/class-tgm-plugin-activation.php:3311
+msgid "Plugin activated successfully."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:401
+#: inc/tgm/class-tgm-plugin-activation.php:3103
+msgid "The following plugin was activated successfully:"
+msgid_plural "The following plugins were activated successfully:"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:403
+msgid "No action taken. Plugin %1$s was already active."
+msgstr ""
+
+#. translators: 1: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:405
+msgid "Plugin not activated. A higher version of %s is needed for this theme. Please update the plugin."
+msgstr ""
+
+#. translators: 1: dashboard link.
+#: inc/tgm/class-tgm-plugin-activation.php:407
+msgid "All plugins installed and activated successfully. %1$s"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:408
+msgid "Dismiss this notice"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:409
+msgid "There are one or more required or recommended plugins to install, update or activate."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:410
+msgid "Please contact the administrator of this site for help."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:616
+msgid "This plugin needs to be updated to be compatible with your theme."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:617
+msgid "Update Required"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:735
+msgid "Set the parent_slug config variable instead."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:1042
+msgid "The remote plugin package does not contain a folder with the desired slug and renaming did not work."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:1042
+#: inc/tgm/class-tgm-plugin-activation.php:1052
+msgid "Please contact the plugin provider and ask them to package their plugin according to the WordPress guidelines."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:1052
+msgid "The remote plugin package consists of more than one file, but the files are not packaged in a folder."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:1243
+#: inc/tgm/class-tgm-plugin-activation.php:3099
+msgctxt "plugin A *and* plugin B"
+msgid "and"
+msgstr ""
+
+#. translators: %s: version number
+#: inc/tgm/class-tgm-plugin-activation.php:2112
+msgid "TGMPA v%s"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2421
+#: woocommerce/myaccount/form-login.php:39
+#: woocommerce/myaccount/form-login.php:43
+#: woocommerce/myaccount/form-login.php:79
+#: woocommerce/myaccount/form-login.php:86
+#: woocommerce/myaccount/form-login.php:93
+msgid "Required"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2424
+msgid "Recommended"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2440
+msgid "WordPress Repository"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2443
+msgid "External Source"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2446
+msgid "Pre-Packaged"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2463
+msgid "Not Installed"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2467
+msgid "Installed But Not Activated"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2469
+msgid "Active"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2475
+msgid "Required Update not Available"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2478
+msgid "Requires Update"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2481
+msgid "Update recommended"
+msgstr ""
+
+#. translators: 1: install status, 2: update status
+#: inc/tgm/class-tgm-plugin-activation.php:2490
+msgctxt "Install/Update Status"
+msgid "%1$s, %2$s"
+msgstr ""
+
+#. translators: 1: number of plugins.
+#: inc/tgm/class-tgm-plugin-activation.php:2536
+msgctxt "plugins"
+msgid "All <span class=\"count\">(%s)</span>"
+msgid_plural "All <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: number of plugins.
+#: inc/tgm/class-tgm-plugin-activation.php:2540
+msgid "To Install <span class=\"count\">(%s)</span>"
+msgid_plural "To Install <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: number of plugins.
+#: inc/tgm/class-tgm-plugin-activation.php:2544
+msgid "Update Available <span class=\"count\">(%s)</span>"
+msgid_plural "Update Available <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: 1: number of plugins.
+#: inc/tgm/class-tgm-plugin-activation.php:2548
+msgid "To Activate <span class=\"count\">(%s)</span>"
+msgid_plural "To Activate <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2630
+msgctxt "as in: \"version nr unknown\""
+msgid "unknown"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2638
+msgid "Installed version:"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2646
+msgid "Minimum required version:"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2658
+msgid "Available version:"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2681
+msgid "No plugins to install, update or activate."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2695
+msgid "Plugin"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2696
+msgid "Source"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2697
+msgid "Type"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2702
+msgid "Status"
+msgstr ""
+
+#. translators: %2$s: plugin name in screen reader markup
+#: inc/tgm/class-tgm-plugin-activation.php:2751
+msgid "Install %2$s"
+msgstr ""
+
+#. translators: %2$s: plugin name in screen reader markup
+#: inc/tgm/class-tgm-plugin-activation.php:2756
+msgid "Update %2$s"
+msgstr ""
+
+#. translators: %2$s: plugin name in screen reader markup
+#: inc/tgm/class-tgm-plugin-activation.php:2762
+msgid "Activate %2$s"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2834
+msgid "Upgrade message from the plugin author:"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2867
+msgid "Install"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2873
+msgid "Update"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2876
+msgid "Activate"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2907
+msgid "No plugins were selected to be installed. No action taken."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2909
+msgid "No plugins were selected to be updated. No action taken."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2950
+msgid "No plugins are available to be installed at this time."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:2952
+msgid "No plugins are available to be updated at this time."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3059
+msgid "No plugins were selected to be activated. No action taken."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3085
+msgid "No plugins are available to be activated at this time."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3310
+msgid "Plugin activation failed."
+msgstr ""
+
+#. translators: 1: plugin name, 2: action number 3: total number of actions.
+#: inc/tgm/class-tgm-plugin-activation.php:3655
+msgid "Updating Plugin %1$s (%2$d/%3$d)"
+msgstr ""
+
+#. translators: 1: plugin name, 2: error message.
+#: inc/tgm/class-tgm-plugin-activation.php:3658
+msgid "An error occurred while installing %1$s: <strong>%2$s</strong>."
+msgstr ""
+
+#. translators: 1: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:3660
+msgid "The installation of %1$s failed."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3664
+msgid "The installation and activation process is starting. This process may take a while on some hosts, so please be patient."
+msgstr ""
+
+#. translators: 1: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:3666
+msgid "%1$s installed and activated successfully."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3667
+msgid "All installations and activations have been completed."
+msgstr ""
+
+#. translators: 1: plugin name, 2: action number 3: total number of actions.
+#: inc/tgm/class-tgm-plugin-activation.php:3669
+msgid "Installing and Activating Plugin %1$s (%2$d/%3$d)"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3672
+msgid "The installation process is starting. This process may take a while on some hosts, so please be patient."
+msgstr ""
+
+#. translators: 1: plugin name.
+#: inc/tgm/class-tgm-plugin-activation.php:3674
+msgid "%1$s installed successfully."
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3675
+msgid "All installations have been completed."
+msgstr ""
+
+#. translators: 1: plugin name, 2: action number 3: total number of actions.
+#: inc/tgm/class-tgm-plugin-activation.php:3677
+msgid "Installing Plugin %1$s (%2$d/%3$d)"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3682
+msgid "Show Details"
+msgstr ""
+
+#: inc/tgm/class-tgm-plugin-activation.php:3682
+msgid "Hide Details"
+msgstr ""
+
+#: inc/tgm/tgm.php:9
+msgid "Classic Blog Grid"
+msgstr ""
+
+#: inc/upgrade-to-pro.php:25
+msgid "Premium Demo"
+msgstr ""
+
+#: inc/upgrade-to-pro.php:27
+msgid "Rate Us"
+msgstr ""
+
+#: inc/upgrade-to-pro.php:29
+msgid "Support Forum"
+msgstr ""
+
+#: inc/upgrade-to-pro.php:31
+msgid "Theme Page"
+msgstr ""
+
+#: inc/upgrade-to-pro.php:33
+msgid "Theme Documentation"
+msgstr ""
+
+#. translators: %s: post title
+#: no-results.php:17
+msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
+msgstr ""
+
+#: no-results.php:21
+msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+msgstr ""
+
+#: no-results.php:30
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+msgstr ""
+
+#. translators: %s: post title
+#: search.php:14
+msgid "Search Results for: %s"
+msgstr ""
+
+#: searchform.php:11
+msgctxt "placeholder"
+msgid "Search"
+msgstr ""
+
+#: searchform.php:13
+msgctxt "submit button"
+msgid "Search"
+msgstr ""
+
+#: sidebar.php:11
+msgid "sidebar1"
+msgstr ""
+
+#: sidebar.php:17
+msgid "sidebar2"
+msgstr ""
+
+#: template-parts/post/content-audio.php:88
+#: template-parts/post/content-gallery.php:86
+#: template-parts/post/content-image.php:93
+#: template-parts/post/content-video.php:88
+#: template-parts/post/content.php:94
+msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:26
+msgid "You must be logged in to checkout."
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:32
+msgid "Checkout"
+msgstr ""
+
+#: woocommerce/checkout/form-checkout.php:54
+msgid "Your order"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:32
+msgid "Login"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:39
+msgid "Username or email address"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:43
+#: woocommerce/myaccount/form-login.php:93
+msgid "Password"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:51
+msgid "Remember me"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:54
+msgid "Log in"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:57
+msgid "Lost your password?"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:70
+#: woocommerce/myaccount/form-login.php:107
+msgid "Register"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:79
+msgid "Username"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:86
+msgid "Email address"
+msgstr ""
+
+#: woocommerce/myaccount/form-login.php:99
+msgid "A link to set a new password will be sent to your email address."
+msgstr ""

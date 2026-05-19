@@ -4,14 +4,23 @@
         <button wire:click="create" class="btn-primary">+ Create Tenant</button>
     </div>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search name or email..." class="form-input w-auto text-sm">
-        <select wire:model.live="filterStatus" class="form-input w-auto text-sm">
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="pending_activation">Pending</option>
-            <option value="archived">Archived</option>
-        </select>
+    <div class="space-y-3 mb-6">
+        <div class="relative max-w-md">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input wire:model.live.debounce.300ms="search" type="text"
+                placeholder="Search name, email, contact, address, status..."
+                class="form-input w-full pl-9 text-sm">
+        </div>
+        @php
+            $tBtn = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterStatus === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Status:</span>
+            <button wire:click="$set('filterStatus','')" class="{{ $tBtn('') }}">All</button>
+            <button wire:click="$set('filterStatus','active')" class="{{ $tBtn('active') }}">Active</button>
+            <button wire:click="$set('filterStatus','pending_activation')" class="{{ $tBtn('pending_activation') }}">Pending</button>
+            <button wire:click="$set('filterStatus','archived')" class="{{ $tBtn('archived') }}">Archived</button>
+        </div>
     </div>
 
     <div class="card overflow-x-auto p-0">
@@ -20,6 +29,9 @@
                 <tr>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Name</th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Email</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Contact</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Address</th>
+                    <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Emergency Contact</th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Status</th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Created</th>
                     <th class="px-4 py-3.5 text-right text-xs font-semibold text-brand-200 uppercase tracking-wider">Actions</th>
@@ -30,6 +42,9 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $t->full_name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-600">{{ $t->email }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->contact_number ?: '—' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate" title="{{ $t->address }}">{{ $t->address ?: '—' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->emergency_contact ?: '—' }}</td>
                     <td class="px-4 py-3">
                         <span class="badge {{ match($t->status) { 'active' => 'bg-green-100 text-green-800', 'pending_activation' => 'bg-amber-100 text-amber-800', 'archived' => 'bg-gray-100 text-gray-600', 'locked' => 'bg-red-100 text-red-800', default => 'bg-gray-100 text-gray-600' } }}">
                             {{ str_replace('_', ' ', ucfirst($t->status)) }}
@@ -59,8 +74,8 @@
 
     {{-- Create Modal --}}
     @if($showCreate)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+    <div class="cs-modal">
+        <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
             <h3 class="text-lg font-semibold mb-4">Create Tenant Account</h3>
             <p class="text-sm text-gray-500 mb-4">A temporary password will be sent to the tenant's email.</p>
             <form wire:submit="store" class="space-y-4">

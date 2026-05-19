@@ -2,7 +2,26 @@
   "permissions": {
     "allow": [
       "PowerShell(php artisan view:clear)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(mkdir -p c:/laragon/www/citiescapes/storage/app/db_backups)",
+      "Bash(\"C:/laragon/bin/mysql/mysql-8.0.30-winx64/bin/mysqldump.exe\" -u root --default-character-set=utf8mb4 citiescapes)",
+      "Bash(ls c:/laragon/bin/mysql/ 2>/dev/null)",
+      "Read(//c/laragon/bin/mysql/**)",
+      "Bash(mkdir -p c:/laragon/www/citiescapes/storage/app/db_backups && \"C:/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysqldump.exe\" -u root --default-character-set=utf8mb4 citiescapes > c:/laragon/www/citiescapes/storage/app/db_backups/citiescapes_pre_wipe_20260510_142854.sql 2>&1; ls -la c:/laragon/www/citiescapes/storage/app/db_backups/)",
+      "Bash(\"c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" artisan *)",
+      "Bash(\"c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Livewire/Admin/Billing/BillingManager.php)",
+      "Bash(\"c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Livewire/Tenant/BillingView.php)",
+      "Bash(\"c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Models/InitialPayment.php)",
+      "Bash(\"c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe\" -l app/Models/Contract.php)",
+      "Bash(c:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe artisan *)",
+      "Bash(xxd c:/laragon/www/citiescapes/.gitignore)",
+      "Bash(git rm *)",
+      "Bash(:)",
+      "Bash(grep -nE 'table|protected \\\\$table' app/Models/NotificationLog.php)",
+      "Bash(grep -nE 'protected \\\\$table' app/Models/NotificationLog.php)"
+    ],
+    "additionalDirectories": [
+      "c:\\laragon\\www\\citiescapes\\storage\\app\\db_backups"
     ]
   }
 }

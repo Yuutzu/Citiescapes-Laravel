@@ -14,8 +14,8 @@
 
     {{-- Compose Modal --}}
     @if($showForm)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-2xl">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">New Announcement</h2>
                     <button wire:click="closeForm" class="text-gray-400 hover:text-gray-600">
@@ -82,8 +82,8 @@
 
     {{-- View Detail Modal --}}
     @if($viewing)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-xl">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-xl">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Announcement Details</h2>
                     <button wire:click="$set('viewingId', null)" class="text-gray-400 hover:text-gray-600">

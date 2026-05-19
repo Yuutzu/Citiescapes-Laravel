@@ -24,6 +24,26 @@ class ContractView extends Component
     }
 
     /**
+     * Tenant requests GM approval to view the signed contract scan.
+     */
+    public function requestScanAccess(): void
+    {
+        if (!$this->contract || !$this->contract->scan_file_path) return;
+        if (in_array($this->contract->scan_view_status, ['pending', 'approved'], true)) return;
+
+        $this->contract->update([
+            'scan_view_status'        => 'pending',
+            'scan_view_requested_at'  => now(),
+            'scan_view_decided_at'    => null,
+            'scan_view_decided_by'    => null,
+            'scan_view_decision_note' => null,
+        ]);
+        AuditLog::record('contract_scan_view_requested', auth()->id(), 'tenant', 'SS4', "Contract #{$this->contract->id} — tenant requested scan access");
+        $this->contract->refresh();
+        session()->flash('success', 'Request sent to the General Manager. You will see the scan here once it is approved.');
+    }
+
+    /**
      * Step 1: Acknowledge terms read.
      */
     public function acknowledgeStep1()

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en" class="h-full bg-paper-100">
 
 <head>
     <meta charset="UTF-8">
@@ -7,13 +7,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Citiescapes' }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|lora:400,500,600,700" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/storage/building/logo.png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
-<body class="h-full">
+<body class="h-full bg-paper-100">
     <div class="min-h-full" x-data="{ sidebarOpen: false }">
         {{-- Mobile sidebar overlay --}}
         <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-40 lg:hidden">
@@ -28,7 +29,7 @@
 
         {{-- Desktop sidebar --}}
         <div class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-            <div class="flex flex-col flex-grow bg-brand-950 border-r border-brand-800 overflow-y-auto">
+            <div class="flex flex-col flex-grow bg-brand-950 border-r border-brand-800 overflow-y-auto sidebar-scroll">
                 @include('layouts.partials.sidebar-content')
             </div>
         </div>
@@ -37,7 +38,7 @@
         <div class="lg:pl-64">
             {{-- Top nav --}}
             <header
-                class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white shadow-sm px-4 sm:px-6 lg:px-8">
+                class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-gray-200 bg-white shadow-sm px-4 sm:px-6 lg:px-8">
                 <button @click="sidebarOpen = true" class="lg:hidden -m-2 p-2 text-gray-500 hover:text-gray-700">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -96,6 +97,21 @@
     </div>
 
     @livewireScripts
+
+    {{-- Global page-transition animation for wire:navigate --}}
+    <script>
+        document.addEventListener('livewire:navigating', () => {
+            document.querySelectorAll('main').forEach(el => el.classList.add('cs-leaving'));
+        });
+        document.addEventListener('livewire:navigated', () => {
+            document.querySelectorAll('main').forEach(el => {
+                el.classList.remove('cs-leaving');
+                el.style.animation = 'none';
+                void el.offsetWidth;
+                el.style.animation = '';
+            });
+        });
+    </script>
 </body>
 
 </html>

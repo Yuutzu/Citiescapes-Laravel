@@ -17,6 +17,7 @@ class InquiryManager extends Component
     use WithPagination;
 
     public string $filterStatus = '';
+    public string $search = '';
 
     public ?int $composingId = null;
     public string $emailSubject = '';
@@ -92,6 +93,17 @@ class InquiryManager extends Component
     {
         $inquiries = Inquiry::query()
             ->with('respondedBy')
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('sender_name', 'like', $term)
+                       ->orWhere('email', 'like', $term)
+                       ->orWhere('contact_number', 'like', $term)
+                       ->orWhere('message', 'like', $term)
+                       ->orWhere('preferred_room_type', 'like', $term)
+                       ->orWhere('status', 'like', $term);
+                });
+            })
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
             ->latest()
             ->paginate(15);

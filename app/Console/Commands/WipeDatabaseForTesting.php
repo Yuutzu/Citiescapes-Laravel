@@ -24,9 +24,10 @@ use Illuminate\Support\Facades\Schema;
 class WipeDatabaseForTesting extends Command
 {
     protected $signature = 'db:wipe-test
-                            {--no-confirm : Skip confirmation prompt}';
+                            {--no-confirm : Skip confirmation prompt}
+                            {--with-testbed : After wiping, re-seed the 57 testbed:seed scenarios}';
 
-    protected $description = 'Wipe database for testing (preserve GM & Rooms)';
+    protected $description = 'Wipe database for testing (preserve GM & Rooms; optionally re-seed testbed)';
 
     public function handle(): int
     {
@@ -78,7 +79,15 @@ class WipeDatabaseForTesting extends Command
 
             $this->newLine();
             $this->info('✅ Database wiped successfully for fresh testing!');
-            $this->info('GM accounts and all rooms have been preserved.');
+            $this->info('GM accounts and original 22 rooms preserved.');
+
+            if ($this->option('with-testbed')) {
+                $this->newLine();
+                $this->info('🌱 Re-seeding testbed scenarios…');
+                $this->call('testbed:seed');
+                $this->newLine();
+                $this->info('✅ Wipe + testbed re-seed complete.');
+            }
 
             return self::SUCCESS;
         } catch (\Exception $e) {
@@ -123,14 +132,17 @@ class WipeDatabaseForTesting extends Command
     }
 
     /**
-     * Delete test rooms (created by seeders), preserve original 22 rooms
-     * Test rooms are identified by BB_ or WB_ prefix in room_number
+     * Delete test rooms (created by seeders), preserve original 22 rooms.
+     * Test rooms are identified by BB_, WB_, or TB- prefix in room_number.
      */
     private function wipeTestRooms(): void
     {
         $testRoomCount = DB::table('rooms')
-            ->where('room_number', 'LIKE', 'BB_%')
-            ->orWhere('room_number', 'LIKE', 'WB_%')
+            ->where(function ($q) {
+                $q->where('room_number', 'LIKE', 'BB_%')
+                  ->orWhere('room_number', 'LIKE', 'WB_%')
+                  ->orWhere('room_number', 'LIKE', 'TB-%');
+            })
             ->count();
 
         if ($testRoomCount === 0) {
@@ -138,11 +150,14 @@ class WipeDatabaseForTesting extends Command
         }
 
         DB::table('rooms')
-            ->where('room_number', 'LIKE', 'BB_%')
-            ->orWhere('room_number', 'LIKE', 'WB_%')
+            ->where(function ($q) {
+                $q->where('room_number', 'LIKE', 'BB_%')
+                  ->orWhere('room_number', 'LIKE', 'WB_%')
+                  ->orWhere('room_number', 'LIKE', 'TB-%');
+            })
             ->delete();
 
-        $this->line("  ✓ Deleted $testRoomCount test rooms (preserved original 22 rooms)");
+        $this->line("  ✓ Deleted $testRoomCount test rooms (BB_/WB_/TB- prefixes; preserved original 22)");
     }
 
     /**

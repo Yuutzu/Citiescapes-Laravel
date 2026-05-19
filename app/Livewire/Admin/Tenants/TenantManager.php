@@ -66,7 +66,7 @@ class TenantManager extends Component
             'original_record_id' => $tenant->id,
             'record_type'        => 'tenant_account',
             'source_subsystem'   => 'SS2',
-            'archive_reason'     => 'Manual archive by GM',
+            'archive_reason'     => 'Tenant record archived by management',
             'data'               => $tenant->toArray(),
             'archived_by'        => auth()->id(),
         ]);
@@ -87,10 +87,17 @@ class TenantManager extends Component
     public function render()
     {
         $tenants = User::where('role', 'tenant')
-            ->when($this->search, fn($q) => $q->where(fn($qq) =>
-                $qq->where('full_name', 'like', "%{$this->search}%")
-                   ->orWhere('email', 'like', "%{$this->search}%")
-            ))
+            ->when($this->search, function ($q) {
+                $term = "%{$this->search}%";
+                $q->where(function ($qq) use ($term) {
+                    $qq->where('full_name', 'like', $term)
+                       ->orWhere('email', 'like', $term)
+                       ->orWhere('contact_number', 'like', $term)
+                       ->orWhere('address', 'like', $term)
+                       ->orWhere('emergency_contact', 'like', $term)
+                       ->orWhere('status', 'like', $term);
+                });
+            })
             ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
             ->latest()
             ->paginate(15);

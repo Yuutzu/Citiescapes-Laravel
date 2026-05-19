@@ -14,7 +14,7 @@
 
     {{-- Submit Form Modal --}}
     @if($showForm)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="cs-modal">
             <div class="bg-white rounded-xl shadow-xl w-full max-w-xl">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-900">Submit Request / Complaint</h2>
@@ -86,7 +86,7 @@
 
     {{-- Submitted Confirmation Modal --}}
     @if($showSubmittedModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" wire:click.self="closeSubmittedModal">
+        <div class="cs-modal" wire:click.self="closeSubmittedModal">
             <div class="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
                 <div class="px-6 py-6 text-center">
                     <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 mb-4">
@@ -111,7 +111,7 @@
 
     {{-- View Detail Modal --}}
     @if($viewing)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div class="cs-modal">
             <div class="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 sticky top-0 bg-white">
                     <div>

@@ -4,6 +4,7 @@ namespace App\Livewire\Tenant;
 
 use App\Models\Bill;
 use App\Models\Contract;
+use App\Models\InitialPayment;
 use App\Models\NotificationLog;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,8 +23,17 @@ class Dashboard extends Component
         $unpaidCount = Bill::where('tenant_id', $user->id)->unpaid()->count();
         $notifications = NotificationLog::where('user_id', $user->id)->latest()->take(5)->get();
 
+        // Initial payment (move-in collection) — shown on dashboard
+        $initialPayment = InitialPayment::with('contract.room')
+            ->where('tenant_id', $user->id)->first();
+
         return view('livewire.tenant.dashboard', compact(
-            'user', 'contract', 'latestBill', 'unpaidCount', 'notifications'
+            'user',
+            'contract',
+            'latestBill',
+            'unpaidCount',
+            'notifications',
+            'initialPayment'
         ));
     }
 }

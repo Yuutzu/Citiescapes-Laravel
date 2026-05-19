@@ -7,7 +7,7 @@
     @apply inline-flex items-center px-4 py-2 bg-brand-700 text-white font-semibold text-sm rounded-lg shadow-sm hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50;
   }
   .btn-secondary {
-    @apply inline-flex items-center px-4 py-2 bg-white text-brand-700 border border-brand-300 font-semibold text-sm rounded-lg shadow-sm hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition ease-in-out duration-150;
+    @apply inline-flex items-center px-4 py-2 bg-paper-50 text-brand-700 border border-brand-300 font-semibold text-sm rounded-lg shadow-sm hover:bg-paper-200 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition ease-in-out duration-150;
   }
   .btn-danger {
     @apply inline-flex items-center px-4 py-2 bg-red-600 text-white font-semibold text-sm rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150;
@@ -16,13 +16,13 @@
     @apply inline-flex items-center px-4 py-2 bg-green-600 text-white font-semibold text-sm rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150;
   }
   .form-input {
-    @apply block w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm;
+    @apply block w-full rounded-lg border-brand-200 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm;
   }
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-brand-800 mb-1;
   }
   .card {
-    @apply bg-white rounded-xl shadow-sm ring-1 ring-gray-950/5 p-6;
+    @apply bg-paper-50 rounded-xl shadow-sm ring-1 ring-brand-950/5 p-6;
   }
   .badge {
     @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
@@ -33,4 +33,188 @@
   .sidebar-link.active {
     @apply bg-brand-700 text-white;
   }
+}
+
+/* ==================== Global page animations ==================== */
+
+@keyframes cs-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cs-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cs-fade-down {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cs-fade-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes cs-fade-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes cs-zoom-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes cs-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes cs-pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.75; }
+}
+
+/* Apply to elements just by adding the class — fires on render. */
+.cs-anim-fade        { animation: cs-fade-in   0.7s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-fade-up     { animation: cs-fade-up   0.7s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-fade-down   { animation: cs-fade-down 0.6s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-fade-left   { animation: cs-fade-left 0.7s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-fade-right  { animation: cs-fade-right 0.7s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-zoom-in     { animation: cs-zoom-in   0.6s cubic-bezier(.2,.7,.3,1) both; }
+.cs-anim-float       { animation: cs-float     4s ease-in-out infinite; }
+.cs-anim-pulse-soft  { animation: cs-pulse-soft 2.4s ease-in-out infinite; }
+
+/* Delay helpers — for cascading stagger effects */
+.cs-delay-100 { animation-delay: 100ms; }
+.cs-delay-200 { animation-delay: 200ms; }
+.cs-delay-300 { animation-delay: 300ms; }
+.cs-delay-400 { animation-delay: 400ms; }
+.cs-delay-500 { animation-delay: 500ms; }
+.cs-delay-700 { animation-delay: 700ms; }
+.cs-delay-1000 { animation-delay: 1000ms; }
+
+/* ============================================================
+   Global smooth scrolling — applies to all anchor links and
+   any JS-driven scrollIntoView() call (dashboards, landing, etc.)
+   ============================================================ */
+html { scroll-behavior: smooth; }
+
+/* Anchor-target padding so sticky headers don't cover the target */
+[id] { scroll-margin-top: 80px; }
+
+/* ============================================================
+   Page transition — fade-out → navigate → fade-in.
+   Applies to every page automatically, including wire:navigate.
+   ============================================================ */
+/* Pure opacity — no transform — so <main> never becomes a containing block
+   for position:fixed children (which would clip modal backdrops). */
+@keyframes cs-page-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cs-page-leave {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Enter animation lives on an inner wrapper instead of <main> directly,
+   so <main> never becomes a containing block for position:fixed modals.
+   Any element that sets `transform`, `filter`, `perspective`, or
+   `will-change: transform` would clip backdrops to its own box. */
+main {
+  /* Explicit no-op — protects against Tailwind utilities or third-party CSS
+     accidentally setting transform on <main> in the future. */
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+  contain: none !important;
+}
+main > * {
+  animation: cs-page-enter 0.45s cubic-bezier(.2,.7,.3,1) both;
+}
+
+/* Leave animation — toggled on by JS during wire:navigate. */
+main.cs-leaving > * {
+  animation: cs-page-leave 0.18s cubic-bezier(.4,0,1,1) both;
+}
+
+/* Modals and dropdowns get the same fade for visual consistency. */
+[x-show],
+[role="dialog"] {
+  transition: opacity 0.2s ease;
+}
+
+/* ===========================================================================
+ * Shared modal backdrop — centers the modal panel in the viewport while
+ * leaving room for the 64px sticky header. Set on every modal so titles
+ * never get clipped by the top nav. Tall modals fall back to scrolling
+ * the whole backdrop via overflow-y-auto.
+ * =========================================================================== */
+.cs-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.6);
+  padding: 6rem 1rem 2rem; /* top clearance below header, sides, bottom */
+  overflow-y: auto;
+}
+
+/* Hover lift utility for interactive cards */
+.cs-lift {
+  transition: transform 0.3s cubic-bezier(.2,.7,.3,1), box-shadow 0.3s ease;
+}
+.cs-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -18px rgba(94, 40, 24, 0.35);
+}
+
+/* Image zoom-on-hover utility */
+.cs-img-zoom { overflow: hidden; }
+.cs-img-zoom img,
+.cs-img-zoom [style*="background-image"] { transition: transform 0.6s ease; }
+.cs-img-zoom:hover img,
+.cs-img-zoom:hover [style*="background-image"] { transform: scale(1.05); }
+
+/* Respect users who prefer reduced motion — turn animations off */
+@media (prefers-reduced-motion: reduce) {
+  .cs-anim-fade,
+  .cs-anim-fade-up,
+  .cs-anim-fade-down,
+  .cs-anim-fade-left,
+  .cs-anim-fade-right,
+  .cs-anim-zoom-in,
+  .cs-anim-float,
+  .cs-anim-pulse-soft,
+  main {
+    animation: none !important;
+  }
+  .cs-lift:hover { transform: none; }
+}
+
+/* ===========================================================================
+ * Sidebar scrollbar — blends with the dark brown nav (bg-brand-950).
+ * Webkit: slim 6px track tinted to brand-900, thumb in brand-700 with hover.
+ * Firefox: scrollbar-width:thin + scrollbar-color matching the same palette.
+ * =========================================================================== */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #7a3b21 #2a140b; /* thumb=brand-700-ish, track=brand-950 */
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: #2a140b; /* matches bg-brand-950 */
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #7a3b21;
+  border-radius: 8px;
+  border: 2px solid #2a140b; /* track-coloured border so the thumb looks inset */
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a14d2b;
+}
+/* When the sidebar isn't scrolling, hide the bar entirely (no white channel). */
+.sidebar-scroll::-webkit-scrollbar-corner {
+  background: #2a140b;
 }

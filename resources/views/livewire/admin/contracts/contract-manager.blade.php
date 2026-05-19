@@ -4,16 +4,24 @@
         <button wire:click="create" class="btn-primary">+ Create Draft</button>
     </div>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search tenant..."
-            class="form-input w-auto text-sm">
-        <select wire:model.live="filterStatus" class="form-input w-auto text-sm">
-            <option value="">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="active">Active</option>
-            <option value="expired">Expired</option>
-            <option value="terminated">Terminated</option>
-        </select>
+    <div class="space-y-3 mb-6">
+        <div class="relative max-w-md">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input wire:model.live.debounce.300ms="search" type="text"
+                placeholder="Search tenant, room, status, house rules..."
+                class="form-input w-full pl-9 text-sm">
+        </div>
+        @php
+            $cBtn = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterStatus === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Status:</span>
+            <button wire:click="$set('filterStatus','')" class="{{ $cBtn('') }}">All</button>
+            <button wire:click="$set('filterStatus','draft')" class="{{ $cBtn('draft') }}">Draft</button>
+            <button wire:click="$set('filterStatus','active')" class="{{ $cBtn('active') }}">Active</button>
+            <button wire:click="$set('filterStatus','expired')" class="{{ $cBtn('expired') }}">Expired</button>
+            <button wire:click="$set('filterStatus','terminated')" class="{{ $cBtn('terminated') }}">Terminated</button>
+        </div>
     </div>
 
     <div class="card overflow-x-auto p-0">
@@ -62,10 +70,33 @@
                         </td>
                         <td class="px-4 py-3">
                             @if($c->scan_file_path)
-                                <button type="button" wire:click="viewScan({{ $c->id }})"
-                                    class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
-                                    <i class="fas fa-file-lines text-[10px]"></i> View
-                                </button>
+                                <div class="flex flex-col items-start gap-1">
+                                    <button type="button" wire:click="viewScan({{ $c->id }})"
+                                        class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                                        <i class="fas fa-file-lines text-[10px]"></i> View
+                                    </button>
+                                    @if($c->scan_view_status === 'pending')
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700">
+                                            <i class="fas fa-hourglass-half"></i> Tenant requested access
+                                        </span>
+                                        <div class="flex items-center gap-1">
+                                            <button wire:click="openScanDecision({{ $c->id }}, 'approve')"
+                                                class="text-[10px] px-2 py-0.5 rounded bg-green-600 text-white hover:bg-green-700">Approve</button>
+                                            <button wire:click="openScanDecision({{ $c->id }}, 'deny')"
+                                                class="text-[10px] px-2 py-0.5 rounded bg-red-600 text-white hover:bg-red-700">Deny</button>
+                                        </div>
+                                    @elseif($c->scan_view_status === 'approved')
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700">
+                                            <i class="fas fa-check-circle"></i> Tenant access approved
+                                        </span>
+                                        <button wire:click="revokeScanAccess({{ $c->id }})" wire:confirm="Revoke tenant's access to this scan?"
+                                            class="text-[10px] text-red-600 hover:underline">Revoke</button>
+                                    @elseif($c->scan_view_status === 'denied')
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700">
+                                            <i class="fas fa-ban"></i> Denied
+                                        </span>
+                                    @endif
+                                </div>
                             @else <span class="text-xs text-gray-400">—</span> @endif
                         </td>
                         <td class="px-4 py-3 text-right">
@@ -101,8 +132,8 @@
 
     {{-- Create/Edit Modal --}}
     @if($showModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
                 <h3 class="text-lg font-semibold mb-4">{{ $editing ? 'Edit Contract' : 'Create Contract Draft' }}</h3>
                 <form wire:submit="save" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -180,8 +211,17 @@
                     </div>
                     <div><label class="form-label">House Rules</label><textarea wire:model="house_rules" rows="3"
                             class="form-input"></textarea></div>
-                    <div><label class="form-label">Upload Signed Contract (scan)</label><input wire:model="scanFile"
-                            type="file" accept=".pdf,.jpg,.jpeg,.png" class="form-input text-sm"></div>
+                    <div>
+                        <label class="form-label">Upload Signed Contract (scan)</label>
+                        <input wire:model="scanFile" type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+                            class="form-input text-sm">
+                        <p class="text-[11px] text-gray-500 mt-1">PDF, image, or Word document (max 10 MB).</p>
+                        <div wire:loading wire:target="scanFile" class="text-xs text-brand-600 mt-1">
+                            <i class="fas fa-spinner fa-spin"></i> Uploading…
+                        </div>
+                        @error('scanFile') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
                     <div class="flex justify-end gap-3 pt-2">
                         <button type="button" wire:click="$set('showModal', false)" class="btn-secondary">Cancel</button>
                         <button type="submit" class="btn-primary">{{ $editing ? 'Update' : 'Save Draft' }}</button>
@@ -199,8 +239,8 @@
             $ext = strtolower(pathinfo($scanContract->scan_file_path, PATHINFO_EXTENSION));
             $isPdf = $ext === 'pdf';
         @endphp
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" wire:click.self="closeScan">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div class="cs-modal" wire:click.self="closeScan">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl flex flex-col">
                 <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
                     <h3 class="text-base font-semibold text-gray-900">
                         Signed Contract — {{ $scanContract->tenant->full_name }}
@@ -224,10 +264,39 @@
         </div>
     @endif
 
+    {{-- Scan-access decision modal --}}
+    @if($showScanDecision)
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6 my-auto">
+                <h3 class="text-lg font-semibold mb-2 {{ $scanDecisionAction === 'approve' ? 'text-green-700' : 'text-red-700' }}">
+                    {{ $scanDecisionAction === 'approve' ? 'Approve' : 'Deny' }} Tenant Scan Access
+                </h3>
+                <p class="text-xs text-gray-500 mb-4">
+                    {{ $scanDecisionAction === 'approve'
+                        ? 'Approving will let the tenant view the signed contract scan in their portal.'
+                        : 'Denying will block tenant access. Provide a reason — the tenant will see it.' }}
+                </p>
+                <form wire:submit="submitScanDecision" class="space-y-4">
+                    <div>
+                        <label class="form-label">{{ $scanDecisionAction === 'deny' ? 'Reason *' : 'Note (optional)' }}</label>
+                        <textarea wire:model="scanDecisionNote" rows="3" class="form-input"></textarea>
+                        @error('scanDecisionNote')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" wire:click="$set('showScanDecision', false)" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="{{ $scanDecisionAction === 'approve' ? 'btn-primary' : 'btn-danger' }}">
+                            {{ $scanDecisionAction === 'approve' ? 'Approve Access' : 'Deny Request' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
     {{-- Terminate Modal --}}
     @if($showTerminate)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4 text-red-700">Terminate Contract</h3>
                 <form wire:submit="terminate" class="space-y-4">
                     <div><label class="form-label">Reason *</label><textarea wire:model="terminateReason" rows="3"

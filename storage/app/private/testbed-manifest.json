@@ -1,0 +1,485 @@
+{
+    "generated_at": "2026-05-19T22:59:19+08:00",
+    "anchors": {
+        "gm_email": "testbed.gm@testbed.local",
+        "tenant_email": "testbed.tenant@testbed.local",
+        "room_number": "TB-101"
+    },
+    "scenarios": {
+        "room.available": {
+            "subsystem": "SS1",
+            "label": "Room with status=available",
+            "expects": "available",
+            "ids": {
+                "room_id": 24
+            }
+        },
+        "room.occupied": {
+            "subsystem": "SS1",
+            "label": "Room with status=occupied + tenant",
+            "expects": "occupied",
+            "ids": {
+                "room_id": 25
+            }
+        },
+        "room.under_maintenance": {
+            "subsystem": "SS1",
+            "label": "Room status=under_maintenance",
+            "expects": "under_maintenance",
+            "ids": {
+                "room_id": 26
+            }
+        },
+        "room.archived": {
+            "subsystem": "SS1",
+            "label": "Room soft-deleted + Archive row",
+            "expects": "archived",
+            "ids": {
+                "room_id": 27,
+                "archive_id": 1
+            }
+        },
+        "inquiry.pending": {
+            "subsystem": "SS1",
+            "label": "Inquiry status=pending",
+            "expects": "pending",
+            "ids": {
+                "inquiry_id": 1
+            }
+        },
+        "inquiry.responded": {
+            "subsystem": "SS1",
+            "label": "Inquiry status=responded",
+            "expects": "responded",
+            "ids": {
+                "inquiry_id": 2
+            }
+        },
+        "inquiry.closed": {
+            "subsystem": "SS1",
+            "label": "Inquiry status=closed",
+            "expects": "closed",
+            "ids": {
+                "inquiry_id": 3
+            }
+        },
+        "tenant.pending_activation": {
+            "subsystem": "SS2",
+            "label": "Tenant just created, must_change_password=true",
+            "expects": "pending_activation",
+            "ids": {
+                "user_id": 60
+            }
+        },
+        "tenant.with_valid_otp": {
+            "subsystem": "SS2",
+            "label": "Pending tenant + OtpRecord expiring in 10 min",
+            "expects": "pending_activation+otp",
+            "ids": {
+                "user_id": 61,
+                "otp_id": 1
+            }
+        },
+        "tenant.with_expired_otp": {
+            "subsystem": "SS2",
+            "label": "Pending tenant + expired OtpRecord (resend branch)",
+            "expects": "otp_expired",
+            "ids": {
+                "user_id": 62,
+                "otp_id": 2
+            }
+        },
+        "tenant.active": {
+            "subsystem": "SS2",
+            "label": "Active tenant, activated_at set",
+            "expects": "active",
+            "ids": {
+                "user_id": 63
+            }
+        },
+        "tenant.archived_manual": {
+            "subsystem": "SS2",
+            "label": "Tenant manually archived by GM (Archive row + status)",
+            "expects": "archived",
+            "ids": {
+                "user_id": 64,
+                "archive_id": 2
+            }
+        },
+        "bill.unpaid_future": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=+5d (still upcoming)",
+            "expects": "unpaid",
+            "ids": {
+                "contract_id": 1,
+                "bill_id": 1
+            }
+        },
+        "bill.grace_day1": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-1d \u2192 grace + first reminder",
+            "expects": "grace",
+            "ids": {
+                "contract_id": 2,
+                "bill_id": 2
+            }
+        },
+        "bill.grace_day3": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-3d \u2192 grace + grace-ending reminder",
+            "expects": "grace",
+            "ids": {
+                "contract_id": 3,
+                "bill_id": 3
+            }
+        },
+        "bill.overdue_day4": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-4d \u2192 overdue + 1 day of penalty",
+            "expects": "overdue",
+            "ids": {
+                "contract_id": 4,
+                "bill_id": 4
+            }
+        },
+        "bill.overdue_day13": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-13d \u2192 overdue, just below delinquent",
+            "expects": "overdue",
+            "ids": {
+                "contract_id": 5,
+                "bill_id": 5
+            }
+        },
+        "bill.delinquent_day14": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-14d \u2192 delinquent + once-only notice",
+            "expects": "delinquent",
+            "ids": {
+                "contract_id": 6,
+                "bill_id": 6
+            }
+        },
+        "bill.delinquent_day29": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-29d \u2192 delinquent, just below eviction",
+            "expects": "delinquent",
+            "ids": {
+                "contract_id": 7,
+                "bill_id": 7
+            }
+        },
+        "bill.eviction_day30": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-30d \u2192 eviction + once-only notice",
+            "expects": "eviction",
+            "ids": {
+                "contract_id": 8,
+                "bill_id": 8
+            }
+        },
+        "bill.eviction_day45": {
+            "subsystem": "SS3",
+            "label": "Bill due_date=-45d \u2192 eviction, deep arrears",
+            "expects": "eviction",
+            "ids": {
+                "contract_id": 9,
+                "bill_id": 9
+            }
+        },
+        "bill.paid": {
+            "subsystem": "SS3",
+            "label": "Bill marked paid (manual GM confirm)",
+            "expects": "paid",
+            "ids": {
+                "contract_id": 10,
+                "bill_id": 10
+            }
+        },
+        "bill.archived": {
+            "subsystem": "SS3",
+            "label": "Bill status=archived (lease end)",
+            "expects": "archived",
+            "ids": {
+                "contract_id": 11,
+                "bill_id": 11
+            }
+        },
+        "bill.penalty_override": {
+            "subsystem": "SS3",
+            "label": "Overdue bill with GM penalty override",
+            "expects": "overdue+override",
+            "ids": {
+                "contract_id": 12,
+                "bill_id": 12,
+                "note": "Open in /admin/billing and apply override to verify branch"
+            }
+        },
+        "bill.initial_payment": {
+            "subsystem": "SS3",
+            "label": "Initial payment row (deposit + 1st month + key)",
+            "expects": "recorded",
+            "ids": {
+                "contract_id": 13,
+                "initial_payment_id": 1
+            }
+        },
+        "contract.draft": {
+            "subsystem": "SS4",
+            "label": "Contract status=draft (no acks)",
+            "expects": "draft",
+            "ids": {
+                "contract_id": 14
+            }
+        },
+        "contract.active_green": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=+60d (green badge)",
+            "expects": "green",
+            "ids": {
+                "contract_id": 15
+            }
+        },
+        "contract.active_amber_30": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=+30d (30-day warning fires)",
+            "expects": "amber",
+            "ids": {
+                "contract_id": 16
+            }
+        },
+        "contract.active_amber_15": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=+15d (amber, mid-warning)",
+            "expects": "amber",
+            "ids": {
+                "contract_id": 17
+            }
+        },
+        "contract.active_red_7": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=+7d (7-day warning fires)",
+            "expects": "red",
+            "ids": {
+                "contract_id": 18
+            }
+        },
+        "contract.active_red_1": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=+1d (red, last day)",
+            "expects": "red",
+            "ids": {
+                "contract_id": 19
+            }
+        },
+        "contract.expired_unarchived": {
+            "subsystem": "SS4",
+            "label": "Active, end_date=-1d \u2192 auto-archive cron candidate",
+            "expects": "cron-will-flip",
+            "ids": {
+                "contract_id": 20
+            }
+        },
+        "contract.expired_archived": {
+            "subsystem": "SS4",
+            "label": "Expired + archived (terminal state)",
+            "expects": "expired",
+            "ids": {
+                "contract_id": 21,
+                "archive_id": 3
+            }
+        },
+        "contract.terminated": {
+            "subsystem": "SS4",
+            "label": "Terminated mid-lease with reason",
+            "expects": "terminated",
+            "ids": {
+                "contract_id": 22
+            }
+        },
+        "contract.step1_ack_only": {
+            "subsystem": "SS4",
+            "label": "Draft + step1_acknowledged_at set, awaiting step 2",
+            "expects": "draft+step1",
+            "ids": {
+                "contract_id": 23
+            }
+        },
+        "contract.step2_ack_active": {
+            "subsystem": "SS4",
+            "label": "Active after step 2 ack",
+            "expects": "active",
+            "ids": {
+                "contract_id": 24
+            }
+        },
+        "archive.room": {
+            "subsystem": "SS5",
+            "label": "Archive(record_type=room, source=SS1)",
+            "expects": "archived",
+            "ids": {
+                "archive_id": 4
+            }
+        },
+        "archive.tenant": {
+            "subsystem": "SS5",
+            "label": "Archive(record_type=tenant_account, source=SS2)",
+            "expects": "archived",
+            "ids": {
+                "archive_id": 5
+            }
+        },
+        "archive.contract": {
+            "subsystem": "SS5",
+            "label": "Archive(record_type=contract, source=SS4)",
+            "expects": "archived",
+            "ids": {
+                "archive_id": 6
+            }
+        },
+        "archive.bill": {
+            "subsystem": "SS5",
+            "label": "Archive(record_type=payment, source=SS3)",
+            "expects": "archived",
+            "ids": {
+                "archive_id": 7
+            }
+        },
+        "archive.restored": {
+            "subsystem": "SS5",
+            "label": "Archive restored=true (record_restored audit)",
+            "expects": "restored",
+            "ids": {
+                "archive_id": 8
+            }
+        },
+        "user.locked_active": {
+            "subsystem": "SS6",
+            "label": "User locked, failed=5, locked_until=now+15m",
+            "expects": "locked",
+            "ids": {
+                "user_id": 65
+            }
+        },
+        "user.locked_expired": {
+            "subsystem": "SS6",
+            "label": "User locked but locked_until past \u2192 auto-unlock",
+            "expects": "auto-unlock-pending",
+            "ids": {
+                "user_id": 66
+            }
+        },
+        "user.must_change_password": {
+            "subsystem": "SS6",
+            "label": "Active user with must_change_password=true",
+            "expects": "forced_change",
+            "ids": {
+                "user_id": 67
+            }
+        },
+        "audit.login": {
+            "subsystem": "SS6",
+            "label": "AuditLog action=login tagged SS6",
+            "expects": "logged",
+            "ids": {
+                "audit_id": 1
+            }
+        },
+        "audit.failed_login": {
+            "subsystem": "SS6",
+            "label": "AuditLog action=failed_login tagged SS6",
+            "expects": "logged",
+            "ids": {
+                "audit_id": 2
+            }
+        },
+        "audit.password_change": {
+            "subsystem": "SS6",
+            "label": "AuditLog action=password_change tagged SS6",
+            "expects": "logged",
+            "ids": {
+                "audit_id": 3
+            }
+        },
+        "audit.settings_updated": {
+            "subsystem": "SS6",
+            "label": "AuditLog action=settings_updated tagged SS6",
+            "expects": "logged",
+            "ids": {
+                "audit_id": 4
+            }
+        },
+        "setting.session_timeout": {
+            "subsystem": "SS6",
+            "label": "SystemSetting session_timeout_minutes=20",
+            "expects": "persisted",
+            "ids": {
+                "setting_id": 17
+            }
+        },
+        "request.open": {
+            "subsystem": "SS7",
+            "label": "TenantRequest type=request, status=pending",
+            "expects": "pending",
+            "ids": {
+                "request_id": 1
+            }
+        },
+        "request.in_progress": {
+            "subsystem": "SS7",
+            "label": "TenantRequest status=in_progress (GM working)",
+            "expects": "in_progress",
+            "ids": {
+                "request_id": 2
+            }
+        },
+        "request.resolved": {
+            "subsystem": "SS7",
+            "label": "TenantRequest status=resolved (locked)",
+            "expects": "resolved",
+            "ids": {
+                "request_id": 3
+            }
+        },
+        "complaint.open": {
+            "subsystem": "SS7",
+            "label": "TenantRequest type=complaint, status=pending",
+            "expects": "pending",
+            "ids": {
+                "request_id": 4
+            }
+        },
+        "announcement.broadcast": {
+            "subsystem": "SS7",
+            "label": "Announcement recipient_type=all",
+            "expects": "sent",
+            "ids": {
+                "announcement_id": 1
+            }
+        },
+        "announcement.direct": {
+            "subsystem": "SS7",
+            "label": "Announcement recipient_type=tenant + recipient_id",
+            "expects": "sent",
+            "ids": {
+                "announcement_id": 2
+            }
+        },
+        "notification.unread": {
+            "subsystem": "SS7",
+            "label": "NotificationLog is_read=false",
+            "expects": "unread",
+            "ids": {
+                "notification_id": 1
+            }
+        },
+        "notification.read": {
+            "subsystem": "SS7",
+            "label": "NotificationLog is_read=true",
+            "expects": "read",
+            "ids": {
+                "notification_id": 2
+            }
+        }
+    }
+}

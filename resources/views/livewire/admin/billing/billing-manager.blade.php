@@ -3,28 +3,36 @@
         <h1 class="text-2xl font-bold text-brand-900">Billing Management</h1>
         <div class="flex gap-2">
             <button wire:click="openInitial"
-                class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-300 hover:bg-brand-50 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-700 ring-1 ring-brand-300 shadow-sm hover:bg-brand-50 transition">
                 <i class="fas fa-receipt text-[11px]"></i> Record Initial Fees
             </button>
             <button wire:click="openGenerate"
-                class="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-400 transition">
+                class="inline-flex items-center gap-2 rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition">
                 <i class="fas fa-plus text-[11px]"></i> Generate Monthly Bill
             </button>
         </div>
     </div>
 
-    <div class="flex flex-wrap gap-3 mb-6">
-        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search tenant..."
-            class="form-input w-auto text-sm">
-        <select wire:model.live="filterStatus" class="form-input w-auto text-sm">
-            <option value="">All Status</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="grace">Grace</option>
-            <option value="overdue">Overdue</option>
-            <option value="delinquent">Delinquent</option>
-            <option value="eviction">Eviction</option>
-            <option value="paid">Paid</option>
-        </select>
+    <div class="space-y-3 mb-6">
+        <div class="relative max-w-md">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input wire:model.live.debounce.300ms="search" type="text"
+                placeholder="Search tenant, room, status, period, reference..."
+                class="form-input w-full pl-9 text-sm">
+        </div>
+        @php
+            $bBtn = fn($v) => 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition ' . ($filterStatus === (string)$v ? 'bg-brand-700 text-white hover:bg-brand-800' : 'bg-white text-brand-700 ring-1 ring-brand-300 hover:bg-brand-50');
+        @endphp
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Status:</span>
+            <button wire:click="$set('filterStatus','')" class="{{ $bBtn('') }}">All</button>
+            <button wire:click="$set('filterStatus','unpaid')" class="{{ $bBtn('unpaid') }}">Unpaid</button>
+            <button wire:click="$set('filterStatus','grace')" class="{{ $bBtn('grace') }}">Grace</button>
+            <button wire:click="$set('filterStatus','overdue')" class="{{ $bBtn('overdue') }}">Overdue</button>
+            <button wire:click="$set('filterStatus','delinquent')" class="{{ $bBtn('delinquent') }}">Delinquent</button>
+            <button wire:click="$set('filterStatus','eviction')" class="{{ $bBtn('eviction') }}">Eviction</button>
+            <button wire:click="$set('filterStatus','paid')" class="{{ $bBtn('paid') }}">Paid</button>
+        </div>
     </div>
 
     {{-- ============ INITIAL PAYMENTS (Move-In) ============ --}}
@@ -123,7 +131,7 @@
                 @foreach($bills as $bill)
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $bill->tenant->full_name }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->room->room_number }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->room?->room_number ?? '—' }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->billing_period }}</td>
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">₱{{ number_format($bill->total_amount, 2) }}
                         </td>
@@ -136,7 +144,7 @@
                                 class="badge {{ $bill->status_badge }}">{{ ucfirst($bill->status) }}{{ $bill->days_overdue > 0 && $bill->status !== 'paid' ? " ({$bill->days_overdue}d)" : '' }}</span>
                         </td>
                         <td class="px-4 py-3 text-right">
-                            <div class="flex items-center justify-end gap-2">
+                            <div class="flex items-center justify-end gap-2 flex-wrap">
                                 @if($bill->status !== 'paid' && $bill->status !== 'archived')
                                     <button wire:click="openPayment({{ $bill->id }})"
                                         class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
@@ -146,6 +154,22 @@
                                         <button wire:click="openOverride({{ $bill->id }})"
                                             class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-300 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-400 transition">
                                             <i class="fas fa-gavel text-[10px]"></i> Override
+                                        </button>
+                                    @endif
+
+                                    {{-- Eviction / delinquent shortcuts: apply deposit credit
+                                         or terminate the contract. Only surface when the GM has
+                                         crossed into the serious-arrears zone. --}}
+                                    @if(in_array($bill->status, ['delinquent', 'eviction'], true))
+                                        <button wire:click="applyDepositToArrears({{ $bill->id }})"
+                                            wire:confirm="Apply remaining security deposit toward this bill?"
+                                            class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50 transition">
+                                            <i class="fas fa-piggy-bank text-[10px]"></i> Apply Deposit
+                                        </button>
+                                        <button wire:click="terminateForArrears({{ $bill->id }})"
+                                            wire:confirm="Terminate the contract for non-payment? This archives the contract and frees the room. Cannot be undone."
+                                            class="inline-flex items-center gap-1 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                                            <i class="fas fa-ban text-[10px]"></i> Mark for Termination
                                         </button>
                                     @endif
                                 @else
@@ -162,8 +186,8 @@
 
     {{-- Generate Monthly Bill Modal --}}
     @if($showGenerate)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4">Generate Monthly Bill</h3>
                 <form wire:submit="generateBill" class="space-y-4">
                     <div>
@@ -215,8 +239,8 @@
             $amenitiesTotal = $this->initAmenitiesTotal;
             $total = $c ? ((float) $c->deposit + (float) $firstRent + (float) $c->room_key_fee + $amenitiesTotal) : 0;
         @endphp
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
                 <h3 class="text-lg font-semibold mb-1">Record Initial Payment</h3>
                 <p class="text-xs text-gray-500 mb-4">Move-in amounts come from the signed contract (SS4). Amenities can be adjusted below if the tenant changed their request at move-in.</p>
                 <form wire:submit="recordInitial" class="space-y-4">
@@ -282,15 +306,31 @@
                         </div>
                         <div>
                             <label class="form-label">Payment Method *</label>
-                            <select wire:model="initPaymentMethod" class="form-input">
+                            <select wire:model.live="initPaymentMethod" class="form-input">
                                 <option value="cash">Cash</option>
                                 <option value="bank_transfer">Bank Transfer</option>
                                 <option value="e_wallet">E-Wallet</option>
                             </select>
                         </div>
                     </div>
+
+                    @if(in_array($initPaymentMethod, ['bank_transfer', 'e_wallet']))
+                        <div class="rounded-lg border border-marigold-300 bg-marigold-50 p-3">
+                            <p class="text-xs uppercase tracking-wider text-brand-700 font-semibold mb-2">Accepted channels</p>
+                            <div class="flex items-center gap-3">
+                                @if($initPaymentMethod === 'bank_transfer')
+                                    <img src="/storage/payment-methods/bdo.jpg" alt="BDO" class="h-10 rounded ring-1 ring-brand-200 object-cover cs-anim-zoom-in">
+                                    <img src="/storage/payment-methods/bpi.jpg" alt="BPI" class="h-10 rounded ring-1 ring-brand-200 object-cover cs-anim-zoom-in cs-delay-100">
+                                @else
+                                    <img src="/storage/payment-methods/gcash.jpg" alt="GCash" class="h-10 rounded ring-1 ring-brand-200 object-cover cs-anim-zoom-in">
+                                @endif
+                                <p class="text-xs text-brand-700/80">Provide the reference number below after payment.</p>
+                            </div>
+                        </div>
+                    @endif
+
                     <div>
-                        <label class="form-label">Reference Number <span class="text-gray-400 text-xs">(optional, for transfer / e-wallet)</span></label>
+                        <label class="form-label">Reference Number <span class="text-brand-400 text-xs">(optional, for transfer / e-wallet)</span></label>
                         <input wire:model="initReferenceNumber" type="text" class="form-input" placeholder="e.g. GCash ref no.">
                     </div>
 
@@ -305,8 +345,8 @@
 
     {{-- Confirm Payment Modal --}}
     @if($showPayment)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4">Confirm Payment</h3>
                 <form wire:submit="confirmPayment" class="space-y-4">
                     <div><label class="form-label">Amount (₱)</label><input wire:model="payAmount" type="number" step="0.01"
@@ -333,8 +373,8 @@
 
     {{-- Override Penalty Modal --}}
     @if($showOverride)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div class="cs-modal">
+            <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4">Override / Waive Penalty</h3>
                 <form wire:submit="saveOverride" class="space-y-4">
                     <div><label class="form-label">New Penalty Amount (₱)</label><input wire:model="overrideAmount"

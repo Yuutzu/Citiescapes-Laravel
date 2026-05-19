@@ -45,10 +45,10 @@
                             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
                             :class="current === i ? 'opacity-100' : 'opacity-0'">
                     </template>
-                    <button @click="prev" class="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                    <button @click="prev" class="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/60">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
                     </button>
-                    <button @click="next" class="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                    <button @click="next" class="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/60">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                     </button>
                     <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -56,7 +56,7 @@
                             <button @click="goto(i)" class="h-2 w-2 rounded-full transition-colors" :class="current === i ? 'bg-white' : 'bg-white/40'"></button>
                         </template>
                     </div>
-                    <div class="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                    <div class="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
                         <span x-text="current + 1"></span> / <span x-text="photos.length"></span>
                     </div>
                 </div>
