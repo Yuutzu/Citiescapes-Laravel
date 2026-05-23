@@ -20,9 +20,10 @@ class Dashboard extends Component
 {
     public function render()
     {
-        // Last 6 months revenue from confirmed payments
+        // Last 6 months revenue from confirmed payments. SUBSTR(...,1,7) gives the
+        // 'YYYY-MM' prefix on every SQL driver we target (MySQL in prod, SQLite in tests).
         $revenueData = Payment::select(
-            DB::raw("DATE_FORMAT(confirmed_at, '%Y-%m') as month"),
+            DB::raw("SUBSTR(confirmed_at, 1, 7) as month"),
             DB::raw('SUM(amount) as total')
         )
             ->whereNotNull('confirmed_at')

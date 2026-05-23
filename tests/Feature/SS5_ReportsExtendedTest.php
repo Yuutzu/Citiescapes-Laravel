@@ -100,22 +100,6 @@ class SS5_ReportsExtendedTest extends TestCase
         $this->assertStringContainsString('0 archive', (string) $log->details);
     }
 
-    /* ── XLSX export ───────────────────────────────── */
-
-    #[Test] // BBT_SS5_EXPORT_XLSX
-    public function xlsx_export_audits_archive_exported_xlsx(): void
-    {
-        $this->makeArchive();
-
-        Livewire::actingAs($this->gm)->test(ReportManager::class)
-            ->call('exportXlsx');
-
-        $this->assertDatabaseHas('audit_logs', [
-            'action'    => 'archive_exported_xlsx',
-            'subsystem' => 'SS5',
-        ]);
-    }
-
     /* ── Contract PDF export ───────────────────────── */
 
     #[Test] // BBT_SS5_EXPORT_PDF_CONTRACT

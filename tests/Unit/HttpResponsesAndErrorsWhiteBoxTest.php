@@ -39,10 +39,12 @@ class HttpResponsesAndErrorsWhiteBoxTest extends TestCase
         $mw = new EnsureUserHasRole();
         $req = Request::create('/admin/dashboard');
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionCode(403);
-
-        $mw->handle($req, fn () => new Response('ok'), 'gm');
+        try {
+            $mw->handle($req, fn () => new Response('ok'), 'gm');
+            $this->fail('Expected HttpException with status 403');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
     }
 
     #[Test] // WBT_HTTP_002 — B1b: authenticated but wrong role → 403
@@ -52,10 +54,12 @@ class HttpResponsesAndErrorsWhiteBoxTest extends TestCase
         $req = Request::create('/admin/dashboard');
         $req->setUserResolver(fn () => $tenant);
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionCode(403);
-
-        (new EnsureUserHasRole())->handle($req, fn () => new Response('ok'), 'gm');
+        try {
+            (new EnsureUserHasRole())->handle($req, fn () => new Response('ok'), 'gm');
+            $this->fail('Expected HttpException with status 403');
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
     }
 
     #[Test] // WBT_HTTP_003 — B1c: correct role → next() returned, no abort

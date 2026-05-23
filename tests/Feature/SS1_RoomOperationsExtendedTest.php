@@ -111,8 +111,10 @@ class SS1_RoomOperationsExtendedTest extends TestCase
         ]);
     }
 
-    #[Test] // BBT_SS1_STATUS_OCCUPIED_TO_AVAIL — clears current_tenant_id
-    public function changing_from_occupied_clears_current_tenant_id(): void
+    #[Test] // BBT_SS1_STATUS_OCCUPIED_BLOCKED — GM cannot flip an occupied room
+    // until the active tenant is moved out / contract terminated. Behaviour added
+    // per SS1 review notes; status stays 'occupied' and an error flash is set.
+    public function changing_status_of_occupied_room_is_blocked(): void
     {
         $tenant = User::create([
             'full_name' => 't', 'email' => 't@x.com',
@@ -126,10 +128,11 @@ class SS1_RoomOperationsExtendedTest extends TestCase
         Livewire::actingAs($this->gm)->test(RoomManager::class)
             ->call('updateStatus', $r->id, 'available');
 
+        // Status must NOT have changed.
         $this->assertDatabaseHas('rooms', [
             'id'                => $r->id,
-            'status'            => 'available',
-            'current_tenant_id' => null,
+            'status'            => 'occupied',
+            'current_tenant_id' => $tenant->id,
         ]);
     }
 
