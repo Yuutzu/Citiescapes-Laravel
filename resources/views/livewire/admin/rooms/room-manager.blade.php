@@ -1,5 +1,5 @@
-<div>
-    <div class="flex items-center justify-between mb-6">
+﻿<div>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h1 class="text-2xl font-bold text-brand-900">Room Management</h1>
         <button type="button" wire:click="toggleCardsEditor"
             class="inline-flex items-center gap-2 rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition">
@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    {{-- ============ PUBLIC ROOM TYPE CARDS EDITOR (SS1) — modal ============ --}}
+    {{-- ============ PUBLIC ROOM TYPE CARDS EDITOR (SS1) â€” modal ============ --}}
     @if ($showCardsEditor)
         <div class="cs-modal"
              wire:click.self="toggleCardsEditor">
@@ -52,7 +52,7 @@
                                 <input wire:model="roomCards.{{ $type }}.subtitle" type="text" class="form-input text-sm py-1.5">
                             </div>
                             <div>
-                                <label class="form-label text-xs !mb-1">Default Monthly Price (₱)</label>
+                                <label class="form-label text-xs !mb-1">Default Monthly Price (â‚±)</label>
                                 <input wire:model="roomCards.{{ $type }}.price" type="number" step="0.01" class="form-input text-sm py-1.5">
                                 @error('roomCards.'.$type.'.price') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                                 <p class="text-[11px] text-gray-400 mt-0.5">Fallback when no live rooms of this type exist.</p>
@@ -79,7 +79,7 @@
                                         <select wire:model="roomCards.{{ $type }}.amenities.{{ $i }}.icon"
                                             class="form-input text-xs py-1.5" style="max-width:180px;">
                                             @foreach ($iconOptions as $iconKey => $iconHint)
-                                                <option value="{{ $iconKey }}">{{ $iconKey }} — {{ $iconHint }}</option>
+                                                <option value="{{ $iconKey }}">{{ $iconKey }} â€” {{ $iconHint }}</option>
                                             @endforeach
                                         </select>
                                         <input wire:model="roomCards.{{ $type }}.amenities.{{ $i }}.label"
@@ -112,7 +112,7 @@
                                         class="flex items-center gap-2 p-2 rounded-lg ring-1 ring-brand-100 bg-white">
                                         {{-- Thumbnail --}}
                                         @if ($photo)
-                                            <img src="{{ str_starts_with($photo, 'http') ? $photo : asset($photo) }}"
+                                            <img src="{{ str_starts_with($photo, 'http') ? $photo : asset('storage/' . ltrim($photo, '/')) }}"
                                                 alt=""
                                                 class="h-12 w-16 object-cover rounded ring-1 ring-brand-200 bg-gray-50 shrink-0"
                                                 onerror="this.style.opacity=0.3">
@@ -145,7 +145,7 @@
                                                     <span>Remove</span>
                                                 </button>
                                                 <span wire:loading wire:target="cardPhotoFile" class="text-[11px] text-brand-600">
-                                                    <i class="fas fa-spinner fa-spin"></i> Uploading…
+                                                    <i class="fas fa-spinner fa-spin"></i> Uploadingâ€¦
                                                 </span>
                                             </div>
                                         </div>
@@ -231,11 +231,11 @@
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $room->room_number }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $room->floor_level }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ ucfirst($room->room_type) }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">₱{{ number_format($room->rate, 2) }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">â‚±{{ number_format($room->rate, 2) }}</td>
                         <td class="px-4 py-3"><span
                                 class="badge {{ $room->status_badge }}">{{ str_replace('_', ' ', ucfirst($room->status)) }}</span>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ $room->currentTenant?->full_name ?? '—' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">{{ $room->currentTenant?->full_name ?? 'â€”' }}</td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2" x-data="{ open: false }">
                                 {{-- Edit pill (brand) --}}
@@ -246,7 +246,7 @@
 
                                 {{-- Status pill (gray, opens dropdown). Locked while a tenant occupies the room.
                                      Maintenance for an occupied room is handled in-place via a Tenant Request (SS7),
-                                     not by flipping the room's status — the tenant stays put while the GM coordinates the fix. --}}
+                                     not by flipping the room's status â€” the tenant stays put while the GM coordinates the fix. --}}
                                 @php $statusLocked = (bool) $room->current_tenant_id; @endphp
                                 <div class="relative">
                                     <button @click="open = !open" type="button"
@@ -256,7 +256,7 @@
                                                 ? 'bg-gray-50 text-gray-400 ring-gray-200 cursor-not-allowed'
                                                 : 'bg-gray-100 text-gray-700 ring-gray-300 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400' }}">
                                         @if($statusLocked)<i class="fas fa-lock text-[10px]"></i>@endif
-                                        Status <span class="text-gray-400">▾</span>
+                                        Status <span class="text-gray-400">â–¾</span>
                                     </button>
                                     @unless($statusLocked)
                                     <div x-show="open" @click.away="open = false" x-cloak
@@ -323,7 +323,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="form-label">Rate (₱/month) *</label>
+                            <label class="form-label">Rate (â‚±/month) *</label>
                             <input wire:model="rate" type="number" step="0.01" class="form-input">
                         </div>
                     </div>

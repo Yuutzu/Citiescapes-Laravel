@@ -1,5 +1,5 @@
-<div>
-    <div class="flex items-center justify-between mb-6">
+﻿<div>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h1 class="text-2xl font-bold text-brand-900">System Audit Log</h1>
         <button wire:click="exportCsv" type="button"
             class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition">
@@ -62,8 +62,8 @@
                     <td class="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{{ $log->created_at->format('M d H:i:s') }}</td>
                     <td class="px-4 py-3 text-sm text-gray-700">{{ $log->user?->full_name ?? 'System' }}</td>
                     <td class="px-4 py-3"><span class="badge bg-brand-50 text-brand-700">{{ $log->action }}</span></td>
-                    <td class="px-4 py-3 text-xs text-gray-600">{{ $subsystemLabels[$log->subsystem] ?? ($log->subsystem ?? '—') }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600 max-w-sm truncate">{{ $log->details ?? '—' }}</td>
+                    <td class="px-4 py-3 text-xs text-gray-600">{{ $subsystemLabels[$log->subsystem] ?? ($log->subsystem ?? 'â€”') }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 max-w-sm truncate">{{ $log->details ?? 'â€”' }}</td>
                     <td class="px-4 py-3 text-xs text-gray-400 font-mono">{{ $log->ip_address }}</td>
                 </tr>
                 @endforeach

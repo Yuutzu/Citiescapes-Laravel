@@ -5,16 +5,16 @@
         <div class="absolute inset-0 bg-gradient-to-br from-brand-950/85 via-brand-900/75 to-brand-800/70"></div>
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32 text-center">
             <span class="cs-anim-fade-down inline-block text-[11px] uppercase tracking-[0.32em] text-marigold-300 font-semibold mb-5">Bajada · Davao City</span>
-            <h1 class="cs-anim-fade-up cs-delay-100 font-serif text-5xl sm:text-6xl font-semibold tracking-tight">Welcome to <span class="text-marigold-300">Citiescapes</span></h1>
-            <p class="cs-anim-fade-up cs-delay-200 mt-5 text-lg text-paper-100/90 max-w-2xl mx-auto">Comfortable, quality, and affordable room rentals — a quiet warm-tiled apartment just off Remedios Street.</p>
-            <div class="cs-anim-fade-up cs-delay-300 mt-7 inline-flex items-center gap-6 text-xs uppercase tracking-[0.24em] text-paper-200/80">
+            <h1 class="cs-anim-fade-up cs-delay-100 font-serif text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight">Welcome to <span class="text-marigold-300">Citiescapes</span></h1>
+            <p class="cs-anim-fade-up cs-delay-200 mt-5 text-base sm:text-lg text-paper-100/90 max-w-2xl mx-auto">Comfortable, quality, and affordable room rentals — a quiet warm-tiled apartment just off Remedios Street.</p>
+            <div class="cs-anim-fade-up cs-delay-300 mt-7 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-6 text-xs uppercase tracking-[0.24em] text-paper-200/80">
                 <span><i class="fas fa-building text-marigold-300 mr-1.5"></i> 22 Rooms</span>
-                <span class="h-3 w-px bg-paper-200/30"></span>
+                <span class="hidden sm:inline-block h-3 w-px bg-paper-200/30"></span>
                 <span><i class="fas fa-layer-group text-marigold-300 mr-1.5"></i> 3 Floors</span>
-                <span class="h-3 w-px bg-paper-200/30"></span>
+                <span class="hidden sm:inline-block h-3 w-px bg-paper-200/30"></span>
                 <span><i class="fas fa-shield-halved text-marigold-300 mr-1.5"></i> 24/7 Secure</span>
             </div>
-            <div class="cs-anim-fade-up cs-delay-400 mt-10 flex items-center justify-center gap-3">
+            <div class="cs-anim-fade-up cs-delay-400 mt-10 flex flex-wrap items-center justify-center gap-3">
                 <a href="#rooms" class="inline-flex items-center gap-2 rounded-md bg-marigold-400 hover:bg-marigold-300 text-brand-950 text-sm font-semibold px-5 py-2.5 shadow-md transition cs-anim-pulse-soft">
                     Browse Rooms <i class="fas fa-arrow-down text-xs"></i>
                 </a>
@@ -34,7 +34,7 @@
             <p class="mt-4 text-sm text-brand-700/80">Two room types to fit students, professionals, or sharing families.</p>
         </div>
 
-        <div class="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
 
             {{-- ===== COMPACT (SMALL) ROOM ===== --}}
             <div class="bg-white rounded-2xl shadow-lg ring-1 ring-brand-200 overflow-hidden" x-data="{
@@ -242,13 +242,13 @@
         x-data
         x-on:scroll-to-inquiry.window="document.getElementById('inquire')?.scrollIntoView({behavior:'smooth', block:'start'})">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
-            <div style="display:flex; flex-direction:row; gap:0; align-items:stretch;">
+            <div class="flex flex-col lg:flex-row lg:items-stretch gap-8 lg:gap-0">
 
                 {{-- Left: Google Map --}}
-                <div style="width:50%; padding-right:3rem;">
+                <div class="w-full lg:w-1/2 lg:pr-12">
                     <h2 class="text-2xl font-bold text-brand-900 mb-2">Find Us Here</h2>
                     <p class="text-sm text-gray-500 mb-4">Remedios St., Bajada, Davao City</p>
-                    <div class="rounded-2xl overflow-hidden shadow-lg ring-1 ring-brand-200" style="height:420px;">
+                    <div class="rounded-2xl overflow-hidden shadow-lg ring-1 ring-brand-200 h-64 sm:h-80 lg:h-[420px]">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1979.6695606739013!2d125.60583978519254!3d7.086629150816199!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32f96d007bbc275d%3A0x3db24c0e9ba43fdc!2sMQCJS%20Apartment!5e0!3m2!1sen!2sph!4v1777975215750!5m2!1sen!2sph"
                             width="100%" height="100%" style="border:0;"
@@ -258,11 +258,12 @@
                     </div>
                 </div>
 
-                {{-- Divider --}}
-                <div style="width:1px; background-color:#c8d2e2; flex-shrink:0;"></div>
+                {{-- Divider: vertical on desktop, horizontal on mobile --}}
+                <div class="hidden lg:block w-px bg-paper-300 shrink-0"></div>
+                <div class="lg:hidden h-px bg-paper-300"></div>
 
                 {{-- Right: Inquiry Form --}}
-                <div style="width:50%; padding-left:3rem; display:flex; flex-direction:column;">
+                <div class="w-full lg:w-1/2 lg:pl-12 flex flex-col">
                     <h2 class="text-2xl font-bold text-brand-900 mb-2">Inquire About a Room</h2>
                     <p class="text-sm text-gray-500 mb-6">Send us your details and we'll get back to you regarding availability.</p>
 
@@ -271,8 +272,8 @@
                             Your inquiry has been sent! Our General Manager will contact you shortly.
                         </div>
                     @else
-                        <form wire:submit="submitInquiry" style="display:flex; flex-direction:column; flex:1; gap:1rem;">
-                            <div class="grid grid-cols-2 gap-4">
+                        <form wire:submit="submitInquiry" class="flex flex-col flex-1 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="form-label">Your Name *</label>
                                     <input wire:model="sender_name" type="text" class="form-input">
@@ -284,7 +285,7 @@
                                     @error('contact_number') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label class="form-label">Email (optional)</label>
                                     <input wire:model="inquiryEmail" type="email" class="form-input">
@@ -298,9 +299,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <div style="display:flex; flex-direction:column; flex:1;">
+                            <div class="flex flex-col flex-1">
                                 <label class="form-label">Message *</label>
-                                <textarea wire:model="message" class="form-input" style="flex:1; resize:none;"></textarea>
+                                <textarea wire:model="message" class="form-input flex-1 resize-none min-h-[120px]"></textarea>
                                 @error('message') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                             </div>
                             <div>

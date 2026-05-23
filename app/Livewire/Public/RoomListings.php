@@ -74,22 +74,9 @@ class RoomListings extends Component
         // Admin-configurable card definitions (managed in SS1 Room Management).
         $cards = RoomManager::loadRoomCards();
 
-        $compactPhotos = !empty($cards['compact']['photos'])
-            ? $cards['compact']['photos']
-            : ($compactRoom?->photos ?: [
-                '/storage/room-types/compact-cover.jpg',
-                '/storage/room-types/compact-1.jpg',
-            ]);
-        $spaciousPhotos = !empty($cards['spacious']['photos'])
-            ? $cards['spacious']['photos']
-            : ($spaciousRoom?->photos ?: [
-                '/storage/room-types/spacious-cover.jpg',
-                '/storage/room-types/spacious-1.jpg',
-            ]);
-
-        // Cap carousel to 2 photos regardless of upload count.
-        $compactPhotos = array_slice($compactPhotos, 0, 2);
-        $spaciousPhotos = array_slice($spaciousPhotos, 0, 2);
+        $toUrl = fn(string $p) => str_starts_with($p, 'http') ? $p : asset('storage/' . ltrim($p, '/'));
+        $compactPhotos = array_map($toUrl, $cards['compact']['photos'] ?? []);
+        $spaciousPhotos = array_map($toUrl, $cards['spacious']['photos'] ?? []);
 
         $compactCount = Room::where('room_type', 'compact')->where('status', 'available')->count();
         $spaciousCount = Room::where('room_type', 'spacious')->where('status', 'available')->count();

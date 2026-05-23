@@ -91,8 +91,8 @@ class RoomManager extends Component
                     ['icon' => 'fa-chair',     'label' => 'Chairs'],
                 ],
                 'photos' => [
-                    '/storage/room-types/compact-cover.jpg',
-                    '/storage/room-types/compact-1.jpg',
+                    'room-type-cards/compact-cover.jpg',
+                    'room-type-cards/compact-1.jpg',
                 ],
             ],
             'spacious' => [
@@ -109,8 +109,8 @@ class RoomManager extends Component
                     ['icon' => 'fa-bed',         'label' => 'Extra Mattress'],
                 ],
                 'photos' => [
-                    '/storage/room-types/spacious-cover.jpg',
-                    '/storage/room-types/spacious-1.jpg',
+                    'room-type-cards/spacious-cover.jpg',
+                    'room-type-cards/spacious-1.jpg',
                 ],
             ],
         ];
@@ -223,7 +223,7 @@ class RoomManager extends Component
         if (!isset($this->roomCards[$type]['photos'])) {
             $this->roomCards[$type]['photos'] = [];
         }
-        $this->roomCards[$type]['photos'][$index] = 'storage/' . $stored;
+        $this->roomCards[$type]['photos'][$index] = $stored;
 
         $this->cardPhotoFile = null;
         $this->cardPhotoSlot = null;

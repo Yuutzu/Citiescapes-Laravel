@@ -1,5 +1,5 @@
-<div>
-    <div class="flex items-center justify-between mb-6">
+﻿<div>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-brand-900">Tenant Requests & Complaints</h1>
             <p class="text-sm text-gray-500 mt-1">Manage and respond to tenant-submitted issues</p>
@@ -46,7 +46,7 @@
                     <hr class="border-gray-200">
 
                     @if($viewing->status === 'resolved')
-                        {{-- Resolved → locked, read-only view --}}
+                        {{-- Resolved â†’ locked, read-only view --}}
                         <div class="rounded-lg bg-emerald-50 border border-emerald-200 p-4">
                             <div class="flex items-center gap-2 mb-2">
                                 <svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -56,7 +56,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-emerald-700 font-semibold uppercase tracking-wide mb-1">Final Response</p>
-                                <p class="text-sm text-emerald-900 whitespace-pre-line leading-relaxed">{{ $viewing->admin_response ?: '— No written response —' }}</p>
+                                <p class="text-sm text-emerald-900 whitespace-pre-line leading-relaxed">{{ $viewing->admin_response ?: 'â€” No written response â€”' }}</p>
                             </div>
                             @if($viewing->responded_at)
                                 <p class="text-xs text-emerald-700 mt-3">Responded by <span class="font-medium">{{ $viewing->respondedBy?->full_name }}</span> on {{ $viewing->responded_at->format('M d, Y g:i A') }}</p>
