@@ -1,6 +1,31 @@
 <div>
     <h1 class="text-2xl font-bold text-brand-900 mb-6">Welcome, {{ $user->full_name }}</h1>
 
+    {{-- Pending-draft prompt — surfaces a contract the GM created so the tenant
+         can complete acknowledgement Step 1 / Step 2 from the dashboard
+         without first navigating to "My Contract" in the sidebar. --}}
+    @if($draftContract)
+        <div class="mb-6 rounded-xl border-2 border-marigold-400 bg-marigold-50/60 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex items-center gap-3 flex-1">
+                <div class="h-10 w-10 rounded-full bg-marigold-400 text-brand-950 flex items-center justify-center shrink-0">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-brand-900">Contract awaiting your acknowledgement</p>
+                    <p class="text-xs text-brand-700 mt-0.5">
+                        Room {{ $draftContract->room->room_number }} &bull; {{ ucfirst($draftContract->room->room_type) }}
+                        &bull; ₱{{ number_format($draftContract->base_rent_rate, 2) }}/mo
+                        &mdash; review and sign to activate.
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('tenant.contract') }}" wire:navigate
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold px-4 py-2 shadow-sm transition shrink-0">
+                <i class="fas fa-arrow-right text-xs"></i> Review & Sign
+            </a>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {{-- Contract timer card --}}
         <div class="card lg:col-span-2">
@@ -30,6 +55,17 @@
                     <div>
                         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Penalty Rate</span>
                         <p class="font-semibold text-gray-900 mt-0.5">₱{{ number_format($contract->penalty_rate, 2) }}/day
+                        </p>
+                    </div>
+                </div>
+            @elseif($draftContract)
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-hourglass-half text-marigold-500 mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-semibold text-brand-900">Draft contract awaiting your signature</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            The General Manager has prepared your contract for Room {{ $draftContract->room->room_number }}.
+                            Acknowledge Step&nbsp;1 and Step&nbsp;2 in <strong>My Contract</strong> to activate it and start your billing cycle.
                         </p>
                     </div>
                 </div>

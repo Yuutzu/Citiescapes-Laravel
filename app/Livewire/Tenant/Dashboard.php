@@ -43,6 +43,15 @@ class Dashboard extends Component
     {
         $user = auth()->user();
         $contract = Contract::with('room')->where('tenant_id', $user->id)->active()->first();
+
+        // Draft contract awaiting tenant acknowledgement. Surfaced as a banner so
+        // a newly-onboarded tenant doesn't miss it; without this prompt the
+        // dashboard would just say "No active contract" and the tenant might
+        // never click into "My Contract" to complete Step 1/Step 2.
+        $draftContract = Contract::with('room')
+            ->where('tenant_id', $user->id)->where('status', 'draft')
+            ->latest()->first();
+
         $latestBill = Bill::with(['room', 'payments'])
             ->where('tenant_id', $user->id)->latest()->first();
         $unpaidCount = Bill::where('tenant_id', $user->id)->unpaid()->count();
@@ -64,6 +73,7 @@ class Dashboard extends Component
         return view('livewire.tenant.dashboard', compact(
             'user',
             'contract',
+            'draftContract',
             'latestBill',
             'unpaidCount',
             'notifications',
