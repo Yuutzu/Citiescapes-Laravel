@@ -28,6 +28,18 @@ class ReportManager extends Component
     {
         $archive = Archive::findOrFail($id);
 
+        // Contracts are immutable historical snapshots — restoring would collide
+        // with room occupancy, billing cycles, and the penalty scheduler. To
+        // re-issue a contract scenario, the GM should create a fresh draft from
+        // the archived data via SS4 instead.
+        if ($archive->record_type === 'contract') {
+            session()->flash('error',
+                'Contracts cannot be restored — they are historical snapshots. ' .
+                'Create a fresh contract draft in Contract Management instead.'
+            );
+            return;
+        }
+
         if ($archive->record_type === 'tenant_account') {
             $user = User::find($archive->original_record_id);
             if ($user) {
