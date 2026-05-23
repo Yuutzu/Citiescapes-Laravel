@@ -8,12 +8,17 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Creates the GM account + the fixed 22-room building inventory
- * (rooms are treated as constant in this app — never added/removed).
+ * Creates the GM account, a demo tenant, and the fixed 22-room building
+ * inventory (rooms are treated as constant in this app — never added/removed).
  *
  * Run:  php artisan db:seed --class=AdminOnlySeeder
  *
- * Login:  citiescapes2017@gmail.com  /  password
+ * Demo logins:
+ *   GM     — citiescapes2017@gmail.com  /  password
+ *   Tenant — demo.tenant@citiescapes.test  /  password
+ *
+ * The demo tenant starts with no contract assigned; the GM can issue one
+ * through the admin UI to exercise the full move-in flow.
  */
 class AdminOnlySeeder extends Seeder
 {
@@ -25,6 +30,21 @@ class AdminOnlySeeder extends Seeder
                 'full_name'            => 'Florie A. Quibod',
                 'password'             => Hash::make('password'),
                 'role'                 => 'gm',
+                'status'               => 'active',
+                'must_change_password' => false,
+                'activated_at'         => now(),
+                'email_verified_at'    => now(),
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'demo.tenant@citiescapes.test'],
+            [
+                'full_name'            => 'Demo Tenant',
+                'contact_number'       => '09171234567',
+                'address'              => 'Bajada, Davao City',
+                'password'             => Hash::make('password'),
+                'role'                 => 'tenant',
                 'status'               => 'active',
                 'must_change_password' => false,
                 'activated_at'         => now(),
@@ -59,7 +79,11 @@ class AdminOnlySeeder extends Seeder
             }
         }
 
-        $this->command->info('GM account ready: citiescapes2017@gmail.com / password');
-        $this->command->info('Seeded ' . Room::count() . ' rooms total.');
+        $this->command->info('────────────────────────────────────────────────');
+        $this->command->info('  GM:     citiescapes2017@gmail.com / password');
+        $this->command->info('  Tenant: demo.tenant@citiescapes.test / password');
+        $this->command->info('  Rooms seeded: ' . Room::count());
+        $this->command->warn('  → Change both passwords immediately after first login.');
+        $this->command->info('────────────────────────────────────────────────');
     }
 }

@@ -109,9 +109,10 @@ http://localhost/citiescapes/public
 
 ## Default Accounts
 
-| Role            | Email                         | Password   |
-| --------------- | ----------------------------- | ---------- |
-| General Manager | `citiescapes2017@gmail.com`   | `password` |
+| Role            | Email                              | Password   |
+| --------------- | ---------------------------------- | ---------- |
+| General Manager | `citiescapes2017@gmail.com`        | `password` |
+| Demo Tenant     | `demo.tenant@citiescapes.test`     | `password` |
 
 Tenant accounts are created by the GM through **Tenant Management**. A temporary password is emailed (check `storage/logs/laravel.log` since MAIL_MAILER=log by default).
 

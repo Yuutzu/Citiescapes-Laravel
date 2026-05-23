@@ -25,6 +25,22 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
+        // ── Demo tenant (active, no contract) ──────────
+        // For first-deploy login testing. The GM can issue a contract through
+        // the admin UI to walk through the full move-in flow.
+        User::create([
+            'full_name'            => 'Demo Tenant',
+            'email'                => 'demo.tenant@citiescapes.test',
+            'contact_number'       => '09171234567',
+            'address'              => 'Bajada, Davao City',
+            'password'             => Hash::make('password'),
+            'role'                 => 'tenant',
+            'status'               => 'active',
+            'must_change_password' => false,
+            'activated_at'         => now(),
+            'email_verified_at'    => now(),
+        ]);
+
         // ── Public room-type cards (SS1) ───────────────
         // Seed system_settings.room_type_cards with the original photo set
         // (compact-cover.jpg / compact-1.jpg / spacious-cover.jpg / spacious-1.jpg
@@ -68,6 +84,11 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created GM account (citiescapes2017@gmail.com / password) and 22 rooms.');
+        $this->command->info('────────────────────────────────────────────────');
+        $this->command->info('  GM:     citiescapes2017@gmail.com / password');
+        $this->command->info('  Tenant: demo.tenant@citiescapes.test / password');
+        $this->command->info('  Rooms seeded: 22 (6 + 8 + 8 across floors 1-3)');
+        $this->command->warn('  → Change both passwords immediately after first login.');
+        $this->command->info('────────────────────────────────────────────────');
     }
 }

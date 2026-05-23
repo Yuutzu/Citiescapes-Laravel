@@ -138,6 +138,40 @@
         @endif
     </div>
 
+    {{-- Announcements (recent, from management) --}}
+    <div class="card mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-semibold text-gray-900">
+                <i class="fas fa-bullhorn text-brand-600 mr-1.5"></i> Recent Announcements
+            </h3>
+            <span class="text-xs text-gray-400">Last {{ count($announcements) }}</span>
+        </div>
+        @forelse($announcements as $a)
+            @php $isRead = in_array($a->title, $readAnnouncementTitles, true); @endphp
+            <div wire:key="ann-{{ $a->id }}"
+                class="py-3 border-b border-gray-100 last:border-0 {{ $isRead ? '' : 'bg-amber-50/40 -mx-2 px-2 rounded' }}">
+                <div class="flex items-start justify-between gap-3 mb-1">
+                    <p class="text-sm font-semibold text-brand-900">
+                        @if(!$isRead)
+                            <span class="inline-block h-2 w-2 rounded-full bg-amber-500 mr-1 align-middle"></span>
+                        @endif
+                        {{ $a->title }}
+                    </p>
+                    <p class="text-[11px] text-gray-400 shrink-0">{{ $a->created_at->format('M d, Y') }}</p>
+                </div>
+                <p class="text-xs text-gray-600 whitespace-pre-line leading-relaxed">{{ $a->body }}</p>
+                @if(!$isRead)
+                    <button type="button" wire:click="markAnnouncementRead({{ $a->id }})"
+                        class="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-700 hover:text-brand-900">
+                        <i class="fas fa-check text-[10px]"></i> Mark as read
+                    </button>
+                @endif
+            </div>
+        @empty
+            <p class="text-sm text-gray-400">No announcements yet.</p>
+        @endforelse
+    </div>
+
     {{-- Notifications --}}
     <div class="card">
         <h3 class="text-base font-semibold text-gray-900 mb-4">Recent Notifications</h3>

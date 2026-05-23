@@ -27,3 +27,17 @@ yarn-error.log
 /.claude
 /citiescapes_backup.sql
 *.sql
+
+# Local-only — not part of the repo
+/docs/
+test.ps1
+run-tests.bat
+run-tests.ps1
+
+# User-uploaded media / runtime storage — only the static set ships in git.
+# Keep: storage/building/, storage/payment-methods/
+# Drop: contract scans, tmp upload buffers, admin-uploaded card photos.
+/storage/contracts/
+/storage/app/private/livewire-tmp/
+/storage/livewire-tmp/
+/storage/room-type-cards/

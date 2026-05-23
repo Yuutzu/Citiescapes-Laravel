@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Tenant;
 
+use App\Models\Announcement;
+use App\Models\AuditLog;
 use App\Models\Bill;
 use App\Models\Contract;
 use App\Models\InitialPayment;
@@ -14,6 +16,29 @@ use Livewire\Component;
 #[Title('My Dashboard — Citiescapes')]
 class Dashboard extends Component
 {
+    /**
+     * Mark a single announcement as read for the current tenant and write a
+     * business-activity audit row. Idempotent — re-marking is a no-op.
+     */
+    public function markAnnouncementRead(int $id): void
+    {
+        $tenantId = auth()->id();
+        $announcement = Announcement::forTenant($tenantId)->find($id);
+        if (!$announcement) return;
+
+        $log = NotificationLog::where('user_id', $tenantId)
+            ->where('type', 'announcement')
+            ->where('message', "[Announcement] {$announcement->title}")
+            ->where('is_read', false)
+            ->first();
+
+        if (!$log) return; // already read or never had a bell row
+
+        $log->update(['is_read' => true]);
+        AuditLog::record('tenant_announcement_viewed', $tenantId, 'tenant', 'SS7',
+            "Announcement #{$announcement->id} \"{$announcement->title}\" marked read");
+    }
+
     public function render()
     {
         $user = auth()->user();
@@ -27,13 +52,24 @@ class Dashboard extends Component
         $initialPayment = InitialPayment::with('contract.room')
             ->where('tenant_id', $user->id)->first();
 
+        // Recent announcements (3 most recent reaching this tenant) and a set of
+        // IDs the tenant has already marked read, so the view can render the badge.
+        $announcements = Announcement::forTenant($user->id)
+            ->latest('created_at')->take(3)->get();
+        $readAnnouncementTitles = NotificationLog::where('user_id', $user->id)
+            ->where('type', 'announcement')->where('is_read', true)
+            ->pluck('message')->map(fn($m) => str_replace('[Announcement] ', '', $m))
+            ->all();
+
         return view('livewire.tenant.dashboard', compact(
             'user',
             'contract',
             'latestBill',
             'unpaidCount',
             'notifications',
-            'initialPayment'
+            'initialPayment',
+            'announcements',
+            'readAnnouncementTitles'
         ));
     }
 }

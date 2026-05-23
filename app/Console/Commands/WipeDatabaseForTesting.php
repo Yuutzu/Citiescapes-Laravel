@@ -79,7 +79,19 @@ class WipeDatabaseForTesting extends Command
 
             $this->newLine();
             $this->info('✅ Database wiped successfully for fresh testing!');
-            $this->info('GM accounts and original 22 rooms preserved.');
+
+            // Show the preserved GM account(s) so the operator can confirm the
+            // login email they'll use after the wipe.
+            $gms = DB::table('users')->where('role', 'gm')->pluck('email');
+            if ($gms->count() > 0) {
+                $this->info('Preserved GM account(s):');
+                foreach ($gms as $email) {
+                    $this->line("  • {$email}");
+                }
+            } else {
+                $this->warn('No GM accounts found — run `php artisan db:seed --class=AdminOnlySeeder` to create one.');
+            }
+            $this->info('Original 22 rooms preserved.');
 
             if ($this->option('with-testbed')) {
                 $this->newLine();
