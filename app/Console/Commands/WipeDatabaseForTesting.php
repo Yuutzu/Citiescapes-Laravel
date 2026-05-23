@@ -71,6 +71,11 @@ class WipeDatabaseForTesting extends Command
             // Delete test rooms (preserve original 22 rooms)
             $this->wipeTestRooms();
 
+            // Reset stale SystemSettings rows that point at files removed during
+            // testing (most importantly room_type_cards — its photo paths can
+            // accumulate references to deleted upload files).
+            $this->resetTestableSystemSettings();
+
             // Re-enable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
@@ -128,10 +133,33 @@ class WipeDatabaseForTesting extends Command
     }
 
     /**
-     * Delete tenants and admins, preserve GM accounts
+     * Reset SystemSettings rows whose values can accumulate stale references
+     * across test runs. Specifically: room_type_cards stores admin-uploaded
+     * photo paths that are wiped from disk by the testbed cleanup but linger
+     * in the JSON setting, causing broken-image previews. Deleting the row
+     * lets the SS1 loader fall back to defaults on the next read.
+     */
+    private function resetTestableSystemSettings(): void
+    {
+        $deleted = DB::table('system_settings')->where('key', 'room_type_cards')->delete();
+        if ($deleted > 0) {
+            $this->line('  ✓ Reset room_type_cards (will rebuild from defaults on next load)');
+        }
+    }
+
+    /**
+     * Delete tenants and admins, preserve GM accounts. Also drops scenario-only
+     * GMs created by `testbed:seed` (their email ends with @testbed.local) so
+     * the testbed never pollutes the real GM list after a wipe.
      */
     private function wipeTenantsAndAdmins(): void
     {
+        $testbedGmCount = DB::table('users')->where('role', 'gm')->where('email', 'like', '%@testbed.local')->count();
+        if ($testbedGmCount > 0) {
+            DB::table('users')->where('role', 'gm')->where('email', 'like', '%@testbed.local')->delete();
+            $this->line("  ✓ Deleted {$testbedGmCount} testbed GM account(s) (@testbed.local)");
+        }
+
         $gmCount = DB::table('users')->where('role', 'gm')->count();
         $tenantCount = DB::table('users')->where('role', '!=', 'gm')->count();
 

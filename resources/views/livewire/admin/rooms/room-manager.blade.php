@@ -110,9 +110,17 @@
                                 @foreach ($roomCards[$type]['photos'] ?? [] as $i => $photo)
                                     <div wire:key="{{ $type }}-ph-{{ $i }}"
                                         class="flex items-center gap-2 p-2 rounded-lg ring-1 ring-brand-100 bg-white">
-                                        {{-- Thumbnail --}}
+                                        {{-- Thumbnail (paths are stored bare like
+                                             'room-type-cards/abc.jpg' — wrap with
+                                             /storage/ so the symlink resolves; also
+                                             keep absolute URLs as-is for any seed defaults). --}}
                                         @if ($photo)
-                                            <img src="{{ str_starts_with($photo, 'http') ? $photo : asset($photo) }}"
+                                            @php
+                                                $previewSrc = str_starts_with($photo, 'http')
+                                                    ? $photo
+                                                    : asset('storage/' . ltrim($photo, '/'));
+                                            @endphp
+                                            <img src="{{ $previewSrc }}"
                                                 alt=""
                                                 class="h-12 w-16 object-cover rounded ring-1 ring-brand-200 bg-gray-50 shrink-0"
                                                 onerror="this.style.opacity=0.3">
