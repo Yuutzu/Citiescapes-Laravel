@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // ── GM account ─────────────────────────────────
         $gm = User::create([
             'full_name' => 'Florie A. Quibod',
-            'email' => 'gm@citiescapes.test',
+            'email' => 'citiescapes2017@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'gm',
             'status' => 'active',

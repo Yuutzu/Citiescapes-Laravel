@@ -1,18 +1,22 @@
-<!DOCTYPE html>
-<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2c3a52;">Welcome to Citiescapes</h2>
-        <p>Hello {{ $name }},</p>
-        <p>Your tenant account has been created. Use the credentials below to log in for the first time:</p>
-        <div style="background: #f5f7fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 5px 0;"><strong>Email:</strong> {{ $email }}</p>
-            <p style="margin: 5px 0;"><strong>Temporary Password:</strong> <code style="font-size: 18px; color: #d97706;">{{ $tempPassword }}</code></p>
-        </div>
-        <p>After logging in, you will need to verify your identity with a One-Time Password (OTP) sent to this email.</p>
-        <p>You will then be prompted to change your password.</p>
-        <hr style="border: none; border-top: 1px solid #e4e9f1; margin: 20px 0;">
-        <p style="font-size: 12px; color: #999;">Citiescapes Apartment Rental &bull; Remedios St., Bajada, Davao City</p>
-    </div>
-</body>
-</html>
+@extends('emails._layout', ['title' => 'Welcome to Citiescapes'])
+
+@section('content')
+    <h2 style="margin:0 0 14px;font-family:Georgia,serif;font-size:22px;color:#2a140b;">Welcome to Citiescapes</h2>
+    <p style="margin:0 0 12px;">Hello <strong>{{ $name }}</strong>,</p>
+    <p style="margin:0 0 18px;color:#5e3322;">Your tenant account has been created. Use the credentials below to log in for the first time:</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+        style="background:#faf3e3;border:1px solid #f5b94e;border-radius:10px;margin:0 0 22px;">
+        <tr>
+            <td style="padding:18px 22px;">
+                <p style="margin:0 0 8px;font-size:13px;color:#7a3b21;text-transform:uppercase;letter-spacing:0.08em;">Email</p>
+                <p style="margin:0 0 14px;font-weight:600;color:#2a140b;">{{ $email }}</p>
+                <p style="margin:0 0 8px;font-size:13px;color:#7a3b21;text-transform:uppercase;letter-spacing:0.08em;">Temporary Password</p>
+                <p style="margin:0;"><code style="font-size:18px;color:#a14d2b;background:#ffffff;padding:6px 12px;border-radius:6px;font-family:'Courier New',monospace;">{{ $tempPassword }}</code></p>
+            </td>
+        </tr>
+    </table>
+
+    <p style="margin:0 0 10px;">After logging in, you will need to verify your identity with a One-Time Password (OTP) sent to this email.</p>
+    <p style="margin:0;font-size:13px;color:#9a6a4f;">You will then be prompted to change your password.</p>
+@endsection

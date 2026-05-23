@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Hash;
  *
  * Run:  php artisan db:seed --class=AdminOnlySeeder
  *
- * Login:  gm@citiescapes.test  /  password
+ * Login:  citiescapes2017@gmail.com  /  password
  */
 class AdminOnlySeeder extends Seeder
 {
     public function run(): void
     {
         User::firstOrCreate(
-            ['email' => 'gm@citiescapes.test'],
+            ['email' => 'citiescapes2017@gmail.com'],
             [
                 'full_name'            => 'Florie A. Quibod',
                 'password'             => Hash::make('password'),
@@ -59,7 +59,7 @@ class AdminOnlySeeder extends Seeder
             }
         }
 
-        $this->command->info('GM account ready: gm@citiescapes.test / password');
+        $this->command->info('GM account ready: citiescapes2017@gmail.com / password');
         $this->command->info('Seeded ' . Room::count() . ' rooms total.');
     }
 }
