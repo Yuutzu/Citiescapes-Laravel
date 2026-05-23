@@ -99,7 +99,13 @@ class BillingManager extends Component
             'water' => $this->genWater,
             'wifi' => $this->genWifi,
             'total_amount' => $total,
-            'due_date' => now()->endOfMonth(),
+            // Due on the LAST day of the period being billed. If the GM
+            // generates on the 31st (or last day of the current month) we
+            // push to next month's end so the tenant never gets a same-day
+            // due bill that becomes overdue the next morning.
+            'due_date' => now()->isLastOfMonth()
+                ? now()->addMonth()->endOfMonth()
+                : now()->endOfMonth(),
         ]);
 
         AuditLog::record('bill_generated', auth()->id(), 'gm', 'SS3', "Monthly bill for contract #{$contract->id}, period {$period}");

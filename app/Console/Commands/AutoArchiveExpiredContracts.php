@@ -2,10 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\ContractTerminatedMail;
 use App\Models\Archive;
+use App\Models\AuditLog;
 use App\Models\Contract;
+use App\Models\NotificationLog;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class AutoArchiveExpiredContracts extends Command
 {
@@ -61,10 +65,55 @@ class AutoArchiveExpiredContracts extends Command
                 ]);
             }
 
+            // Notify the tenant + audit row. Without these, a tenant logs in
+            // to find their account archived with no notice and the GM has no
+            // record of what fired the auto-archive.
+            $this->notifyTenantAndAudit($contract);
+
             $count++;
         }
 
         $this->info("Auto-archived {$count} expired contracts.");
         return self::SUCCESS;
+    }
+
+    /**
+     * Cron-driven termination still deserves the same notification + audit
+     * footprint as a manual GM termination: bell (authoritative), email
+     * (best-effort), and an audit row tagged actor=system.
+     */
+    private function notifyTenantAndAudit(Contract $contract): void
+    {
+        AuditLog::record('contract_auto_archived', null, 'system', 'SS4',
+            "Contract #{$contract->id} auto-archived (end_date {$contract->end_date->format('Y-m-d')} passed)");
+
+        if (!$contract->tenant) return;
+
+        $endedOn = $contract->end_date->format('M d, Y');
+
+        NotificationLog::create([
+            'user_id' => $contract->tenant_id,
+            'type'    => 'contract_auto_archived',
+            'source'  => 'SS4',
+            'message' => "Your lease for Room {$contract->room?->room_number} ended on {$endedOn} and was auto-archived. Contact the General Manager to renew.",
+        ]);
+
+        if ($contract->tenant->email) {
+            try {
+                Mail::to($contract->tenant->email)->send(
+                    new ContractTerminatedMail(
+                        $contract->tenant->full_name,
+                        (string) ($contract->room?->room_number ?? '—'),
+                        $endedOn,
+                        "Lease term ended on {$endedOn}. The system auto-archived your contract on its scheduled expiry date.",
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Auto-archive ContractTerminatedMail send failed', [
+                    'contract_id' => $contract->id,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        }
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\BillStatusNoticeMail;
 use App\Models\Bill;
 use App\Models\NotificationLog;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
 
 class ApplyBillingPenalties extends Command
 {
@@ -15,7 +17,7 @@ class ApplyBillingPenalties extends Command
     {
         $bills = Bill::whereIn('status', ['unpaid', 'grace', 'overdue', 'delinquent'])
             ->where('due_date', '<', now()->startOfDay())
-            ->with('contract')
+            ->with('contract', 'tenant')
             ->get();
 
         $updated = 0;
@@ -40,6 +42,7 @@ class ApplyBillingPenalties extends Command
                         'source'  => 'SS3',
                         'message' => "Reminder: Your bill for {$bill->billing_period} is overdue. Grace period ends in " . ($graceDays - $daysOverdue) . " day(s).",
                     ]);
+                    $this->sendBillStatusEmail($bill, 'grace', $daysOverdue);
                 }
             }
             // Day 4+: apply penalty
@@ -63,6 +66,7 @@ class ApplyBillingPenalties extends Command
                         'source'  => 'SS3',
                         'message' => "NOTICE: Your bill for {$bill->billing_period} is now {$daysOverdue} days overdue and marked Delinquent.",
                     ]);
+                    $this->sendBillStatusEmail($bill, 'delinquent', $daysOverdue);
                 }
             }
             // Day 30+: eviction
@@ -79,6 +83,7 @@ class ApplyBillingPenalties extends Command
                         'source'  => 'SS3',
                         'message' => "URGENT: Your bill for {$bill->billing_period} is {$daysOverdue} days overdue. Eviction proceedings may begin.",
                     ]);
+                    $this->sendBillStatusEmail($bill, 'eviction', $daysOverdue);
                 }
             }
 
@@ -88,5 +93,33 @@ class ApplyBillingPenalties extends Command
 
         $this->info("Processed {$updated} overdue bills.");
         return self::SUCCESS;
+    }
+
+    /**
+     * Bell row is the authoritative delivery channel (already created by the
+     * caller); this is the best-effort email accompaniment that matches the
+     * SS7 delivery guarantee. Failure is logged but does not block the cron.
+     */
+    private function sendBillStatusEmail(Bill $bill, string $stage, int $daysOverdue): void
+    {
+        if (!$bill->tenant?->email) return;
+
+        try {
+            Mail::to($bill->tenant->email)->send(
+                new BillStatusNoticeMail(
+                    $bill->tenant->full_name,
+                    $stage,
+                    (string) ($bill->billing_period ?? '—'),
+                    $daysOverdue,
+                    number_format((float) $bill->total_amount, 2),
+                )
+            );
+        } catch (\Throwable $e) {
+            \Log::error('BillStatusNoticeMail send failed', [
+                'bill_id' => $bill->id,
+                'stage'   => $stage,
+                'error'   => $e->getMessage(),
+            ]);
+        }
     }
 }
