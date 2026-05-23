@@ -27,4 +27,3 @@ yarn-error.log
 /.claude
 /citiescapes_backup.sql
 *.sql
-/docs/

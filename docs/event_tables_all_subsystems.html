@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citiescapes — Event Tables, Data Dictionary & Process Descriptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBFAF7; --paper-warm: #F4F1EA; --ink: #1C1C1C;
+    --ink-soft: #3A3A3A; --ink-mute: #6A6A6A; --rule: #C8C4BC;
+    --rule-soft: #E5E1D8; --accent: #8B2331; --row-stripe: #FAF8F2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; font-size: 14.5px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+
+  .title-page { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 40px; text-align: center; border-bottom: 1px solid var(--rule); }
+  .title-page-eyebrow { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 32px; }
+  .title-page h1 { font-family: 'Lora', serif; font-weight: 600; font-size: clamp(32px, 4.5vw, 46px); line-height: 1.15; margin: 0 0 12px; max-width: 820px; }
+  .title-page-sub { font-family: 'Lora', serif; font-style: italic; font-size: 20px; color: var(--ink-soft); margin-bottom: 56px; max-width: 720px; }
+  .title-page-members { border-top: 1px solid var(--rule); padding-top: 32px; margin-top: 40px; width: 100%; max-width: 520px; }
+  .title-page-members-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 16px; }
+  .title-page-members ul { list-style: none; margin: 0; padding: 0; font-family: 'Lora', serif; font-size: 16px; line-height: 2; color: var(--ink-soft); }
+  .title-page-foot { margin-top: 56px; font-size: 12.5px; color: var(--ink-mute); letter-spacing: 0.05em; }
+
+  .doc-container { max-width: 1280px; margin: 0 auto; padding: 60px 40px 100px; }
+  .doc-section-head { text-align: center; margin-bottom: 56px; padding-bottom: 18px; border-bottom: 2px solid var(--ink); }
+  .doc-section-head .doc-eyebrow { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+  .doc-section-head h2 { font-family: 'Lora', serif; font-weight: 600; font-size: 30px; margin: 0; }
+  .doc-section-head .doc-blurb { margin: 14px auto 0; color: var(--ink-mute); max-width: 760px; font-size: 14px; }
+
+  .conventions { background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 24px 32px; margin-bottom: 48px; }
+  .conventions h3 { font-family: 'Lora', serif; font-size: 17px; margin: 0 0 12px; }
+  .conventions ul { margin: 0; padding-left: 22px; color: var(--ink-soft); font-size: 13.5px; }
+  .conventions li { padding: 3px 0; }
+  .conventions code { background: white; padding: 1px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+  .toc { background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 28px 36px; margin-bottom: 64px; }
+  .toc-title { font-family: 'Lora', serif; font-weight: 600; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 16px; }
+  .toc ol { margin: 0; padding: 0 0 0 24px; counter-reset: toc-counter; list-style: none; }
+  .toc li { counter-increment: toc-counter; padding: 6px 0; border-bottom: 1px dotted var(--rule-soft); display: flex; align-items: baseline; gap: 12px; }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before { content: counter(toc-counter, decimal-leading-zero) "."; font-family: 'Lora', serif; font-size: 13px; color: var(--accent); font-weight: 600; min-width: 28px; }
+  .toc a { color: var(--ink); text-decoration: none; font-size: 14.5px; flex: 1; }
+  .toc a:hover { color: var(--accent); }
+
+  .subsystem { margin-bottom: 72px; scroll-margin-top: 24px; }
+  .subsystem-header { margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .subsystem-number { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .subsystem-header h3 { font-family: 'Lora', serif; font-weight: 700; font-size: 24px; text-transform: uppercase; letter-spacing: 0.06em; margin: 4px 0 0; }
+
+  .block-label { font-family: 'Lora', serif; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 28px 0 10px; }
+  .et-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: white; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; table-layout: fixed; margin-bottom: 8px; }
+  .et-table thead th { background: var(--ink); color: white; text-align: left; padding: 9px 10px; font-weight: 600; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .et-table tbody td { padding: 8px 10px; border-top: 1px solid var(--rule-soft); vertical-align: top; color: var(--ink-soft); word-wrap: break-word; }
+  .et-table tbody tr:nth-child(even) { background: var(--row-stripe); }
+  .et-table strong { color: var(--ink); }
+  .et-table code { background: #F4F1EA; padding: 1px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4B5563; }
+  .et-table em { font-style: italic; color: var(--accent); font-weight: 500; }
+
+  .process-list { background: var(--paper-warm); border-left: 3px solid var(--accent); padding: 16px 22px; margin: 8px 0 14px; border-radius: 0 4px 4px 0; }
+  .process-list h4 { font-family: 'Lora', serif; font-size: 14.5px; margin: 6px 0 6px; color: var(--ink); letter-spacing: 0.04em; }
+  .process-list h4:first-child { margin-top: 0; }
+  .process-list ul { margin: 0 0 10px; padding-left: 22px; color: var(--ink-soft); font-size: 13.5px; }
+  .process-list li { padding: 2px 0; }
+
+  .doc-footer { text-align: center; padding: 32px 40px; border-top: 1px solid var(--rule); color: var(--ink-mute); font-size: 12.5px; }
+
+  @media print { body { background: white; } .subsystem { page-break-inside: auto; } .et-table tr { page-break-inside: avoid; } .title-page { min-height: auto; page-break-after: always; } a { color: var(--ink); text-decoration: none; } }
+</style>
+</head>
+<body>
+
+<section class="title-page">
+  <div class="title-page-eyebrow">CS12L · Major Project</div>
+  <h1>Event Tables, Data Dictionary &amp; Process Descriptions<br>Apartment Rental Management System</h1>
+  <div class="title-page-sub">Citiescapes Apartment — per-Subsystem Entities, Processes, Event Tables, Data Flows, Data Stores, and Process Descriptions</div>
+  <div class="title-page-members">
+    <div class="title-page-members-label">Members</div>
+    <ul>
+      <li>Liu, John Marlo</li>
+      <li>Suansing, John Carlo</li>
+      <li>Tagud, Ben Alexandre</li>
+      <li>Polinar, Justine Keith Q.</li>
+    </ul>
+  </div>
+  <div class="title-page-foot">University of Mindanao · Davao City · Revised 2026-05-18</div>
+</section>
+
+<div class="doc-container">
+
+  <div class="conventions">
+    <h3>Document conventions</h3>
+    <ul>
+      <li><strong>Subsystems referenced:</strong> Room Operations, Tenant Management, Billing &amp; Collections, Contract &amp; Lease Management, Report and Archive Management, User Access and Authentication, Communications &amp; Notifications.</li>
+      <li><code>PK</code> = Primary Key &nbsp;·&nbsp; <code>FK</code> = Foreign Key.</li>
+      <li>All inter-subsystem signals flow through the system bus; <strong>System</strong> is shown as the actor when no human user originates the action.</li>
+    </ul>
+  </div>
+
+  <nav class="toc">
+    <p class="toc-title">Subsystems</p>
+    <ol>
+      <li><a href="#ss1">Room Operations</a></li>
+      <li><a href="#ss2">Tenant Management</a></li>
+      <li><a href="#ss3">Billing &amp; Collections</a></li>
+      <li><a href="#ss4">Contract &amp; Lease Management</a></li>
+      <li><a href="#ss5">Report and Archive Management</a></li>
+      <li><a href="#ss6">User Access and Authentication</a></li>
+      <li><a href="#ss7">Communications &amp; Notifications</a></li>
+    </ol>
+  </nav>
+
+  <div class="doc-section-head">
+    <div class="doc-eyebrow">Compiled Reference</div>
+    <h2>Event Tables &amp; Process Descriptions</h2>
+    <p class="doc-blurb">For each of the seven subsystems: the actors, processes, event table, data flows, data stores, and narrative process descriptions — aligned to the Use Case Diagrams document.</p>
+  </div>
+
+  <!-- ===================== Room Operations ===================== -->
+  <section class="subsystem" id="ss1">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 01</div>
+      <h3>Room Operations</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:14%"><col style="width:11%"><col style="width:35%"><col style="width:20%"><col style="width:20%"></colgroup>
+      <thead><tr><th>Entity</th><th>Alt. Name</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Public Visitor</strong></td><td>Tenant (Visitor)</td><td>Any unauthenticated visitor who browses the public landing page and may submit an inquiry. Has no account.</td><td>Room Listings Display, Card Image, Response</td><td>Room Inquiry, Type Preference</td></tr>
+        <tr><td><strong>General Manager</strong></td><td>Admin</td><td>Sole administrator. Owns all room CRUD, room status, room type card image management, inquiry handling, archives.</td><td>Inquiry, Status Command, Card Image Upload</td><td>Inquiry Response, Updated Room, Updated Card, Archive Command</td></tr>
+        <tr><td><strong>System</strong></td><td>Automated Platform</td><td>Renders public listing, sends inquiry notifications, stores uploaded card files, re-renders landing page on change.</td><td>Card Image Upload, Inquiry Event</td><td>Notification, File Stored, Listing Re-rendered</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:32%"><col style="width:38%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>1.1</td><td>Display Room Listings</td><td>Visitor page load</td><td>Public landing with two cards (Compact / Spacious)</td></tr>
+        <tr><td>1.2</td><td>Receive &amp; Log Inquiry</td><td>Inquiry form data</td><td>Inquiry row + Admin notification</td></tr>
+        <tr><td>1.3</td><td>Confirm Availability</td><td>Inquiry, current room status</td><td>Tenant informed; Contract draft started in Contract Management</td></tr>
+        <tr><td>1.4</td><td>Set Room Rate &amp; Amenities</td><td>Rate, amenities, photos</td><td>Room record updated</td></tr>
+        <tr><td>1.5</td><td>Update Room Status</td><td>Admin status command</td><td>Room.status persisted (Available / Occupied / Under Maintenance)</td></tr>
+        <tr><td>1.6</td><td>View Occupancy Dashboard</td><td>Admin view request</td><td>Full occupancy panel rendered</td></tr>
+        <tr><td>1.7</td><td>View &amp; Manage Inquiry Log</td><td>Admin view request</td><td>Inquiry list with Respond / Close actions</td></tr>
+        <tr><td>1.8</td><td>Manage Room Type Card</td><td>Card image upload from Admin (Settings page)</td><td>RoomTypeCard row updated; image stored; landing page re-rendered next request</td></tr>
+        <tr><td>1.9</td><td>Archive Room Record</td><td>Admin archive command</td><td>Record moved to the Archive store (Report &amp; Archive)</td></tr>
+        <tr><td>1.10</td><td>Delete Room Record</td><td>Admin delete command (confirmed)</td><td>Record permanently removed; logged in audit trail</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:15%"><col style="width:12%"><col style="width:25%"><col style="width:18%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>View Room Listings</td><td>Visitor opens website</td><td>Public Visitor</td><td>System renders both Room Type Cards with current image, floor, specs, amenities, rate, availability count.</td><td>Landing page displayed; no login required</td><td>Public Visitor</td></tr>
+        <tr><td>Submit Room Inquiry</td><td>Visitor sends form</td><td>Public Visitor</td><td>Inquiry validated; row written to inquiries table; bell notification + email dispatched to GM.</td><td>Inquiry log entry; Admin pinged</td><td>GM + Inquiry Log</td></tr>
+        <tr><td>Notify Admin</td><td>Inquiry persisted</td><td>System</td><td>Bell badge incremented; email queued.</td><td>Admin notified</td><td>GM</td></tr>
+        <tr><td>Respond to Inquiry</td><td>GM submits reply form</td><td>GM</td><td>Inquiry status → responded; reply persisted; email sent.</td><td>Visitor / tenant informed</td><td>Inquiry Log + Mail Queue</td></tr>
+        <tr><td>Set Rate &amp; Amenities</td><td>GM saves room edit</td><td>GM</td><td>Validation + persistence; audit row written.</td><td>Listing reflects new data</td><td>Rooms DB + Audit Log</td></tr>
+        <tr><td>Update Room Status</td><td>GM changes status</td><td>GM</td><td>Status persisted with timestamp + GM ID.</td><td>Listing visibility recomputed</td><td>Rooms DB</td></tr>
+        <tr><td>Manage Room Type Card</td><td>GM uploads image in System Settings</td><td>GM</td><td>File validated (mime / size), stored under <code>storage/app/public/room-type-cards/</code>; row updated.</td><td>Card image saved; version bumped</td><td>RoomTypeCards DB + Public file storage</td></tr>
+        <tr><td>Re-render Public Listing</td><td>Card record updated</td><td>System</td><td>Cache invalidated; next public request fetches new asset.</td><td>Landing page shows new image</td><td>Public Listing</td></tr>
+        <tr><td>View Occupancy Dashboard</td><td>GM opens dashboard</td><td>GM</td><td>System aggregates Rooms + Tenants and renders dashboard.</td><td>Full occupancy overview shown</td><td>GM</td></tr>
+        <tr><td>Close Inquiry</td><td>GM clicks Close</td><td>GM</td><td>Inquiry status → closed.</td><td>Inquiry closed</td><td>Inquiry Log</td></tr>
+        <tr><td>Archive Room Record</td><td>GM clicks Archive after tenant vacate</td><td>GM</td><td>Room record exported to the Archive store; remains in rooms table marked archived; audit row written.</td><td>Archive copy created</td><td>Report &amp; Archive store</td></tr>
+        <tr><td>Delete Room Record</td><td>GM confirms hard delete</td><td>GM</td><td>Record permanently deleted; deletion logged.</td><td>Record removed</td><td>System Audit Log</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:36%"><col style="width:15%"><col style="width:16%"><col style="width:15%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Volume / Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Room Listings Display</td><td>Full public listing rendered with cards, photos, status.</td><td>System / Rooms DB</td><td>Public Visitor</td><td>Continuous</td></tr>
+        <tr><td>Room Inquiry</td><td>Form submission with name, contact, preferred type.</td><td>Public Visitor</td><td>Process 1.2</td><td>~10 / month</td></tr>
+        <tr><td>Card Image Upload</td><td>Multipart-form image file (jpg / png / webp, ≤ 2 MB).</td><td>GM (Settings)</td><td>Process 1.8</td><td>Rare; on demand</td></tr>
+        <tr><td>Card Image Asset</td><td>Public URL pointing to the latest stored card image.</td><td>Storage</td><td>Public Visitor</td><td>Continuous</td></tr>
+        <tr><td>Rate &amp; Amenity Update</td><td>Room edit form payload.</td><td>GM</td><td>Process 1.4</td><td>~4–6 / month</td></tr>
+        <tr><td>Room Status Update</td><td>Manual GM action; saved with timestamp + GM ID.</td><td>GM</td><td>Process 1.5</td><td>~15–20 / month</td></tr>
+        <tr><td>Occupancy Dashboard Data</td><td>Aggregated Rooms + Tenants summary.</td><td>System</td><td>GM</td><td>Several times daily</td></tr>
+        <tr><td>Inquiry Log Data</td><td>All inquiries grouped by status.</td><td>System</td><td>GM</td><td>On demand</td></tr>
+        <tr><td>Archived Room Record</td><td>Room export payload sent to the Archive store.</td><td>Process 1.9</td><td>Report &amp; Archive</td><td>~2–4 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:14%"><col style="width:14%"><col style="width:26%"><col style="width:32%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Alt. Name</th><th>Description</th><th>Key Attributes</th><th>Volume / Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Room Listings</td><td><code>rooms</code> table</td><td>Each physical room with manual status, rate, photos, occupant.</td><td>Room ID (PK), Room Number, Floor, Type, Photos[], Amenities, Rate, Max Occupants, Status, Updated By, Updated At, Tenant ID (FK → Tenant Management)</td><td>22 rooms; ~15–20 status updates / mo</td></tr>
+        <tr><td>Inquiry Log</td><td><code>inquiries</code> table</td><td>Submissions from public visitors.</td><td>Inquiry ID (PK), Sender Name, Contact, Email, Preferred Type, Message, Inquiry Date, Status, Response, Responded At, Notes</td><td>~10–15 / month</td></tr>
+        <tr><td>Room Type Cards</td><td><code>room_type_cards</code> table</td><td>Public landing cards (Compact / Spacious). Image-only editable by GM via Settings.</td><td>Card ID (PK), Slug (compact|spacious), Title, Subtitle, Body, Image Path, Image Updated At, Updated By (GM ID), Version</td><td>2 rows total; image replaced rarely</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 1.1 — Display Room Listings</h4>
+      <ul><li>Renders the public landing on every page visit.</li><li>Composes the two Room Type Cards from the <code>room_type_cards</code> table (image, title, subtitle, body) and the live availability count from the <code>rooms</code> table.</li><li>No authentication required.</li></ul>
+      <h4>Process 1.2 — Receive &amp; Log Inquiry</h4>
+      <ul><li>Validates inquiry form input; persists an <code>inquiries</code> row.</li><li>Dispatches an in-app bell notification + email to the GM.</li></ul>
+      <h4>Process 1.3 — Confirm Availability</h4>
+      <ul><li>GM reads the room's current status from <code>rooms</code> and contacts the visitor.</li><li>On confirm, GM proceeds to the Contract module to create a contract draft.</li><li>Room status does not change here; it remains Available until GM manually flips it after physical move-in.</li></ul>
+      <h4>Process 1.4 — Set Room Rate &amp; Amenities</h4>
+      <ul><li>GM enters room rate, amenities list, max occupancy, photos.</li><li>Saved to <code>rooms</code>; public listing reflects changes immediately.</li></ul>
+      <h4>Process 1.5 — Update Room Status</h4>
+      <ul><li>GM picks one of: Available / Occupied / Under Maintenance.</li><li>Every change records timestamp and GM's user ID. No automatic transitions.</li></ul>
+      <h4>Process 1.6 — View Occupancy Dashboard</h4>
+      <ul><li>GM accesses an aggregated summary of all 22 rooms with status, tenant, floor, and last status update.</li></ul>
+      <h4>Process 1.7 — View &amp; Manage Inquiry Log</h4>
+      <ul><li>GM lists inquiries grouped by Pending / Responded / Closed.</li><li>Marks responded with a free-text note; resolved → Closed.</li></ul>
+      <h4>Process 1.8 — Manage Room Type Card</h4>
+      <ul><li>GM opens System Settings &gt; Room Type Cards.</li><li>For each card (Compact, Spacious) GM may upload a new image.</li><li>System validates mimetype (jpg | png | webp) and size (≤ 2 MB).</li><li>File stored under <code>storage/app/public/room-type-cards/{slug}-{timestamp}.{ext}</code>.</li><li><code>room_type_cards.image_path</code> updated; <code>image_updated_at</code> and <code>updated_by</code> stamped.</li><li>Action audited in the system audit log.</li><li>Public landing fetches the new asset on the next request; no manual cache bust required.</li></ul>
+      <h4>Process 1.9 — Archive Room Record</h4>
+      <ul><li>GM archives a room's historical record once a tenant vacates and all billing / contract records are finalized.</li><li>Record copied to the Archive store; room continues to exist in active table with current status.</li></ul>
+      <h4>Process 1.10 — Delete Room Record</h4>
+      <ul><li>GM permanently removes a room record.</li><li>Irreversible; logged in the system audit trail with GM ID and timestamp.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== Tenant Management ===================== -->
+  <section class="subsystem" id="ss2">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 02</div>
+      <h3>Tenant Management</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:14%"><col style="width:11%"><col style="width:35%"><col style="width:20%"><col style="width:20%"></colgroup>
+      <thead><tr><th>Entity</th><th>Alt. Name</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tenant</strong></td><td>Holder</td><td>Account holder after contract is signed. Activates via OTP, views profile, and manages their own account.</td><td>Temp Password, OTP, Notifications</td><td>OTP Response, Profile Update</td></tr>
+        <tr><td><strong>GM</strong></td><td>Admin</td><td>Creates accounts, views profiles, and archives accounts.</td><td>Tenant Info, Archive Cmd</td><td>Account, Status, Archive</td></tr>
+        <tr><td><strong>System</strong></td><td>Automated</td><td>Generates temp password, dispatches OTP via the Auth module, and auto-archives on contract end.</td><td>Account Created, Contract End Signal</td><td>Email, Auto-Archive</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:30%"><col style="width:40%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>2.1</td><td>Create Tenant Account</td><td>GM-entered name + email</td><td>Account; temporary password emailed</td></tr>
+        <tr><td>2.2</td><td>Activate Account</td><td>Temp password + OTP</td><td>Account Active; first-login forced password change</td></tr>
+        <tr><td>2.3</td><td>View Tenant Profile</td><td>GM or tenant request</td><td>Profile rendered</td></tr>
+        <tr><td>2.4</td><td>Update Tenant Profile</td><td>Tenant profile form</td><td>Profile persisted; GM notified</td></tr>
+        <tr><td>2.5</td><td>View Tenant Dashboard</td><td>Tenant login</td><td>Cross-subsystem snapshot: active contract, latest bill + unpaid count, initial payment receipt, 5 latest notifications</td></tr>
+        <tr><td>2.9</td><td>Archive / Delete Account</td><td>GM command / Contract end signal</td><td>Account archived in the Archive store or permanently deleted</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:12%"><col style="width:27%"><col style="width:16%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Create Tenant Account</td><td>Contract signed in the Contract module</td><td>GM</td><td>Account row written; temp password emailed.</td><td>Account created</td><td>Tenant (via email)</td></tr>
+        <tr><td>Account Activation</td><td>First login + OTP entry</td><td>Tenant + System</td><td>OTP validated by the Auth module; account marked Active.</td><td>Tenant in portal</td><td>Tenant</td></tr>
+        <tr><td>View Profile</td><td>Profile page accessed</td><td>GM / Tenant</td><td>Profile data retrieved.</td><td>Profile shown</td><td>GM / Tenant</td></tr>
+        <tr><td>Update Profile</td><td>Tenant submits change</td><td>Tenant</td><td>Validation; row updated; GM notified.</td><td>Profile updated</td><td>DB + GM</td></tr>
+        <tr><td>Auto-Archive Account</td><td>Contract end signal</td><td>System</td><td>Account flagged archived; record copied to Archive store.</td><td>Account archived</td><td>Report &amp; Archive</td></tr>
+        <tr><td>Manual Archive / Delete</td><td>GM command</td><td>GM</td><td>Archive or permanent delete with audit row.</td><td>Archived / removed</td><td>Archive store / Audit Log</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:38%"><col style="width:13%"><col style="width:17%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Contract Signed Signal</td><td>Contract module → Tenant module trigger to create account.</td><td>Contract Mgmt</td><td>Process 2.1</td><td>~5–8 / month</td></tr>
+        <tr><td>Temporary Password</td><td>Auto-generated, emailed on account creation.</td><td>System</td><td>Tenant (email)</td><td>~5–8 / month</td></tr>
+        <tr><td>OTP Verification</td><td>Sent by the Auth module for first login.</td><td>User Access</td><td>Tenant</td><td>~5–8 / month</td></tr>
+        <tr><td>Profile Data</td><td>Stored personal details rendered to user.</td><td>System</td><td>GM / Tenant</td><td>Continuous</td></tr>
+        <tr><td>Profile Update</td><td>Updated contact / personal info from tenant.</td><td>Tenant</td><td>DB</td><td>~3–5 / month</td></tr>
+        <tr><td>Contract End Signal</td><td>Contract module → Tenant module trigger to auto-archive.</td><td>Contract Mgmt</td><td>Process 2.9</td><td>~5–8 / month</td></tr>
+        <tr><td>Archived Account</td><td>Account export to the Archive store.</td><td>Process 2.9</td><td>Report &amp; Archive</td><td>~5–8 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:30%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Tenant Accounts</td><td>Login credentials + status.</td><td>Tenant ID (PK), Email, Hashed Password, Status, Created At, Activated At, Contract ID (FK), Archived By, Archived At</td><td>~5–8 new / month</td></tr>
+        <tr><td>Tenant Profiles</td><td>Personal info; editable by tenant.</td><td>Profile ID (PK), Tenant ID (FK), Full Name, Contact, Address, Emergency Contact, Move-In, Lease End (from Contract Mgmt)</td><td>~5 updates / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 2.1 — Create Tenant Account</h4>
+      <ul><li>After the Contract module records a signed contract, GM enters full name + email.</li><li>A temporary password is generated, hashed, persisted, and emailed.</li></ul>
+      <h4>Process 2.2 — Activate Account</h4>
+      <ul><li>Tenant logs in with the temporary password.</li><li>The Auth module sends an OTP; on correct entry the account moves to Active.</li><li>Tenant is forced to change password before any portal screen renders.</li></ul>
+      <h4>Process 2.3 / 2.4 — View / Update Profile</h4>
+      <ul><li>Both GM and tenant can view; only the owning tenant can update.</li><li>Updates write to the profile table; GM notified via bell.</li></ul>
+      <h4>Process 2.9 — Archive / Delete Account</h4>
+      <ul><li><strong>Manual:</strong> GM clicks Archive or Delete.</li><li><strong>Auto:</strong> Contract end signal triggers an archive flow.</li><li>Archives copy the record to the Archive store and revoke login.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== Billing & Collections ===================== -->
+  <section class="subsystem" id="ss3">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 03</div>
+      <h3>Billing &amp; Collections</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:13%"><col style="width:39%"><col style="width:24%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Entity</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tenant</strong></td><td>Makes initial payment, views bills + receipts, marks unpaid count.</td><td>Bill, Receipt, Notification</td><td>Initial Payment, View Requests</td></tr>
+        <tr><td><strong>GM</strong></td><td>Generates bills, confirms payments, applies penalty overrides, archives at lease end.</td><td>Contract, Payment Proof, Override Reason</td><td>Bill, Override, Archive Cmd</td></tr>
+        <tr><td><strong>System</strong></td><td>Activates billing on contract start, applies daily penalties, sends reminders, escalates delinquency, sends notices.</td><td>Contract Active Signal, Daily Schedule</td><td>Penalty, Reminder, Escalation, Notice</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:30%"><col style="width:40%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>3.1</td><td>Activate Billing</td><td>Contract Active signal (Contract Mgmt)</td><td>Billing profile created</td></tr>
+        <tr><td>3.2</td><td>Record Initial Payment</td><td>Tenant initial payment details</td><td>InitialPayment row + receipt</td></tr>
+        <tr><td>3.3</td><td>Generate Monthly Bill</td><td>Billing cycle trigger + contract rate</td><td>Bill row; tenant notified</td></tr>
+        <tr><td>3.4</td><td>Confirm Payment</td><td>GM payment proof confirmation</td><td>Bill.status = Paid; receipt logged</td></tr>
+        <tr><td>3.5</td><td>Apply Grace Reminder</td><td>Day 1–3 unpaid</td><td>Reminder notification</td></tr>
+        <tr><td>3.6</td><td>Apply Penalty</td><td>Day 4+ unpaid (daily scheduler)</td><td>Bill.penalty + Bill.status = Overdue</td></tr>
+        <tr><td>3.7</td><td>Escalate Status</td><td>Day 14 / Day 30 unpaid</td><td>Delinquent / Eviction notice</td></tr>
+        <tr><td>3.8</td><td>Penalty Override / Waive</td><td>GM action + written reason</td><td>Bill adjusted; override row</td></tr>
+        <tr><td>3.9</td><td>Archive Billing</td><td>Lease end / GM command</td><td>Records exported to the Archive store</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:10%"><col style="width:27%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Billing Activated</td><td>Contract Active (Contract Mgmt)</td><td>System</td><td>Billing profile initialized using contract rate.</td><td>Ready for first bill</td><td>Billing DB</td></tr>
+        <tr><td>Record Initial Fees</td><td>Tenant moves in</td><td>GM</td><td>Deposit + first rent + key fee recorded.</td><td>Receipt generated</td><td>GM</td></tr>
+        <tr><td>Generate Monthly Bill</td><td>Billing cycle</td><td>GM</td><td>Itemized bill created.</td><td>Tenant notified</td><td>Tenant</td></tr>
+        <tr><td>Payment Received</td><td>Tenant pays</td><td>Tenant</td><td>GM confirms; payment + date logged.</td><td>Bill marked Paid</td><td>DB</td></tr>
+        <tr><td>Grace Reminder</td><td>Day 1–3 unpaid</td><td>System</td><td>Overdue counter starts; automated reminders sent.</td><td>Counter visible</td><td>Tenant</td></tr>
+        <tr><td>Penalty Applied</td><td>Day 4+ unpaid</td><td>System</td><td>Daily penalty added to bill.</td><td>Bill → Overdue</td><td>Tenant</td></tr>
+        <tr><td>Formal Notice</td><td>Day 14 / Day 30</td><td>System</td><td>Status escalation + formal notice + eviction flag.</td><td>GM + tenant notified</td><td>GM + Tenant</td></tr>
+        <tr><td>Penalty Override</td><td>GM action</td><td>GM</td><td>Adjustment + written reason logged.</td><td>Override row</td><td>Override Log</td></tr>
+        <tr><td>Archive Payment Records</td><td>Lease end</td><td>GM</td><td>Billing records exported.</td><td>Archive copy in Report &amp; Archive</td><td>Report &amp; Archive</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:38%"><col style="width:13%"><col style="width:17%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Contract Active Signal</td><td>Contract module → Billing module to initialize billing profile.</td><td>Contract Mgmt</td><td>Process 3.1</td><td>~5–8 / month</td></tr>
+        <tr><td>Initial Payment Data</td><td>Deposit + first rent + key fee.</td><td>Tenant / GM</td><td>Process 3.2</td><td>~5–8 / month</td></tr>
+        <tr><td>Monthly Bill</td><td>Itemized rent + utilities + penalties.</td><td>Process 3.3</td><td>Tenant</td><td>~22 / month</td></tr>
+        <tr><td>Penalty Application</td><td>Daily computed penalty on overdue bills.</td><td>System</td><td>Bill row</td><td>Daily</td></tr>
+        <tr><td>Reminder Notification</td><td>Bell + email reminders during grace.</td><td>System</td><td>Tenant</td><td>As needed</td></tr>
+        <tr><td>Escalation Notice</td><td>Formal Delinquent / Eviction message.</td><td>System</td><td>Tenant + GM</td><td>As needed</td></tr>
+        <tr><td>Override Reason</td><td>GM-supplied free-text justification.</td><td>GM</td><td>Override Log</td><td>As needed</td></tr>
+        <tr><td>Archived Billing</td><td>Records exported on lease end.</td><td>Process 3.9</td><td>Report &amp; Archive</td><td>~5–8 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:16%"><col style="width:32%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Bills</td><td>Monthly bills per contract.</td><td>Bill ID (PK), Contract ID (FK), Period, Base Rent, Utilities, Penalty, Total, Status, Due Date, Paid At, Confirmed By</td><td>~22 / month</td></tr>
+        <tr><td>Initial Payments</td><td>One-time move-in fees.</td><td>IP ID (PK), Contract ID (FK), Deposit, First Rent, Key Fee, Amenity Fees, Paid At, Receipt File</td><td>~5–8 / month</td></tr>
+        <tr><td>Override Log</td><td>Penalty adjustments with reasons.</td><td>Override ID (PK), Bill ID (FK), Old Penalty, New Penalty, Reason, GM ID, Created At</td><td>Rare</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 3.1 — Activate Billing</h4>
+      <ul><li>On Contract Active signal, billing profile created with the contract rate as the base for all future bills.</li></ul>
+      <h4>Process 3.2 — Record Initial Payment</h4>
+      <ul><li>GM records security deposit, first month's rent, and key fee on move-in.</li><li>Receipt PDF generated and saved.</li></ul>
+      <h4>Process 3.3 — Generate Monthly Bill</h4>
+      <ul><li>Each cycle GM creates an itemized bill: rent + utilities + outstanding penalty + total. Tenant notified.</li></ul>
+      <h4>Process 3.4 — Confirm Payment</h4>
+      <ul><li>GM verifies receipt and marks the bill as Paid with date.</li></ul>
+      <h4>Process 3.5 — Grace Reminder (Day 1–3)</h4>
+      <ul><li>System starts an overdue counter on the tenant's dashboard.</li><li>Daily reminders sent; no penalty yet.</li></ul>
+      <h4>Process 3.6 — Apply Penalty (Day 4+)</h4>
+      <ul><li>Daily penalty computed using the System Setting <code>penalty_rate</code>.</li><li>Bill status → Overdue.</li></ul>
+      <h4>Process 3.7 — Escalate Status</h4>
+      <ul><li>Day 14 → Delinquent (formal notice).</li><li>Day 30 → Eviction flag (eviction notice).</li></ul>
+      <h4>Process 3.8 — Penalty Override / Waive</h4>
+      <ul><li>GM may reduce or waive any penalty with a written reason.</li><li>Override + reason saved for audit.</li></ul>
+      <h4>Process 3.9 — Archive Billing Records</h4>
+      <ul><li>On lease end, GM moves all bills + initial payments + overrides to the Archive store.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== Contract & Lease Management ===================== -->
+  <section class="subsystem" id="ss4">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 04</div>
+      <h3>Contract &amp; Lease Management</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:13%"><col style="width:39%"><col style="width:24%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Entity</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GM</strong></td><td>Drafts, prints, scans, uploads, renews, terminates contracts. Owns the contract lifecycle.</td><td>Room availability confirmation, Tenant Info, Scan</td><td>Contract Draft, Scan, Renewal / Termination</td></tr>
+        <tr><td><strong>Tenant</strong></td><td>Signs the paper contract, then digitally acknowledges terms (Step 1) and penalty clause (Step 2). Views timer.</td><td>Contract Summary, Timer, Expiry Notification</td><td>Physical Signature, Step 1 / 2 Acknowledgement</td></tr>
+        <tr><td><strong>System</strong></td><td>Activates contracts after both acknowledgements, runs the daily timer, sends expiry warnings, auto-archives on expiry.</td><td>Acknowledgements, Dates</td><td>Activation, Timer, Expiry Notifications, Cross-module signals to Billing / Tenant Mgmt / Report &amp; Archive</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:30%"><col style="width:40%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>4.1</td><td>Create Contract Draft</td><td>Room availability, agreed terms</td><td>Contract draft saved; PDF ready</td></tr>
+        <tr><td>4.2</td><td>Print &amp; Record Physical Sign</td><td>Finalized draft</td><td>Paper contract signed; logged</td></tr>
+        <tr><td>4.3</td><td>Upload Scanned Contract</td><td>Scanned PDF / image</td><td>Scan stored + linked to the Archive store</td></tr>
+        <tr><td>4.4</td><td>Display Contract Summary</td><td>Tenant login</td><td>Terms + scan link rendered</td></tr>
+        <tr><td>4.5</td><td>Record Step 1 Acknowledgement</td><td>Tenant click</td><td>Step 1 timestamp saved</td></tr>
+        <tr><td>4.6</td><td>Record Step 2 Penalty Ack.</td><td>Tenant click</td><td>Contract Active; Billing activated; timer init</td></tr>
+        <tr><td>4.7</td><td>Maintain Contract Timer</td><td>Current date, contract <code>end_date</code></td><td>Days remaining + colour badge refreshed daily</td></tr>
+        <tr><td>4.8</td><td>Send Expiry Warnings</td><td>Days remaining = 30 or 7</td><td>Notifications to GM + tenant</td></tr>
+        <tr><td>4.9</td><td>Renew Contract</td><td>GM renewal command + new dates</td><td>New draft; old contract archived</td></tr>
+        <tr><td>4.10</td><td>Terminate Contract</td><td>GM termination command + reason</td><td>Contract Terminated; tenant account archived</td></tr>
+        <tr><td>4.11</td><td>Auto-Archive Expired</td><td>Scheduler past <code>end_date</code></td><td>Contract Expired; archive to the Archive store</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:12%"><col style="width:27%"><col style="width:16%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Contract Initiated</td><td>Room Operations confirms availability</td><td>GM</td><td>Draft created with all agreed terms.</td><td>Draft saved</td><td>GM</td></tr>
+        <tr><td>Physical Signing</td><td>Terms agreed</td><td>GM + Tenant</td><td>Both sign the printed paper contract in person.</td><td>Legally binding</td><td>GM (paper copy)</td></tr>
+        <tr><td>Upload Scan</td><td>After physical signing</td><td>GM</td><td>PDF / image stored; linked to contract + Archive store.</td><td>Digital scan stored</td><td>System + Report &amp; Archive</td></tr>
+        <tr><td>Account Creation</td><td>After physical signing</td><td>Contract → Tenant Mgmt</td><td>Trigger to create the tenant account.</td><td>Tenant account flow started</td><td>Tenant Mgmt</td></tr>
+        <tr><td>View Contract Summary</td><td>Tenant login</td><td>Tenant</td><td>Full terms + scan + penalty schedule shown.</td><td>Summary shown</td><td>Tenant</td></tr>
+        <tr><td>Ack Step 1</td><td>Tenant clicks "I read"</td><td>Tenant</td><td>Step 1 timestamp saved; Step 2 unlocked.</td><td>Step 2 enabled</td><td>System</td></tr>
+        <tr><td>Ack Step 2</td><td>Tenant clicks "I accept"</td><td>Tenant</td><td>Contract → Active; billing activated; timer started.</td><td>Billing activated</td><td>System → Billing</td></tr>
+        <tr><td>Timer Initialized</td><td>Contract Active</td><td>System</td><td>Days remaining + badge initialized.</td><td>Timer visible</td><td>Tenant Dashboard</td></tr>
+        <tr><td>30-Day Warning</td><td>30 days before end</td><td>System</td><td>Single unified notification to GM + tenant.</td><td>Both notified</td><td>GM + Tenant</td></tr>
+        <tr><td>7-Day Warning</td><td>7 days before end</td><td>System</td><td>Urgent notification; badge → Red.</td><td>Both notified</td><td>GM + Tenant</td></tr>
+        <tr><td>Contract Renewed</td><td>GM renewal</td><td>GM</td><td>New draft + restart; old archived.</td><td>New cycle</td><td>Contract Mgmt + Archive</td></tr>
+        <tr><td>Contract Terminated</td><td>GM termination</td><td>GM</td><td>Marked Terminated; tenant account archived; Archive store updated.</td><td>Archived</td><td>Tenant Mgmt + Archive</td></tr>
+        <tr><td>Contract Expired</td><td><code>end_date</code> passes</td><td>System</td><td>Marked Expired; auto-archived with scan; tenant account archived.</td><td>Archived</td><td>Archive + Tenant Mgmt</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:20%"><col style="width:36%"><col style="width:14%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Contract Draft Data</td><td>Agreed rate, dates, rules, penalty schedule.</td><td>GM</td><td>Process 4.1</td><td>~5–8 / month</td></tr>
+        <tr><td>Scanned Contract Upload</td><td>PDF / image of signed paper contract.</td><td>GM</td><td>DB + Archive</td><td>~5–8 / month</td></tr>
+        <tr><td>Contract Summary</td><td>Full terms shown to tenant in portal.</td><td>Process 4.4</td><td>Tenant</td><td>Once per new contract</td></tr>
+        <tr><td>Step 1 / 2 Ack</td><td>Tenant click events with timestamps.</td><td>Tenant</td><td>Acknowledgement Log</td><td>Once per contract</td></tr>
+        <tr><td>Timer &amp; Status Data</td><td>Daily countdown + colour badge.</td><td>System</td><td>Tenant</td><td>Daily</td></tr>
+        <tr><td>Expiry Warnings</td><td>Unified 30 d / 7 d notifications.</td><td>System</td><td>GM + Tenant</td><td>2 per cycle</td></tr>
+        <tr><td>Billing Activation Signal</td><td>Trigger to Billing on Step 2 acknowledgement.</td><td>Process 4.6</td><td>Billing</td><td>Once per cycle</td></tr>
+        <tr><td>Archived Contract Pkg</td><td>Full record + scan exported to the Archive store.</td><td>4.9 / 4.10 / 4.11</td><td>Report &amp; Archive</td><td>~5–8 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:30%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Contracts</td><td>All lease contracts; timer uses dates only.</td><td>Contract ID (PK), Tenant ID, Room ID, Base Rent, Deposit, Key Fee, Start, End, Status, Penalty Rate, Grace Days, Step1 Acked At, Step2 Acked At, Scan Path</td><td>~5–8 new / month</td></tr>
+        <tr><td>Contract Scans</td><td>Uploaded scan files; read-only.</td><td>Scan ID (PK), Contract ID (FK), File Name, Path, Upload Date, Uploaded By, File Size</td><td>~5–8 / month</td></tr>
+        <tr><td>Acknowledgement Log</td><td>2 rows per contract (Step 1, Step 2).</td><td>Ack ID (PK), Contract ID (FK), Tenant ID, Step (1|2), Acknowledged At, Session Token</td><td>2 per contract</td></tr>
+        <tr><td>Notification Log</td><td>Expiry warnings (delivery + dedupe).</td><td>Notif ID (PK), Contract ID (FK), Type (30 / 7 / Expired), Sent At, Recipient, Status</td><td>~10–16 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 4.1 — Create Contract Draft</h4>
+      <ul><li>GM enters agreed terms — rate, move-in date, lease period, rules, penalty clause. Draft saved; PDF prepared for printing.</li></ul>
+      <h4>Process 4.2 — Print &amp; Physical Signing</h4>
+      <ul><li>GM prints; GM and tenant sign in person. This is the legally binding step.</li></ul>
+      <h4>Process 4.3 — Upload Scanned Contract</h4>
+      <ul><li>GM scans the signed paper and uploads PDF / image. File linked to the contract entry and mirrored to the Archive store.</li></ul>
+      <h4>Process 4.4 — Display Contract Summary</h4>
+      <ul><li>After tenant activates account, full terms + scan link appear in the portal.</li></ul>
+      <h4>Process 4.5 / 4.6 — Tenant Acknowledgement</h4>
+      <ul><li>Two explicit click steps: (1) "I read and understand", (2) "I accept the penalty clause".</li><li>After Step 2 the contract becomes Active, Billing is activated, and the lease timer initializes.</li></ul>
+      <h4>Process 4.7 — Maintain Contract Timer</h4>
+      <ul><li>Daily scheduler computes days remaining; renders colour badge: Green &gt; 30 d, Amber ≤ 30 d, Red ≤ 7 d, Gray = Expired.</li></ul>
+      <h4>Process 4.8 — Send Expiry Warnings</h4>
+      <ul><li>Single unified notification at 30 d and 7 d to both GM and tenant. Displayed via Tenant Mgmt; not duplicated.</li></ul>
+      <h4>Process 4.9 — Renew Contract</h4>
+      <ul><li>GM can renew before expiry. New draft created; old contract archived; timer resets.</li></ul>
+      <h4>Process 4.10 — Terminate Contract</h4>
+      <ul><li>GM ends a contract early with a reason. Tenant account archived; Archive store updated.</li></ul>
+      <h4>Process 4.11 — Auto-Archive on Expiry</h4>
+      <ul><li>Daily scheduler: when <code>end_date</code> passes without renewal, contract → Expired, archive package sent to the Archive store, tenant account archived, room released.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== Report and Archive Management ===================== -->
+  <section class="subsystem" id="ss5">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 05</div>
+      <h3>Report and Archive Management</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:13%"><col style="width:39%"><col style="width:24%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Entity</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GM</strong></td><td>Sole user. Generates / exports reports, browses archive, restores or permanently deletes records.</td><td>Report Type + Filters, Restore / Delete Commands</td><td>Generated Report, Export File, Restored Record</td></tr>
+        <tr><td><strong>System</strong></td><td>Receives auto-archive feeds from Rooms, Tenants, Billing &amp; Contracts and stores them.</td><td>Archive Records from upstream subsystems</td><td>Archive Confirmation</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:30%"><col style="width:40%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>5.1</td><td>Receive &amp; Store Archived Record</td><td>Flagged record from upstream subsystems</td><td>Stored in archive DB</td></tr>
+        <tr><td>5.2</td><td>Generate Report</td><td>Type + filters</td><td>Filtered report rendered</td></tr>
+        <tr><td>5.3</td><td>Filter &amp; Export Report</td><td>Report data + export choice</td><td>CSV or PDF downloaded</td></tr>
+        <tr><td>5.4</td><td>View Archived Records</td><td>GM request</td><td>Archive listing with type labels</td></tr>
+        <tr><td>5.5</td><td>View Scanned Contract</td><td>Selected contract archive</td><td>Scan displayed</td></tr>
+        <tr><td>5.6</td><td>Restore Record</td><td>GM restore command</td><td>Record back in originating active DB</td></tr>
+        <tr><td>5.7</td><td>Permanently Delete Record</td><td>GM hard-delete confirmation</td><td>Removed; logged in audit</td></tr>
+        <tr><td>5.8</td><td>Export Archive to CSV</td><td>GM clicks Export CSV</td><td>Filtered rows streamed as UTF-8 CSV; <em>archive_exported_csv</em> audited</td></tr>
+        <tr><td>5.9</td><td><em>(Removed)</em> Export Archive to Excel</td><td>&mdash;</td><td>The .xlsx exporter and PhpSpreadsheet dependency were dropped: Excel opens UTF-8 CSV natively, so 5.8 covers the same need with less footprint.</td></tr>
+        <tr><td>5.10</td><td>Export Contract to PDF</td><td>GM clicks PDF on a contract row</td><td>Printable A4 PDF (DomPDF) with contract data + scan path; <em>archive_contract_pdf</em> audited</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:10%"><col style="width:27%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Auto-Archive Record</td><td>Record flagged by Rooms / Tenants / Billing / Contracts</td><td>System</td><td>Flagged record moved to the Archive store.</td><td>Archived; accessible</td><td>Archive DB</td></tr>
+        <tr><td>Generate Report</td><td>GM picks type + filters</td><td>GM</td><td>Query against archive + active records.</td><td>Report rendered</td><td>GM</td></tr>
+        <tr><td>Export Report</td><td>GM clicks Export</td><td>GM</td><td>Stream the filtered archive as CSV, or one archived contract as PDF (DomPDF).</td><td>File downloaded</td><td>GM</td></tr>
+        <tr><td>View Archived Record</td><td>GM opens module</td><td>GM</td><td>List rendered with type / date filters.</td><td>Archive list shown</td><td>GM</td></tr>
+        <tr><td>View Scanned Contract</td><td>GM opens record</td><td>GM</td><td>Linked scan retrieved and displayed.</td><td>Scan shown</td><td>GM</td></tr>
+        <tr><td>Restore Record</td><td>GM restore action</td><td>GM</td><td>Record returned to originating active DB.</td><td>Active row re-created</td><td>Originating module</td></tr>
+        <tr><td>Permanently Delete</td><td>GM confirms hard delete</td><td>GM</td><td>Removed irreversibly; logged.</td><td>Removed; audit row</td><td>Audit Log</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:38%"><col style="width:14%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Incoming Archive Record</td><td>Records from Rooms (rooms), Tenants (accounts), Billing (payments), Contracts (contracts + scans).</td><td>Upstream modules</td><td>Process 5.1</td><td>~15–25 / month</td></tr>
+        <tr><td>Report Query</td><td>GM filter selection.</td><td>GM</td><td>Process 5.2</td><td>On demand</td></tr>
+        <tr><td>Generated Report</td><td>Filtered report data.</td><td>Process 5.2</td><td>GM</td><td>On demand</td></tr>
+        <tr><td>Exported Report File</td><td>CSV (archive list) or PDF (single archived contract) download.</td><td>Process 5.3</td><td>GM</td><td>On demand</td></tr>
+        <tr><td>Archive Listing</td><td>Filtered archive list.</td><td>Process 5.4</td><td>GM</td><td>On demand</td></tr>
+        <tr><td>Restored Record</td><td>Record returned to originating active DB.</td><td>Process 5.6</td><td>Originating module</td><td>Rare</td></tr>
+        <tr><td>Deletion Log Entry</td><td>Audit record of permanent deletion.</td><td>Process 5.7</td><td>Audit Log</td><td>Rare</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:16%"><col style="width:32%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Archive Database</td><td>All archived records from upstream subsystems.</td><td>Archive ID (PK), Original Record ID, Record Type, Source Subsystem, Archive Reason, Date, Archived By, Restored (bool)</td><td>~15–25 / month</td></tr>
+        <tr><td>Contract Scans Archive</td><td>Stored scan files linked to archived contract records.</td><td>Scan Archive ID (PK), Archive ID (FK), Original Contract ID, File Name, Path, Upload Date, File Size</td><td>~5–8 / month</td></tr>
+        <tr><td>Report Logs</td><td>Optional log of generated reports.</td><td>Log ID (PK), Type, Filters, Generated By, Generated At, Exported (bool)</td><td>On demand</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 5.1 — Receive &amp; Store Archived Record</h4>
+      <ul><li>The Archive module is always active. Records flow in automatically whenever Rooms, Tenants, Billing, or Contracts flags a record. The originating active DB removes or hides the row; the Archive store keeps a retrievable copy.</li></ul>
+      <h4>Process 5.2 — Generate Report</h4>
+      <ul><li>GM picks a report type and applies filters: date range, floor, room number, tenant, payment status.</li></ul>
+      <h4>Process 5.3 — Filter &amp; Export Report</h4>
+      <ul><li>Generated reports can be exported as PDF or Excel.</li></ul>
+      <h4>Process 5.4 / 5.5 — View Archived Records / Scanned Contract</h4>
+      <ul><li>Archive module lists everything; scanned contracts open inline.</li></ul>
+      <h4>Process 5.6 — Restore Record</h4>
+      <ul><li>If a record was archived by mistake, GM restores it; the record returns to the originating active DB.</li></ul>
+      <h4>Process 5.7 — Permanently Delete Record</h4>
+      <ul><li>Irreversible. Logged with GM ID, record ID, type, timestamp.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== User Access and Authentication ===================== -->
+  <section class="subsystem" id="ss6">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 06</div>
+      <h3>User Access and Authentication</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:13%"><col style="width:39%"><col style="width:24%"><col style="width:24%"></colgroup>
+      <thead><tr><th>Entity</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tenant</strong></td><td>First-time activation via OTP, subsequent logins, password changes, session management.</td><td>Temp Password, OTP, Login Credentials</td><td>Session, OTP Response, Password Change Request</td></tr>
+        <tr><td><strong>GM</strong></td><td>Logs in to manage subsystems. Exclusive access to audit log and system settings.</td><td>Credentials, Lockout Alerts</td><td>Session, Audit View, Settings Updates</td></tr>
+        <tr><td><strong>System</strong></td><td>Sends OTPs, locks accounts on failures, auto-unlocks, times out sessions, writes audit log.</td><td>Login Attempts, Sessions, Status</td><td>OTP Email, Lockout Notification, Audit Entries</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:26%"><col style="width:30%"><col style="width:38%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>6.1</td><td>Send OTP</td><td>First-login + temp password</td><td>OTP emailed with expiry</td></tr>
+        <tr><td>6.2</td><td>Verify OTP &amp; Activate</td><td>OTP entered</td><td>Session opened; account Active</td></tr>
+        <tr><td>6.3</td><td>Authenticate Normal Login</td><td>Email + password</td><td>Session token</td></tr>
+        <tr><td>6.4</td><td>End Session / Logout</td><td>POST /logout or inactivity timer</td><td>Session invalidated; CSRF regenerated; <em>logout</em> audited with actor + IP</td></tr>
+        <tr><td>6.5</td><td>Change Password</td><td>Old + new password</td><td>New hash saved; audit row</td></tr>
+        <tr><td>6.6</td><td>Lock Account</td><td>5 consecutive failures</td><td>Account locked; GM alerted</td></tr>
+        <tr><td>6.7</td><td>Auto-Unlock</td><td>15-minute timer</td><td>Account unlocked</td></tr>
+        <tr><td>6.8</td><td>View Audit Log</td><td>GM request</td><td>System-wide event log shown</td></tr>
+        <tr><td>6.9</td><td>Configure System Settings</td><td>GM settings form</td><td>Settings persisted system-wide</td></tr>
+        <tr><td>6.10</td><td>Activated-Account Gate (middleware)</td><td>Every authenticated request</td><td>Middleware EnsureAccountActivated: auto-unlocks, blocks locked / archived (logout + redirect), redirects pending → /otp/verify, forces password change when <code>must_change_password = true</code></td></tr>
+        <tr><td>6.11</td><td>Export Audit Log (CSV)</td><td>GM clicks Export CSV in Audit Log</td><td>Filtered rows streamed as CSV; <em>audit_log_exported</em> audited</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:12%"><col style="width:27%"><col style="width:16%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Send Temp Password</td><td>Account created in Tenant Mgmt</td><td>System</td><td>Random password generated and emailed.</td><td>Tenant receives email</td><td>Tenant (email)</td></tr>
+        <tr><td>First Login + OTP</td><td>Temp password used</td><td>Tenant + System</td><td>OTP emailed; tenant enters.</td><td>Account activated</td><td>Tenant</td></tr>
+        <tr><td>Normal Login</td><td>Email + password</td><td>Tenant / GM</td><td>Credentials validated.</td><td>Session started</td><td>Tenant / GM</td></tr>
+        <tr><td>Logout</td><td>User clicks logout</td><td>Tenant / GM</td><td>Session token cleared.</td><td>Logged out</td><td>Tenant / GM</td></tr>
+        <tr><td>Change Password</td><td>User request</td><td>Tenant / GM</td><td>Validation + hash + audit.</td><td>Password updated</td><td>System</td></tr>
+        <tr><td>Account Locked</td><td>5 failed attempts</td><td>System</td><td>Account locked 15 min; GM alerted.</td><td>Lockout</td><td>GM (alert)</td></tr>
+        <tr><td>Auto-Unlock</td><td>15 min after lockout</td><td>System</td><td>Account unlocked.</td><td>Login possible</td><td>Tenant / GM</td></tr>
+        <tr><td>Session Timeout</td><td>Inactivity period</td><td>System</td><td>Session ended.</td><td>Logged out</td><td>Tenant / GM</td></tr>
+        <tr><td>View Audit Log</td><td>GM opens log</td><td>GM</td><td>Retrieves all events system-wide.</td><td>Log displayed</td><td>GM</td></tr>
+        <tr><td>Configure Settings</td><td>GM saves settings</td><td>GM</td><td>Settings persisted + applied.</td><td>Settings saved</td><td>System</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:38%"><col style="width:14%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>OTP Email</td><td>One-time password emailed with expiry.</td><td>System</td><td>Tenant (email)</td><td>~5–8 / month</td></tr>
+        <tr><td>OTP Entry</td><td>Code entered by tenant.</td><td>Tenant</td><td>Process 6.2</td><td>~5–8 / month</td></tr>
+        <tr><td>Login Credentials</td><td>Email + password.</td><td>Tenant / GM</td><td>Process 6.3</td><td>Multiple daily</td></tr>
+        <tr><td>Session Token</td><td>Per-login token granting access to Billing + Contracts.</td><td>Process 6.3</td><td>Browser</td><td>Per login</td></tr>
+        <tr><td>Lockout Notification</td><td>Alert sent to GM on lockout.</td><td>Process 6.6</td><td>GM</td><td>Rare</td></tr>
+        <tr><td>Audit Log Entry</td><td>Every significant action recorded.</td><td>All processes</td><td>Audit Log DB</td><td>Continuous</td></tr>
+        <tr><td>Audit Log View</td><td>GM read of audit log.</td><td>Process 6.8</td><td>GM</td><td>On demand</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:16%"><col style="width:32%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>User Sessions</td><td>Active session tokens; cleared on logout / timeout.</td><td>Session ID (PK), User ID (FK), Type, Token, Created At, Expires At, Last Active, IP</td><td>Continuous</td></tr>
+        <tr><td>OTP Records</td><td>First-login OTPs; expire after a set time.</td><td>OTP ID (PK), Tenant ID (FK), Code (hashed), Created, Expires, Used</td><td>~5–8 / month</td></tr>
+        <tr><td>Audit Log</td><td>Complete system-wide event log.</td><td>Log ID (PK), User ID (FK), Type, Action, Timestamp, IP, Notes</td><td>Continuous</td></tr>
+        <tr><td>System Settings</td><td>Session timeout, lockout threshold, OTP expiry, penalty grace days + rate.</td><td>Setting ID (PK), Name, Value, Last Updated By, Last Updated At</td><td>Rarely updated</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 6.1 — Send OTP</h4>
+      <ul><li>On first login with temp password the system emails an OTP with a fixed expiry window (from System Settings).</li></ul>
+      <h4>Process 6.2 — Verify OTP &amp; Activate</h4>
+      <ul><li>On correct OTP entry, account flips to Active and the session opens.</li></ul>
+      <h4>Process 6.3 — Authenticate Normal Login</h4>
+      <ul><li>Standard login by email + password; failed attempts feed the lockout counter.</li></ul>
+      <h4>Process 6.4 — End Session</h4>
+      <ul><li>Either explicit logout or inactivity timeout ends the session.</li></ul>
+      <h4>Process 6.5 — Change Password</h4>
+      <ul><li>User submits old + new; new password hashed and saved; change audited.</li></ul>
+      <h4>Process 6.6 — Lock Account</h4>
+      <ul><li>5 consecutive failed logins → account locked for 15 min; GM alerted.</li></ul>
+      <h4>Process 6.7 — Auto-Unlock</h4>
+      <ul><li>15 min after lockout the account auto-unlocks.</li></ul>
+      <h4>Process 6.8 — View Audit Log</h4>
+      <ul><li>GM-only read of the complete system-wide audit log.</li></ul>
+      <h4>Process 6.9 — Configure System Settings</h4>
+      <ul><li>GM updates session timeout, lockout threshold + duration, OTP expiry, penalty grace + rate, room type card images, notification preferences. Each change is audited.</li></ul>
+    </div>
+  </section>
+
+  <!-- ===================== Communications & Notifications ===================== -->
+  <section class="subsystem" id="ss7">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 07</div>
+      <h3>Communications &amp; Notifications</h3>
+    </header>
+
+    <div class="block-label">Entities</div>
+    <table class="et-table">
+      <colgroup><col style="width:14%"><col style="width:11%"><col style="width:35%"><col style="width:20%"><col style="width:20%"></colgroup>
+      <thead><tr><th>Entity</th><th>Alt. Name</th><th>Description</th><th>Input Data Flows</th><th>Output Data Flows</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Tenant</strong></td><td>Holder</td><td>Submits maintenance requests and complaints; receives alerts.</td><td>Request, Complaint, Notification Acknowledgment</td><td>Notification, Read</td></tr>
+        <tr><td><strong>GM</strong></td><td>Admin</td><td>Receives and responds to tenant requests; sends announcements.</td><td>Request, Reply, Announcement</td><td>Notification</td></tr>
+        <tr><td><strong>System</strong></td><td>Automated</td><td>Records communication events, delivers bell + email alerts, and tracks notification read state.</td><td>Request, Reply, Announcement</td><td>NotificationLog</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Processes</div>
+    <table class="et-table">
+      <colgroup><col style="width:6%"><col style="width:24%"><col style="width:30%"><col style="width:40%"></colgroup>
+      <thead><tr><th>No.</th><th>Process Name</th><th>Input</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td>7.1</td><td>Submit Maintenance Request</td><td>Tenant request form</td><td>Request row; GM bell + email</td></tr>
+        <tr><td>7.2</td><td>Submit Complaint</td><td>Tenant complaint form</td><td>Complaint row; GM bell + email</td></tr>
+        <tr><td>7.3</td><td>Respond to Request</td><td>GM reply form</td><td>Request status updated; tenant notified</td></tr>
+        <tr><td>7.4</td><td>Send Announcement</td><td>GM compose + send</td><td>Announcement row; recipients bell + email</td></tr>
+        <tr><td>7.5</td><td>Audit-Log Communications Events</td><td>Every comms event</td><td>AuditLog rows for <em>tenant_request_submitted</em>, <em>tenant_request_responded</em>, <em>announcement_sent</em></td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Event Table</div>
+    <table class="et-table">
+      <colgroup><col style="width:17%"><col style="width:16%"><col style="width:12%"><col style="width:27%"><col style="width:16%"><col style="width:12%"></colgroup>
+      <thead><tr><th>Event</th><th>Trigger</th><th>Source</th><th>Activity</th><th>Response</th><th>Destination</th></tr></thead>
+      <tbody>
+        <tr><td>Submit Maintenance Request</td><td>Tenant submits form</td><td>Tenant</td><td>Request row created; GM bell + email logged.</td><td>Request created</td><td>GM</td></tr>
+        <tr><td>Submit Complaint</td><td>Tenant submits form</td><td>Tenant</td><td>Complaint row created; GM bell + email logged.</td><td>Complaint created</td><td>GM</td></tr>
+        <tr><td>Respond to Request</td><td>GM submits reply</td><td>GM</td><td>Status set; reply persisted; tenant notified.</td><td>Tenant informed</td><td>Tenant</td></tr>
+        <tr><td>Send Announcement</td><td>GM publishes message</td><td>GM</td><td>Announcement row + bell + emails per recipient.</td><td>Recipients notified</td><td>Tenants</td></tr>
+        <tr><td>View Notification</td><td>Tenant opens notification</td><td>Tenant</td><td>Notification marked read; message displayed.</td><td>Notification updated</td><td>NotificationLog</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Flows</div>
+    <table class="et-table">
+      <colgroup><col style="width:18%"><col style="width:38%"><col style="width:14%"><col style="width:16%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Data Flow</th><th>Description</th><th>Origin</th><th>Destination</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Tenant Request</td><td>Maintenance / complaint submissions.</td><td>Tenant</td><td>DB + GM</td><td>~10–15 / month</td></tr>
+        <tr><td>GM Reply</td><td>Response payload with status change.</td><td>GM</td><td>Tenant</td><td>~10–15 / month</td></tr>
+        <tr><td>Announcement Payload</td><td>Broadcast message + recipient list.</td><td>GM</td><td>Tenants</td><td>~1–2 / month</td></tr>
+        <tr><td>Notification Delivery</td><td>Bell + email notification sent.</td><td>System</td><td>Tenant / GM</td><td>~15–25 / month</td></tr>
+        <tr><td>Notification Read</td><td>Tenant opens or clears a notification.</td><td>Tenant</td><td>NotificationLog</td><td>~10–20 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Data Stores</div>
+    <table class="et-table">
+      <colgroup><col style="width:16%"><col style="width:32%"><col style="width:38%"><col style="width:14%"></colgroup>
+      <thead><tr><th>Store</th><th>Description</th><th>Key Attributes</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Tenant Requests</td><td>Maintenance + complaints + responses.</td><td>Request ID (PK), Tenant ID (FK), Type, Body, Status, Reply, Replied At</td><td>~10–15 / month</td></tr>
+        <tr><td>Announcements</td><td>Outbound broadcasts and history.</td><td>Announcement ID (PK), Title, Body, Sent At, Recipient Count</td><td>~1–2 / month</td></tr>
+        <tr><td>Notification Log</td><td>Bell + email events, source-tagged.</td><td>Notification ID (PK), User ID (FK), Type, Message, Sent At, Source, Read Status</td><td>~15–25 / month</td></tr>
+      </tbody>
+    </table>
+
+    <div class="block-label">Process Descriptions</div>
+    <div class="process-list">
+      <h4>Process 7.1 / 7.2 — Submit Maintenance Request / Complaint</h4>
+      <ul><li>Tenant submits a request or complaint form; row written to <code>tenant_requests</code>.</li><li>System creates a bell + email notification for the GM.</li></ul>
+      <h4>Process 7.3 — Respond to Request</h4>
+      <ul><li>GM replies and sets status (open / in_progress / resolved).</li><li>Tenant receives a confirmation bell + email and can view the admin reply.</li></ul>
+      <h4>Process 7.4 — Send Announcement</h4>
+      <ul><li>GM composes a title + body and selects recipients.</li><li>System persists the announcement, sends bell + email per recipient, and logs the broadcast.</li></ul>
+    </div>
+  </section>
+
+</div>
+
+<footer class="doc-footer">
+  <strong>Citiescapes</strong> — CS12L Major Project · Revised 2026-05-18 · End of document
+</footer>
+
+</body>
+</html>

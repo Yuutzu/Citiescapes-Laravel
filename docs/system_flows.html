@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Citiescapes — System Flows Guide</title>
+<style>
+    :root {
+        --brand-50:  #fbf3ec;
+        --brand-100: #f3e3d4;
+        --brand-200: #e3c1a3;
+        --brand-300: #c89c75;
+        --brand-500: #a06a3e;
+        --brand-700: #7a3b21;
+        --brand-800: #5e2c19;
+        --brand-900: #432010;
+        --brand-950: #2a140b;
+        --paper:     #fdfbf6;
+        --ink:       #1f2937;
+        --ink-soft:  #4b5563;
+        --line:      #e5e7eb;
+        --ok:        #047857;
+        --warn:      #b45309;
+        --danger:    #b91c1c;
+        --info:      #1d4ed8;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink); font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif; line-height: 1.55; font-size: 15px; }
+    a { color: var(--brand-700); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: 'Fira Code', Consolas, monospace; font-size: 0.88em; background: var(--brand-50); color: var(--brand-800); padding: 1px 5px; border-radius: 3px; }
+    pre { font-family: 'Fira Code', Consolas, monospace; font-size: 0.85em; background: var(--brand-950); color: #e8ddc8; padding: 14px 18px; border-radius: 6px; overflow-x: auto; line-height: 1.5; }
+    .wrap { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+    nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; background: var(--brand-950); color: #e8ddc8; padding: 28px 22px; }
+    nav.toc h2 { font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand-300); margin: 22px 0 8px; font-weight: 600; }
+    nav.toc h2:first-child { margin-top: 0; }
+    nav.toc a { display: block; color: #e8ddc8; padding: 5px 0; font-size: 13.5px; border-left: 2px solid transparent; padding-left: 10px; margin-left: -10px; }
+    nav.toc a:hover { color: white; border-left-color: var(--brand-300); text-decoration: none; }
+    nav.toc .brand { font-family: 'Lora', Georgia, serif; font-size: 22px; font-weight: 700; color: white; }
+    nav.toc .brand-sub { color: var(--brand-300); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 4px; }
+    main { padding: 48px 64px; max-width: 1100px; }
+    h1 { font-family: 'Lora', Georgia, serif; font-size: 38px; margin: 0 0 6px; color: var(--brand-900); }
+    h1 + p.lede { font-size: 17px; color: var(--ink-soft); margin: 0 0 36px; max-width: 70ch; }
+    h2.section { font-family: 'Lora', Georgia, serif; font-size: 28px; color: var(--brand-900); border-bottom: 2px solid var(--brand-200); padding-bottom: 8px; margin: 52px 0 18px; }
+    h2.section:first-of-type { margin-top: 0; }
+    h3 { font-size: 20px; color: var(--brand-800); margin: 32px 0 10px; font-weight: 600; }
+    h4 { font-size: 16px; color: var(--brand-700); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+    p { margin: 0 0 12px; }
+    ul, ol { margin: 0 0 14px 22px; padding: 0; }
+    ul li, ol li { margin-bottom: 6px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
+    .card.subtle { background: var(--brand-50); border-color: var(--brand-200); }
+    .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: 0.03em; vertical-align: middle; }
+    .b-actor    { background: #e0e7ff; color: var(--info); }
+    .b-system   { background: #fee2e2; color: var(--danger); }
+    .b-tenant   { background: #dcfce7; color: var(--ok); }
+    .b-gm       { background: var(--brand-100); color: var(--brand-800); }
+    .b-new      { background: #fef9c3; color: #854d0e; }
+    .step-list { counter-reset: step; padding-left: 0; list-style: none; margin-bottom: 0; }
+    .step-list > li { counter-increment: step; position: relative; padding: 10px 0 10px 50px; border-bottom: 1px dashed var(--brand-100); }
+    .step-list > li:last-child { border-bottom: none; }
+    .step-list > li::before {
+        content: counter(step);
+        position: absolute; left: 0; top: 10px;
+        width: 32px; height: 32px;
+        background: var(--brand-700); color: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 13px;
+    }
+    .step-list .who { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .who-gm { background: var(--brand-100); color: var(--brand-800); }
+    .who-tn { background: #dcfce7; color: var(--ok); }
+    .who-sy { background: #fef9c3; color: #854d0e; }
+    .who-pu { background: #e0e7ff; color: var(--info); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+    table th { text-align: left; padding: 10px 12px; background: var(--brand-900); color: white; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+    table td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    table tr:hover { background: var(--brand-50); }
+    .callout { border-left: 4px solid; padding: 12px 16px; border-radius: 4px; margin: 16px 0; background: white; }
+    .callout.info { border-color: var(--info); background: #eff6ff; }
+    .callout.warn { border-color: var(--warn); background: #fffbeb; }
+    .callout.danger { border-color: var(--danger); background: #fef2f2; }
+    .callout.ok { border-color: var(--ok); background: #f0fdf4; }
+    .callout strong { color: inherit; }
+    .file-path { font-family: 'Fira Code', Consolas, monospace; font-size: 0.85em; color: var(--brand-700); }
+    .footnote { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+    .ascii { font-family: 'Fira Code', Consolas, monospace; white-space: pre; background: var(--brand-950); color: #e8ddc8; padding: 18px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+    @media (max-width: 900px) {
+        .wrap { grid-template-columns: 1fr; }
+        nav.toc { position: static; height: auto; }
+        main { padding: 24px; }
+        .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc">
+    <div class="brand">Citiescapes</div>
+    <div class="brand-sub">Flows Guide</div>
+
+    <h2>Foundation</h2>
+    <a href="#overview">System overview</a>
+    <a href="#actors">Actors &amp; roles</a>
+    <a href="#data">Data model at a glance</a>
+
+    <h2>Subsystem flows</h2>
+    <a href="#ss1">SS1 — Rooms</a>
+    <a href="#ss2">SS2 — Tenants</a>
+    <a href="#ss3">SS3 — Billing</a>
+    <a href="#ss4">SS4 — Contracts</a>
+    <a href="#ss5">SS5 — Archive</a>
+    <a href="#ss6">SS6 — Authentication</a>
+    <a href="#ss7">SS7 — Communications</a>
+
+    <h2>End-to-end stories</h2>
+    <a href="#story-onboard">New tenant move-in</a>
+    <a href="#story-monthly">Monthly billing cycle</a>
+    <a href="#story-renewal">Lease renewal</a>
+    <a href="#story-arrears">Arrears &amp; eviction</a>
+    <a href="#story-scan">Tenant requests scan</a>
+    <a href="#story-maintenance">Room needs maintenance</a>
+
+    <h2>Operational</h2>
+    <a href="#automation">Automation (schedulers)</a>
+    <a href="#recent">Recent additions</a>
+    <a href="#gotchas">Gotchas &amp; conventions</a>
+</nav>
+
+<main>
+    <h1>Citiescapes — System Flows Guide</h1>
+    <p class="lede">
+        This document describes every business flow in the Citiescapes Apartment Rental Management System,
+        organised by subsystem and end-to-end scenario. It is the canonical "how the system actually works
+        when you click a button" reference — read this alongside the use-case diagrams
+        (<a href="use_cases_all_subsystems.html"><code>use_cases_all_subsystems.html</code></a>) and the event tables
+        (<a href="EVENT_TABLES_REVISED.txt"><code>EVENT_TABLES_REVISED.txt</code></a>).
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="overview">System overview</h2>
+    <p>
+        Citiescapes is a Laravel 11 + Livewire 3 + MySQL apartment rental platform. It is structured as
+        seven subsystems (<strong>SS1 – SS7</strong>) that share one database and one authenticated session,
+        but are kept logically isolated so each can be reasoned about, tested, and audited independently.
+    </p>
+
+    <div class="grid-2">
+        <div class="card">
+            <h4>What the system manages</h4>
+            <ul>
+                <li>A fixed inventory of <strong>22 rooms</strong> across 3 floors (compact / spacious).</li>
+                <li>Tenant accounts and their lease contracts.</li>
+                <li>Monthly billing, utility charges, penalties, and payments.</li>
+                <li>Public room listings + inquiries from prospective tenants.</li>
+                <li>An archive of every terminated, expired, deleted, or restored record.</li>
+                <li>An audit log of every state-changing action across all subsystems.</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>What the system does not manage</h4>
+            <ul>
+                <li>Physical building maintenance work-orders (it tracks requests, not work).</li>
+                <li>Legal eviction process — the software flags it, the GM acts in real life.</li>
+                <li>Tax accounting, bookkeeping, or formal financial reports.</li>
+                <li>Multi-property portfolios — one deployment = one building.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="actors">Actors &amp; roles</h2>
+    <table>
+        <thead><tr><th>Role</th><th>Who</th><th>Authentication</th><th>Capability</th></tr></thead>
+        <tbody>
+        <tr>
+            <td><span class="badge b-gm">GM</span></td>
+            <td>General Manager</td>
+            <td>Email + password, full admin access</td>
+            <td>Full CRUD on rooms, tenants, contracts, bills. Approves scan access. Sees audit log.</td>
+        </tr>
+        <tr>
+            <td><span class="badge b-tenant">Tenant</span></td>
+            <td>Apartment occupant</td>
+            <td>Email + GM-issued temp password, OTP-protected on first login</td>
+            <td>Views own bills + contract, submits requests, requests scan access, acknowledges contract.</td>
+        </tr>
+        <tr>
+            <td><span class="badge b-actor">Public visitor</span></td>
+            <td>Prospective tenant (no account)</td>
+            <td>None</td>
+            <td>Browses the public room listings, submits an inquiry through a contact form.</td>
+        </tr>
+        <tr>
+            <td><span class="badge b-system">System</span></td>
+            <td>Laravel scheduler (cron)</td>
+            <td>n/a — runs as job</td>
+            <td>
+                Daily: applies penalties, advances bill statuses, auto-archives expired contracts,
+                sends 30/7-day lease-expiry warnings.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="data">Data model at a glance</h2>
+    <p>
+        The seven subsystems hang off these main tables. Read it top-down: <strong>rooms</strong> hold
+        physical inventory; <strong>users</strong> are people; <strong>contracts</strong> bind a user to a
+        room for a period; everything financial and communicative attaches to a contract.
+    </p>
+    <div class="ascii">
+rooms ◄────────────────── contracts ───────────────► users (role=tenant)
+  ▲                         │  │  │                        │
+  │                         │  │  └─► initial_payments     │
+  │                         │  └────► bills ──► payments   │
+  │                         │             └► penalty_overrides
+  │                         └────► (scan_view_status approval flow)
+  │
+  │            announcements ─────────────► users (role=tenant or all)
+  │            tenant_requests ───────────► users (tenant submits, GM responds)
+  │            inquiries ───────────────► (public submits, GM replies via email)
+  │            archives ◄── (any subsystem can archive its records here)
+  │            audit_logs ◄── (every state change writes here)
+  │            system_settings ─► (e.g. room_type_cards JSON for public landing page)
+  │            notification_logs ─► (in-app bell)
+  └── (room.current_tenant_id → users.id when occupied)
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SS1 ROOMS                                                       -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss1">SS1 — Room Operations</h2>
+    <p>Manages the physical inventory and the public-facing room-type cards.</p>
+
+    <h3>What lives here</h3>
+    <ul>
+        <li><span class="file-path">app/Livewire/Admin/Rooms/RoomManager.php</span> — admin CRUD on rooms + the Public Room Type Cards editor.</li>
+        <li><span class="file-path">app/Livewire/Admin/Rooms/InquiryManager.php</span> — public-inquiry inbox.</li>
+        <li><span class="file-path">app/Livewire/Public/RoomListings.php</span> — the public website's room browser.</li>
+    </ul>
+
+    <h3>Flow A: GM updates a room</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Navigates to <em>Room Management</em>, clicks <strong>Edit</strong> on a room row.</li>
+        <li><span class="who who-gm">GM</span> Adjusts rate, max occupants, description, amenities; saves.</li>
+        <li><span class="who who-sy">System</span> Updates the row, writes <code>room_updated</code> to audit log (SS1).</li>
+        <li><span class="who who-pu">Public</span> Next visit to the public listings shows the new data immediately.</li>
+    </ol>
+
+    <h3>Flow B: GM changes room status</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Status ▾</strong> on a room row.</li>
+        <li><span class="who who-sy">System</span> If the room has <code>current_tenant_id</code> set, the dropdown is <strong>locked</strong>. An occupied room stays occupied — maintenance happens in-place via a tenant request (SS7 Flow B), not by flipping the room's status.</li>
+        <li><span class="who who-gm">GM</span> Picks <em>Available / Occupied / Maintenance</em> (only available when the room is empty).</li>
+        <li><span class="who who-sy">System</span> Writes <code>room_status_change</code> to audit log with old→new.</li>
+    </ol>
+
+    <div class="callout info">
+        <strong>Design note — why no Transfer Tenant action.</strong>
+        An earlier draft of this system included a "Transfer Tenant" action that moved a tenant to
+        another available room so the original could go on maintenance. That feature was removed
+        because it broke at full occupancy (no destination room to move to) and added contract-state
+        complexity for a scenario that's better served by in-place maintenance. The correct flow is:
+        the tenant submits a request describing the issue (SS7), the GM coordinates the fix with the
+        tenant in residence, the room status stays <code>occupied</code> the whole time. The maintenance
+        work is tracked by the request's status (<em>pending → in progress → resolved</em>), not by the
+        room's status field.
+    </div>
+
+    <h3>Flow C: GM edits Public Room Type Cards</h3>
+    <p>These are the two cards (Compact / Spacious) shown on the public landing page. They live as a JSON blob in <code>system_settings.room_type_cards</code>.</p>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Edit Public Room Cards</strong> → modal opens.</li>
+        <li><span class="who who-gm">GM</span> Edits title, subtitle, default price, max occupants, amenity chips, photos.</li>
+        <li><span class="who who-gm">GM</span> To replace a photo, clicks <strong>Choose</strong> or <strong>Replace</strong>; file picker opens; tenant selects a JPG/PNG/WebP from disk.</li>
+        <li><span class="who who-sy">System</span> Uploads via the patched Livewire upload route (<span class="file-path">app/Http/Controllers/PatchedLivewireUploadController.php</span>) — fixes a Windows/Laragon <code>realpath</code> bug that breaks the default upload.</li>
+        <li><span class="who who-sy">System</span> Stores the file under <span class="file-path">storage/app/public/room-type-cards/</span> and writes the URL into the JSON.</li>
+        <li><span class="who who-gm">GM</span> Clicks <strong>Save Public Cards</strong>; <code>room_cards_updated</code> goes to audit log.</li>
+    </ol>
+
+    <h3>Flow D: Public visitor submits an inquiry</h3>
+    <ol class="step-list">
+        <li><span class="who who-pu">Public</span> Fills the inquiry form on the public room listing page.</li>
+        <li><span class="who who-sy">System</span> Creates an <code>inquiries</code> row with status <code>pending</code>.</li>
+        <li><span class="who who-sy">System</span> Notifies all active GMs via in-app bell + email.</li>
+        <li><span class="who who-gm">GM</span> Opens <em>Inquiry Log</em>, clicks <strong>Email Reply</strong>, types a response.</li>
+        <li><span class="who who-sy">System</span> Sends the email and flips the inquiry to <code>responded</code>. GM can later <strong>Close</strong> it.</li>
+    </ol>
+
+    <h3>Flow E: Archive Room (Clear Tenancy) <span class="badge b-new">CHANGED 2026-05-20</span></h3>
+    <p>
+        Clicking <em>Archive</em> on a room no longer removes the room from inventory.
+        It now ends the current tenancy and resets the room to default available state,
+        archiving the tenant + their contract along the way.
+    </p>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> On a room row, clicks the red-outlined <strong>Archive</strong> pill (with confirmation prompt — copy varies based on whether the room is occupied).</li>
+        <li><span class="who who-sy">System</span> Always: snapshots the room's current state into <code>archives</code> (record_type = <code>room</code>, source_subsystem = <code>SS1</code>).</li>
+        <li>
+            <span class="who who-sy">System</span> If a tenant was occupying the room:
+            <ul>
+                <li>Snapshots the tenant account into <code>archives</code> (record_type = <code>tenant_account</code>, source_subsystem = <code>SS2</code>), flips the user to <code>archived</code> with <code>archived_at</code> + <code>archived_by</code> stamped.</li>
+                <li>Finds the active contract bound to this tenant + room, sets it to <code>terminated</code> with a reason citing the room clear-out, snapshots it into <code>archives</code> (record_type = <code>contract</code>, source_subsystem = <code>SS4</code>, scan path preserved).</li>
+            </ul>
+        </li>
+        <li><span class="who who-sy">System</span> Resets the room row: <code>current_tenant_id = null</code>, <code>status = available</code>, <code>last_status_update = now</code>. The room <em>itself</em> stays in inventory with the same id, room_number, floor, type, rate, amenities — it is immediately editable and can be re-occupied.</li>
+        <li><span class="who who-sy">System</span> Writes a single <em>room_cleared</em> audit-log entry summarising who was archived, contract id, and reason.</li>
+    </ol>
+    <div class="callout info">
+        <strong>Why this changed.</strong> Previously, "Archive Room" soft-deleted the room itself — which conflated "tenant moved out" with "we're decommissioning this room". In a building with 22 fixed rooms, you essentially never want to soft-delete a room; you want to clean it up between tenants. The <em>Permanently Delete Room</em> button still exists for the rare case where a room actually leaves the inventory (e.g. renovation merged two rooms into one).
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- SS2 TENANTS                                                     -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss2">SS2 — Tenant Management</h2>
+    <p>Creating tenant accounts, archiving them, and providing the tenant their first password.</p>
+
+    <h3>Flow: GM creates a tenant account</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Tenant Management → + Create Tenant</em>; enters full name + email.</li>
+        <li><span class="who who-sy">System</span> Generates a random 10-character temp password, creates the user with role <code>tenant</code>, status <code>pending_activation</code>, and <code>must_change_password = true</code>.</li>
+        <li><span class="who who-sy">System</span> Emails the temp password to the tenant (<span class="file-path">app/Mail/TempPasswordMail.php</span>).</li>
+        <li><span class="who who-tn">Tenant</span> Logs in, OTP is enforced, then is required to change password (SS6 takes over here).</li>
+    </ol>
+
+    <h3>Flow: GM archives a tenant</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Archive</strong> on a tenant row.</li>
+        <li><span class="who who-sy">System</span> Creates an <code>archives</code> row of type <code>tenant_account</code> with reason "Tenant record archived by management", sets the user's status to <code>archived</code>.</li>
+        <li>From the Archive page (SS5), the GM can <strong>Restore</strong> to bring the tenant back to active, or <strong>Delete Permanently</strong>.</li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <!-- SS3 BILLING                                                     -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss3">SS3 — Billing &amp; Collections</h2>
+    <p>The most operationally important subsystem. Initial fees, monthly bills, payments, penalties, partial payments, and arrears handling.</p>
+
+    <h3>Flow A: Recording the initial (move-in) payment</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Billing → Record Initial Fees</em>.</li>
+        <li><span class="who who-gm">GM</span> Picks a contract that's awaiting initial payment.</li>
+        <li><span class="who who-sy">System</span> Auto-fills deposit + first month rent + key fee + amenity totals from the contract (SS4).</li>
+        <li><span class="who who-gm">GM</span> Selects payment method (cash / bank transfer / e-wallet) + optional reference, submits.</li>
+        <li><span class="who who-sy">System</span> Creates an <code>initial_payments</code> row, audit-logs <code>initial_payment_recorded</code>.</li>
+        <li><span class="who who-tn">Tenant</span> Sees the receipt on their <em>My Bills</em> page.</li>
+    </ol>
+
+    <h3>Flow B: Generating a monthly bill</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Billing → Generate Monthly Bill</em>.</li>
+        <li><span class="who who-gm">GM</span> Picks a contract, enters electricity / water / wifi usage.</li>
+        <li><span class="who who-sy">System</span> Creates a <code>bills</code> row with <code>type = monthly</code>, billing period = current month, due date = end of month, status <code>unpaid</code>.</li>
+    </ol>
+
+    <h3>Flow C: Confirming payment (full or partial)</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Confirm Pay</strong> on an unpaid bill, enters amount + method.</li>
+        <li><span class="who who-sy">System</span> Creates a <code>payments</code> row.</li>
+        <li><span class="who who-sy">System</span> Recomputes the bill's balance (<code>Bill::balance</code> accessor = total − sum of payments).</li>
+        <li>
+            <span class="who who-sy">System</span>
+            <strong>If balance ≤ 0:</strong> flips status to <code>paid</code>, stamps <code>paid_at</code>, logs <code>payment_confirmed</code>.<br>
+            <strong>If balance &gt; 0:</strong> keeps existing status (eg. <code>eviction</code>), logs <code>payment_partial</code> with the new balance. <span class="badge b-new">NEW</span>
+        </li>
+    </ol>
+
+    <div class="callout info">
+        <strong>Partial-payment design note.</strong> Before the fix, the system flipped the bill to <code>paid</code>
+        regardless of amount — so a tenant in arrears could pay ₱100 of a ₱8 000 bill and the system would
+        mark it settled. Now, the bill remains in its prior status until the cumulative payments cover
+        <code>total_amount</code>. This matters most in delinquent / eviction states where multiple partials
+        are common.
+    </div>
+
+    <h3>Flow D: Daily penalty cascade (automated)</h3>
+    <p>Runs once per day via the Laravel scheduler.</p>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> <span class="file-path">app/Console/Commands/ApplyBillingPenalties.php</span> sweeps every unpaid bill.</li>
+        <li>
+            <span class="who who-sy">System</span> For each bill, computes <code>days_overdue</code> from <code>due_date</code> and steps the status:
+            <ul>
+                <li><strong>0 days:</strong> <code>unpaid</code></li>
+                <li><strong>1–3 days:</strong> <code>grace</code> (grace period, no penalty yet)</li>
+                <li><strong>4–14 days:</strong> <code>overdue</code> (penalty ₱100/day starts accruing)</li>
+                <li><strong>15–29 days:</strong> <code>delinquent</code></li>
+                <li><strong>30+ days:</strong> <code>eviction</code></li>
+            </ul>
+        </li>
+        <li><span class="who who-sy">System</span> Adds the day's penalty to <code>penalty_amount</code>, updates <code>total_amount</code>.</li>
+    </ol>
+
+    <h3>Flow E: GM overrides a penalty</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Override</strong> on a bill with a penalty.</li>
+        <li><span class="who who-gm">GM</span> Enters an adjusted penalty amount + written reason; saves.</li>
+        <li><span class="who who-sy">System</span> Creates a <code>penalty_overrides</code> row, updates the bill's penalty + total. Audit-logs <code>penalty_override</code>.</li>
+    </ol>
+
+    <h3>Flow F: Apply Deposit to Arrears <span class="badge b-new">NEW</span></h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> On a bill in <code>delinquent</code> or <code>eviction</code>, clicks <strong>Apply Deposit</strong>.</li>
+        <li><span class="who who-sy">System</span> Computes remaining deposit = <code>contract.deposit − contract.deposit_applied_amount</code>.</li>
+        <li><span class="who who-sy">System</span> Applies the smaller of (remaining deposit) or (bill balance), creates a <code>payments</code> row tagged <code>deposit_applied</code>, increments <code>deposit_applied_amount</code>, stamps <code>deposit_applied_at</code>.</li>
+        <li><span class="who who-sy">System</span> If this clears the balance, flips the bill to <code>paid</code>. Audit-logs <code>deposit_applied_to_bill</code>.</li>
+    </ol>
+
+    <h3>Flow G: Mark for Termination (eviction shortcut) <span class="badge b-new">NEW</span></h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> On a bill in <code>delinquent</code> or <code>eviction</code>, clicks <strong>Mark for Termination</strong>.</li>
+        <li><span class="who who-sy">System</span> Auto-fills a termination reason citing the bill, flips contract to <code>terminated</code>, archives the contract (SS5), archives the tenant, frees the room. Audit-logs <code>contract_terminated_arrears</code>.</li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <!-- SS4 CONTRACTS                                                   -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss4">SS4 — Contract &amp; Lease Management</h2>
+    <p>The legal binding between a tenant and a room. Drafts → activation → expiry → archive.</p>
+
+    <h3>Flow A: GM creates a contract draft</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Contract Management → + Create Draft</em>.</li>
+        <li><span class="who who-gm">GM</span> Picks tenant + room (rent auto-fills from room's rate), sets deposit, key fee, start/end dates, penalty rate, grace days, house rules.</li>
+        <li><span class="who who-gm">GM</span> Optionally adds requested amenities (one-time fees billed at move-in).</li>
+        <li><span class="who who-gm">GM</span> Uploads a scan of the signed contract (PDF / JPG / PNG / WebP / DOC / DOCX, max 10 MB).</li>
+        <li><span class="who who-sy">System</span> Saves contract with status <code>draft</code>.</li>
+    </ol>
+
+    <h3>Flow B: Tenant acknowledges the contract (2 steps)</h3>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> Opens <em>My Contract</em>.</li>
+        <li><span class="who who-tn">Tenant</span> <strong>Step 1:</strong> clicks "I have read and understood this contract" — stamps <code>step1_acknowledged_at</code>.</li>
+        <li><span class="who who-tn">Tenant</span> <strong>Step 2:</strong> clicks "I accept the penalty clause" — stamps <code>step2_acknowledged_at</code>, flips contract to <code>active</code>, stamps <code>activated_at</code>, links room to tenant.</li>
+        <li><span class="who who-sy">System</span> Audit-logs <code>contract_step1_ack</code> and <code>contract_step2_ack</code>.</li>
+    </ol>
+
+    <h3>Flow C: GM activates a contract directly</h3>
+    <p>Used when the tenant signs in-person and the GM wants to skip the portal-side acknowledgment.</p>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Activate</strong> on a draft contract.</li>
+        <li>
+            <span class="who who-sy">System</span> Guards:
+            <ul>
+                <li>Refuses if contract is not <code>draft</code>.</li>
+                <li>Refuses if the linked room is already occupied by another tenant.</li>
+                <li>Refuses if the signed contract scan has not been uploaded — the paper IS the legal document, so the GM must upload it before going live (<span class="badge b-new">NEW</span> guard).</li>
+            </ul>
+        </li>
+        <li>
+            <span class="who who-sy">System</span> Flips contract to <code>active</code>, marks the room <code>occupied</code> with <code>current_tenant_id</code>, promotes the tenant from <code>pending_activation</code> to <code>active</code>.
+        </li>
+        <li>
+            <span class="who who-sy">System</span> <span class="badge b-new">NEW</span> Auto-stamps <code>step1_acknowledged_at</code> and <code>step2_acknowledged_at</code> with the activation timestamp if they're empty. Path B happens when the tenant signed paper in person — the paper IS the agreement, so the digital acknowledgment fields are mirrored to keep the database state consistent. The audit-log entry distinguishes "GM-initiated activation (paper signed)" from "GM-initiated activation after tenant in-portal acknowledgment", so a future reader can tell which path was used.
+        </li>
+    </ol>
+
+    <h3>Flow D: Contract scan view approval <span class="badge b-new">NEW</span></h3>
+    <p>For security, tenants cannot view the signed contract scan without explicit GM approval.</p>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> Opens <em>My Contract</em>, sees the scan area locked with a "Request access" button.</li>
+        <li><span class="who who-tn">Tenant</span> Clicks <strong>Request access</strong>; contract's <code>scan_view_status</code> becomes <code>pending</code>.</li>
+        <li><span class="who who-gm">GM</span> Sees a "Tenant requested access" badge on the Contracts page. Clicks <strong>Approve</strong> or <strong>Deny</strong> (deny requires a reason).</li>
+        <li><span class="who who-sy">System</span> Stamps <code>scan_view_decided_at</code>, <code>scan_view_decided_by</code>.</li>
+        <li>
+            <span class="who who-tn">Tenant</span> Refreshes My Contract:
+            <ul>
+                <li><strong>Approved</strong> → scan loads inline (PDF in iframe, image inline, .doc/.docx as a download button).</li>
+                <li><strong>Denied</strong> → sees reason + "Request again" button.</li>
+            </ul>
+        </li>
+        <li>GM can later <strong>Revoke</strong>, returning the contract to no-access state.</li>
+    </ol>
+
+    <h3>Flow E: Renewal</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Renew</strong> on an active contract.</li>
+        <li><span class="who who-sy">System</span> Archives the old contract to SS5 with reason "Renewed — old contract archived", flips its status to <code>expired</code>.</li>
+        <li><span class="who who-sy">System</span> Pre-fills a new draft with the same tenant, room, terms, but start date = day after old end date.</li>
+        <li><span class="who who-gm">GM</span> Reviews the draft, makes any changes (e.g., rate increase), saves. Then activates as in Flow C.</li>
+    </ol>
+
+    <h3>Flow F: Termination (early end)</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Terminate</strong> on an active contract, enters reason.</li>
+        <li><span class="who who-sy">System</span> Flips contract to <code>terminated</code>, archives to SS5, archives the tenant, frees the room.</li>
+    </ol>
+
+    <h3>Flow G: Auto-archive on expiry (automated)</h3>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> <span class="file-path">app/Console/Commands/AutoArchiveExpiredContracts.php</span> runs daily.</li>
+        <li><span class="who who-sy">System</span> For every contract where <code>end_date &lt; today</code> and status is still <code>active</code>, archives it with reason "Auto-archived — lease end date passed" and flips it to <code>expired</code>.</li>
+    </ol>
+
+    <h3>Flow H: Lease-expiry warnings (automated)</h3>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> Daily, for every active contract <strong>30 days</strong> from end_date (one-time), sends a warning email + bell to the tenant and flips <code>warning_30_sent = true</code>.</li>
+        <li><span class="who who-sy">System</span> Same for the <strong>7-day</strong> mark with <code>warning_7_sent</code>.</li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <!-- SS5 ARCHIVE                                                     -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss5">SS5 — Report and Archive Management</h2>
+    <p>Every other subsystem pushes records here when something gets terminated, expired, or removed. SS5 is read-only at the row level — modifications happen at the source subsystem.</p>
+
+    <h3>Flow A: Browsing the archive</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Archive</em>. Filters by <strong>Type</strong> (room / tenant / payment / contract) and <strong>Source</strong> (SS1–SS4). Date-range filter available.</li>
+        <li><span class="who who-gm">GM</span> Universal search across reason, type, source, date.</li>
+    </ol>
+
+    <h3>Flow B: Export</h3>
+    <ul>
+        <li><strong>Export CSV</strong> — streams a UTF-8 CSV of the filtered list. Audit-logged.</li>
+        <li><strong>PDF</strong> button (per archived contract) — generates a printable PDF (<span class="file-path">resources/views/pdf/archived-contract.blade.php</span>) with all contract fields + a reference to the stored scan.</li>
+    </ul>
+
+    <h3>Flow C: Restore (tenant accounts only)</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> On a <code>tenant_account</code> archive row, clicks <strong>Restore</strong> (the button is shown <em>only</em> for that record type).</li>
+        <li><span class="who who-sy">System</span> Re-activates the user — status back to <code>active</code>, clears <code>archived_at</code> / <code>archived_by</code> — so the tenant can log in again. Marks the archive row <code>restored = true</code> with <code>restored_at</code>. Audit-logs <code>record_restored</code>.</li>
+    </ol>
+    <div class="callout info">
+        <strong>Why restore is tenant-only.</strong> A tenant account is the one archive type where restoration is both <em>impactful</em> (a person regains access) and <em>safe</em> (just a status flip). Room archives are snapshots — the room itself was never deleted, so there's nothing to restore. Contract and payment archives are immutable historical records: un-terminating a contract or reviving a settled bill would collide with room occupancy and the penalty scheduler. Those rows have no Restore button and the controller rejects any attempt server-side. To revive a contract scenario, the GM creates a fresh draft (SS4) pre-filled from the archived data — which goes through the normal activation guards.
+    </div>
+
+    <h3>Flow D: Permanent delete</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> Clicks <strong>Delete Permanently</strong> (red, confirmation prompt).</li>
+        <li><span class="who who-sy">System</span> Hard-deletes the archive row. Audit-log retains the action via <code>record_permanently_deleted</code>.</li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <!-- SS6 AUTH                                                        -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss6">SS6 — User Access &amp; Authentication</h2>
+
+    <h3>Flow A: First-time login (tenant)</h3>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> Receives temp password via email (from SS2 Create Tenant flow).</li>
+        <li><span class="who who-tn">Tenant</span> Logs in on the public login page using email + temp password.</li>
+        <li><span class="who who-sy">System</span> Validates credentials, sends a 6-digit OTP to the tenant's email.</li>
+        <li><span class="who who-tn">Tenant</span> Enters OTP on the verification page.</li>
+        <li><span class="who who-sy">System</span> Because <code>must_change_password = true</code>, redirects to the Change Password page.</li>
+        <li><span class="who who-tn">Tenant</span> Sets a new password.</li>
+        <li><span class="who who-sy">System</span> Clears <code>must_change_password</code>, lands the tenant on the dashboard. Audit-logs <code>password_changed</code>.</li>
+    </ol>
+
+    <h3>Flow B: Lockout protection</h3>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> After <strong>5 failed login attempts</strong> within 15 minutes, locks the account.</li>
+        <li><span class="who who-sy">System</span> Lock auto-clears after <strong>15 minutes</strong>; the user can also reset by clicking "Forgot password".</li>
+        <li><span class="who who-sy">System</span> All failed attempts and lockouts go to the audit log.</li>
+    </ol>
+
+    <!-- ================================================================ -->
+    <!-- SS7 COMMS                                                       -->
+    <!-- ================================================================ -->
+    <h2 class="section" id="ss7">SS7 — Communications &amp; Notifications</h2>
+
+    <h3>Flow A: GM sends an announcement</h3>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> <em>Announcements → New Announcement</em>; types title + message, picks "All Active Tenants" or one specific tenant.</li>
+        <li><span class="who who-sy">System</span> Creates an <code>announcements</code> row. For each recipient: creates a <code>notification_logs</code> row (in-app bell) and sends an <code>AnnouncementMail</code>.</li>
+    </ol>
+
+    <h3>Flow B: Tenant submits a request or complaint</h3>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> <em>My Requests → New</em>; picks type (request / complaint), subject, body.</li>
+        <li><span class="who who-sy">System</span> Creates a <code>tenant_requests</code> row with status <code>pending</code>. Notifies all active GMs (bell + email).</li>
+        <li><span class="who who-gm">GM</span> <em>Tenant Requests</em>, opens the row, updates status (pending → in progress → resolved), writes a response.</li>
+        <li><span class="who who-sy">System</span> Sends response to tenant (bell + email). Once status is <code>resolved</code>, the request locks — no further edits.</li>
+    </ol>
+
+    <h3>Flow C: Payment-plan request <span class="badge b-new">NEW</span></h3>
+    <p>A specialised version of Flow B, triggered from the tenant billing page.</p>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> Has a bill in <code>delinquent</code> or <code>eviction</code>; sees red banner on <em>My Bills</em>.</li>
+        <li><span class="who who-tn">Tenant</span> Clicks <strong>Request payment plan</strong>.</li>
+        <li><span class="who who-sy">System</span> Guards against duplicates (one open request per bill).</li>
+        <li><span class="who who-sy">System</span> Creates a <code>tenant_requests</code> row with auto-filled subject "Payment difficulty — Bill #N (period)" and a body summarising the balance.</li>
+        <li><span class="who who-sy">System</span> Notifies all GMs (bell + email). Audit-logs <code>payment_plan_requested</code> under SS3.</li>
+        <li><span class="who who-gm">GM</span> Handles the request via SS7 Flow B's response interface, then takes action in SS3 (Override Penalty, Apply Deposit, or Confirm a partial payment).</li>
+    </ol>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="story-onboard">End-to-end: New tenant move-in</h2>
+    <div class="callout info">
+        Crosses <strong>SS2 → SS4 → SS6 → SS3</strong>. Time horizon: a few hours of clicking, then 24 hours for tenant to acknowledge.
+    </div>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> SS2: Creates tenant account → temp password email sent.</li>
+        <li><span class="who who-tn">Tenant</span> SS6: Logs in with temp password → OTP → sets new password.</li>
+        <li><span class="who who-gm">GM</span> SS4: Creates contract draft with tenant + chosen room, uploads signed scan.</li>
+        <li><span class="who who-tn">Tenant</span> SS4: My Contract page → Step 1 ack → Step 2 ack → contract auto-activates, room becomes occupied.</li>
+        <li><span class="who who-gm">GM</span> SS3: Records initial payment (deposit + first month + key fee + any amenities).</li>
+        <li><span class="who who-tn">Tenant</span> SS3: Sees the initial payment receipt on My Bills page.</li>
+    </ol>
+
+    <h2 class="section" id="story-monthly">End-to-end: Monthly billing cycle</h2>
+    <ol class="step-list">
+        <li><span class="who who-gm">GM</span> SS3: Generate Monthly Bill for the contract, entering utility usage.</li>
+        <li><span class="who who-tn">Tenant</span> SS3: Sees the new bill (status <code>unpaid</code>) with breakdown.</li>
+        <li><span class="who who-tn">Tenant</span> Pays the GM via the agreed method (cash / bank / e-wallet — outside the system).</li>
+        <li><span class="who who-gm">GM</span> SS3: Clicks Confirm Pay, enters amount + reference.</li>
+        <li><span class="who who-sy">System</span> Flips bill to <code>paid</code> if balance reached zero, otherwise keeps status and logs partial.</li>
+        <li><span class="who who-sy">System</span> If the due date passes without full payment, the daily scheduler advances the status through grace → overdue → delinquent → eviction, accruing penalty each day past grace.</li>
+    </ol>
+
+    <h2 class="section" id="story-renewal">End-to-end: Lease renewal</h2>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> Sends 30-day and 7-day warnings to the tenant.</li>
+        <li><span class="who who-gm">GM</span> SS4: Clicks Renew → old contract archived, new draft pre-filled with continuing dates.</li>
+        <li><span class="who who-gm">GM</span> Adjusts rate / amenities / scan if needed, uploads new signed scan, saves.</li>
+        <li><span class="who who-tn">Tenant</span> SS4: My Contract page now shows new draft → does Step 1 + Step 2 acknowledgment.</li>
+        <li><span class="who who-gm">GM</span> SS3: Records new initial payment if deposit/keys changed.</li>
+    </ol>
+
+    <h2 class="section" id="story-arrears">End-to-end: Arrears &amp; eviction <span class="badge b-new">NEW</span></h2>
+    <div class="callout danger">
+        Crosses <strong>SS3 → SS7 → SS4 → SS5</strong>. The most sensitive flow in the system; every step is audit-logged.
+    </div>
+    <ol class="step-list">
+        <li><span class="who who-sy">System</span> SS3 daily scheduler: bill misses due date → status advances over days from <code>grace</code> → <code>overdue</code> → <code>delinquent</code> → <code>eviction</code>. Penalty accrues from day 4.</li>
+        <li><span class="who who-tn">Tenant</span> SS3: Sees red banner on My Bills page once status hits <code>delinquent</code> or <code>eviction</code>.</li>
+        <li>
+            <span class="who who-tn">Tenant</span> Has three real-world options:
+            <ul>
+                <li><strong>Pay in full</strong> — pays GM, GM clicks Confirm Pay, bill closes.</li>
+                <li><strong>Partial pay + plan</strong> — pays what they can, then clicks <strong>Request payment plan</strong> (SS7 Flow C).</li>
+                <li><strong>Surrender</strong> — agrees to leave, GM applies deposit and terminates.</li>
+            </ul>
+        </li>
+        <li><span class="who who-gm">GM</span> Reviews the request in SS7, decides.</li>
+        <li>
+            <span class="who who-gm">GM</span> Possible SS3 actions:
+            <ul>
+                <li><strong>Override</strong> the penalty (lower it as a concession).</li>
+                <li><strong>Apply Deposit</strong> as a credit against the bill.</li>
+                <li>Accept a partial payment — bill stays open until balance reaches zero.</li>
+                <li><strong>Mark for Termination</strong> if the tenant won't or can't pay.</li>
+            </ul>
+        </li>
+        <li><span class="who who-sy">System</span> If Mark for Termination is used: contract → terminated, archived to SS5, tenant → archived, room → available. The cycle ends.</li>
+    </ol>
+
+    <h2 class="section" id="story-maintenance">End-to-end: Room needs maintenance while tenant is occupying it</h2>
+    <div class="callout info">
+        Crosses <strong>SS7 → SS1</strong>. Tenant stays in the room; the work happens with them in
+        residence. The contract is untouched and no rooms change occupancy.
+    </div>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> Notices a problem (leak, broken AC, electrical issue, etc.) and submits a Tenant Request via <em>My Requests → New</em> (SS7 Flow B). Type: <em>request</em>. Subject and body describe the issue.</li>
+        <li><span class="who who-sy">System</span> Creates a <code>tenant_requests</code> row, status <code>pending</code>. Notifies all active GMs (bell + email).</li>
+        <li><span class="who who-gm">GM</span> Opens <em>Tenant Requests</em>, reviews the issue, updates status to <code>in_progress</code>, writes initial notes (e.g. "Maintenance scheduled for Friday morning").</li>
+        <li><span class="who who-sy">System</span> Sends the GM's response to the tenant via bell + email.</li>
+        <li><span class="who who-gm">GM</span> Coordinates the repair: contacts contractor, schedules access, ensures tenant is available or has agreed to entry.</li>
+        <li>(Maintenance happens in real life. The room stays <code>occupied</code> the whole time; the room's status is not changed.)</li>
+        <li><span class="who who-gm">GM</span> Once verified the issue is resolved, updates the request to <code>resolved</code> with a final response (e.g. "Plumber replaced the valve, water restored, no further work needed.").</li>
+        <li><span class="who who-sy">System</span> Locks the request from further edits and sends the final response to the tenant. The audit log retains the full timeline (<code>tenant_request_submitted</code>, <code>tenant_request_status_change</code>, etc.).</li>
+    </ol>
+    <div class="callout warn">
+        <strong>Edge case — uninhabitable room.</strong> If the room becomes genuinely uninhabitable
+        (fire, structural failure, prolonged loss of water/power) and there is no available room to
+        move the tenant to, the GM should use <strong>SS4 Flow F (Terminate)</strong> with a reason
+        like "Room declared uninhabitable — early termination at GM discretion". The tenant has legal
+        grounds to break the lease in this case; refunds and re-housing happen outside the system.
+    </div>
+
+    <h2 class="section" id="story-scan">End-to-end: Tenant requests scan access <span class="badge b-new">NEW</span></h2>
+    <ol class="step-list">
+        <li><span class="who who-tn">Tenant</span> SS4 My Contract: scan viewer is locked with an "Approval required" message.</li>
+        <li><span class="who who-tn">Tenant</span> Clicks <strong>Request access</strong>.</li>
+        <li><span class="who who-sy">System</span> Sets <code>scan_view_status = pending</code>, stamps <code>scan_view_requested_at</code>.</li>
+        <li><span class="who who-gm">GM</span> SS4 Contracts page: sees the "Tenant requested access" badge. Clicks Approve or Deny.</li>
+        <li><span class="who who-sy">System</span> Records the decision, who decided, optional note.</li>
+        <li><span class="who who-tn">Tenant</span> Refreshes: sees the scan inline (if approved) or the denial reason + "Request again" button (if denied).</li>
+    </ol>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="automation">Automation (schedulers)</h2>
+    <p>The following Artisan commands are wired into the Laravel scheduler. They are the system's only "fully automatic" actors.</p>
+    <table>
+        <thead><tr><th>Command</th><th>Schedule</th><th>Effect</th></tr></thead>
+        <tbody>
+        <tr>
+            <td><code>billing:apply-penalties</code></td>
+            <td>Daily</td>
+            <td>Advances every unpaid bill's status by days overdue and accrues penalty (SS3 Flow D).</td>
+        </tr>
+        <tr>
+            <td><code>contracts:auto-archive</code></td>
+            <td>Daily</td>
+            <td>Expires + archives contracts past their <code>end_date</code> (SS4 Flow G).</td>
+        </tr>
+        <tr>
+            <td><code>contracts:send-warnings</code></td>
+            <td>Daily</td>
+            <td>Sends 30-day and 7-day lease-expiry warnings (SS4 Flow H).</td>
+        </tr>
+        <tr>
+            <td><code>room:sync-status</code></td>
+            <td>Hourly</td>
+            <td>Reconciles <code>rooms.status</code> with the actual presence of an active contract (defensive — catches drift).</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="recent">Recent additions (changelog)</h2>
+    <p>Changes since the system's CS12L baseline, ordered most-recent first.</p>
+
+    <h3>2026-05-19 — Maintenance design decision (no Transfer Tenant)</h3>
+    <ul>
+        <li>An earlier draft added a "Transfer Tenant" action that moved an occupying tenant to another available room so the original could go on maintenance. It was removed.</li>
+        <li><strong>Why removed:</strong> the feature broke at full occupancy (no destination room), added contract-state complexity, and duplicated work the existing tenant-request workflow already handles.</li>
+        <li><strong>Correct flow:</strong> tenant submits a Tenant Request (SS7), GM coordinates the fix in-place, room stays <code>occupied</code> the whole time. The request's status (<em>pending → in progress → resolved</em>) is the source of truth for the maintenance work.</li>
+        <li><strong>Edge case:</strong> if the room becomes uninhabitable, GM uses SS4 Terminate with reason "Room declared uninhabitable" — refunds happen outside the system.</li>
+    </ul>
+
+    <h3>2026-05-19 — Eviction &amp; arrears flow</h3>
+    <ul>
+        <li>Partial-payment aware <code>confirmPayment</code> — bills only flip to <code>paid</code> when the balance reaches zero.</li>
+        <li>New tenant action: <strong>Request payment plan</strong> from a red banner on My Bills (SS7 Flow C).</li>
+        <li>New GM action: <strong>Apply Deposit to Arrears</strong> (SS3 Flow F).</li>
+        <li>New GM action: <strong>Mark for Termination</strong> shortcut from a bill (SS3 Flow G).</li>
+        <li>Schema: <code>contracts.deposit_applied_amount</code> + <code>deposit_applied_at</code>.</li>
+    </ul>
+
+    <h3>2026-05-19 — UI/UX standardisation</h3>
+    <ul>
+        <li>All modals normalised to a single <code>.cs-modal</code> CSS class with full-viewport dim + clearance below the sticky header.</li>
+        <li>Filter dropdowns across every admin page replaced with horizontal rectangular brand-button bars (rounded-lg, active=filled, inactive=outlined).</li>
+        <li>All search inputs match across every visible column on their page, not just one or two fields.</li>
+        <li>Sidebar scrollbar restyled to brand colours, slim 8 px.</li>
+        <li>Page-enter animation moved to <code>main > *</code> and is opacity-only so <code>main</code> never becomes a containing block for fixed-positioned modals.</li>
+    </ul>
+
+    <h3>2026-05-19 — Contract scan access approval</h3>
+    <ul>
+        <li>Tenants must request GM approval before viewing the signed contract scan (SS4 Flow D).</li>
+        <li>Schema: <code>contracts.scan_view_status</code>, <code>scan_view_requested_at</code>, <code>scan_view_decided_at</code>, <code>scan_view_decided_by</code>, <code>scan_view_decision_note</code>.</li>
+        <li>Scan upload widened to accept .doc and .docx (10 MB cap); .docx renders as a download button on the tenant side.</li>
+    </ul>
+
+    <h3>2026-05-20 — Final compiled revision</h3>
+    <ul>
+        <li><strong>Restore restricted to tenant accounts.</strong> The Restore button now appears only on <code>tenant_account</code> archive rows; room/contract/payment archives are immutable snapshots. The controller rejects any restore attempt on a non-tenant type.</li>
+        <li><strong>Empty-data export guards.</strong> Archive CSV and Audit-Log CSV exports now refuse to run when the filtered result set is empty — a flash error is shown instead of streaming a header-only file. No audit row is written for a refused export.</li>
+        <li><strong>System-wide validation hardening.</strong> Every create/update/action form has explicit required-field rules with human-readable messages, inline <code>@error</code> displays, red-ring error states, and loading states on submit buttons.</li>
+        <li><strong>Cross-database dashboard query.</strong> The revenue-by-month chart no longer uses the MySQL-only <code>DATE_FORMAT</code> — it groups in PHP, so the dashboard renders on both MySQL (production) and SQLite (tests).</li>
+        <li><strong>Test suite: 273 passing, 0 failing, 0 pending.</strong> All BBT + WBT cases updated to match the finalized behavior.</li>
+    </ul>
+
+    <h3>2026-05-20 — Archive Room behavior changed (SS1 Flow E)</h3>
+    <ul>
+        <li><strong>Behavior change:</strong> "Archive" on a room used to soft-delete the room. It now ends the current tenancy and resets the room to available, keeping the room in inventory.</li>
+        <li>The room snapshot, the tenant account, and the active contract all get archived (record_type = <code>room</code> / <code>tenant_account</code> / <code>contract</code>).</li>
+        <li>The room itself stays — same id, room number, floor, rate, amenities — immediately editable and ready to be re-occupied.</li>
+        <li>Audit-log action renamed from <code>room_archived</code> to <code>room_cleared</code> to reflect the new semantic.</li>
+        <li>Confirm prompt copy is dynamic: occupied rooms get a "Clear this room?" message; empty rooms get a "Snapshot this room's state?" message.</li>
+        <li><strong>Permanently Delete Room</strong> still exists for the rare case where a room actually leaves the inventory.</li>
+        <li>Test <code>BBT_SS1_ROOM_ARCHIVE</code> updated to match the new behavior — verifies room stays present and is reset to available.</li>
+    </ul>
+
+    <h3>2026-05-20 — Type hint hardening</h3>
+    <ul>
+        <li>Added PHPDoc <code>@property</code> declarations to the <code>Contract</code> and <code>Room</code> models so the static analyzer knows date fields are Carbon instances. Eliminates the <em>"Call to unknown method: date::format()"</em> / <em>addDay()</em> / <em>addYear()</em> hints.</li>
+        <li>Added <code>/rooms/{type}</code> route binding the previously-orphaned <code>RoomTypeDetail</code> Livewire component (type constrained to <code>compact</code> or <code>spacious</code>). Closes the documentation-vs-actual-routes mismatch and prevents a 404 if anyone follows that path from the public listing.</li>
+    </ul>
+
+    <h3>2026-05-20 — GM activation hardening</h3>
+    <ul>
+        <li>GM <strong>Activate</strong> now refuses if the signed contract scan hasn't been uploaded — the paper IS the legal contract, so it must be on file before going live.</li>
+        <li>When the GM activates without a tenant in-portal acknowledgment, the system auto-stamps <code>step1_acknowledged_at</code> and <code>step2_acknowledged_at</code> with the activation time. The database state stays consistent and the audit-log entry distinguishes the two paths so a future reader can tell which one was used.</li>
+    </ul>
+
+    <h3>2026-05-19 — Room status lock + activation guards</h3>
+    <ul>
+        <li>Room status cannot change to <code>maintenance</code> or <code>available</code> while a tenant is occupying it (SS1 Flow B).</li>
+        <li>Contract activation guards against non-draft status and conflicting room occupancy (SS4 Flow C).</li>
+        <li>Activation auto-promotes <code>pending_activation</code> tenants to <code>active</code>.</li>
+    </ul>
+
+    <h3>2026-05-19 — Photo upload fix</h3>
+    <ul>
+        <li>Added <span class="file-path">app/Http/Controllers/PatchedLivewireUploadController.php</span> that overrides Livewire's upload route. Uses <code>getPathname()</code> instead of <code>getRealPath()</code> to work around a Windows / Laragon temp-file bug.</li>
+        <li>Created <span class="file-path">storage/app/private/livewire-tmp/</span> (the right dir for Laravel 11 default disk).</li>
+        <li>Photo upload limit raised to 25 MB.</li>
+        <li>Public Room Type Cards photo loader fixed — admin deletions and replacements now persist instead of being grafted back from defaults.</li>
+    </ul>
+
+    <h3>2026-05-19 — Removed dead UI</h3>
+    <ul>
+        <li>Removed the unused "Archive Bills on Lease End" function (was unwired, broken).</li>
+        <li>Removed the "Export Excel" archive button (CSV is enough; less library footprint).</li>
+        <li>Removed the "Create Room" button (rooms are fixed inventory; <code>create()</code> kept in controller as a recovery escape hatch only).</li>
+        <li>Removed Photo field from the Edit Room form (room cards manage the public-facing photos).</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2 class="section" id="gotchas">Gotchas &amp; conventions</h2>
+
+    <ul>
+        <li>
+            <strong>Soft-delete vs archive vs hard-delete.</strong> Contracts and bills use Laravel soft-deletes for accidental-undo. The <em>archive</em> action does a different thing — it copies a snapshot into <code>archives</code> for historical reference. "Permanently delete" from the Archive page is the only operation that truly removes data.
+        </li>
+        <li>
+            <strong>Audit log is append-only.</strong> Every state-changing controller action writes one row to <code>audit_logs</code>. Never edit or delete these rows — they are the system's compliance record. Filter is by Subsystem (Room / Tenant / Billing / Contract / Archive / Settings / Communications), not raw "SS1" codes.
+        </li>
+        <li>
+            <strong>The GM is one person.</strong> The role is named "General Manager" but the system makes no distinction between multiple GM accounts. Notifications fan out to "all active GMs" wherever applicable.
+        </li>
+        <li>
+            <strong>"System" in audit log = scheduler.</strong> Any audit_logs row with <code>user_id = null</code> was written by an automated command, not a person.
+        </li>
+        <li>
+            <strong>Public site re-renders live.</strong> The public room listings page reads from <code>system_settings.room_type_cards</code> on every request. There is no static cache to invalidate — saving the cards editor is immediately visible to visitors.
+        </li>
+        <li>
+            <strong>Auto-archive vs Terminate.</strong> Auto-archive is for the <em>natural</em> end of a lease (it ran its course). Terminate is for <em>early</em> end (tenant left, eviction, mutual cancellation). They use the same archive sink but capture different reasons.
+        </li>
+        <li>
+            <strong>Partial payments and eviction.</strong> A tenant in eviction can still make payments — the bill stays in <code>eviction</code> status until the balance reaches zero. The GM has to decide whether the partial restores their good standing (none of the auto-status code reverses on its own; the next daily scheduler tick will just check overdue again).
+        </li>
+    </ul>
+
+    <p class="footnote" style="margin-top: 60px;">
+        — End of guide. For the formal use-case diagrams, open
+        <a href="use_cases_all_subsystems.html"><code>use_cases_all_subsystems.html</code></a>.
+        For the testing plan, see
+        <a href="black_box_testing_all_subsystems.html"><code>black_box_testing_all_subsystems.html</code></a>
+        and <a href="white_box_testing_all_subsystems.html"><code>white_box_testing_all_subsystems.html</code></a>.
+    </p>
+</main>
+
+</div>
+</body>
+</html>

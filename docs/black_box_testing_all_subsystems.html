@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Citiescapes — Black-Box Testing (Functional Test Case Specification)</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        color: #000;
+        background: #fff;
+        margin: 0;
+        padding: 32px 40px 64px;
+        line-height: 1.4;
+    }
+    h1.doc-title { font-size: 20px; margin: 0 0 4px; }
+    p.doc-sub { font-size: 12px; color: #333; margin: 0 0 24px; }
+
+    /* Module header block — mirrors the reference PDF */
+    table.meta {
+        border-collapse: collapse;
+        width: 760px;
+        margin: 40px 0 6px;
+    }
+    table.meta td {
+        border: 1px solid #000;
+        padding: 4px 8px;
+        vertical-align: top;
+        font-size: 12px;
+    }
+    table.meta td.label { font-weight: bold; width: 150px; }
+    table.meta td.value { font-weight: bold; }
+    .course-line { font-size: 11px; font-weight: bold; margin: 2px 0 0; }
+    .milestone-line { font-size: 11px; margin: 2px 0 14px; }
+    .summary-head { font-size: 12px; font-weight: bold; margin: 14px 0 8px; }
+
+    /* Test case table — 5-column reference layout */
+    table.tc {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 0 0 40px;
+    }
+    table.tc th, table.tc td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        vertical-align: top;
+        font-size: 11.5px;
+    }
+    table.tc thead th {
+        background: #cfcfcf;
+        text-align: center;
+        font-weight: bold;
+    }
+    table.tc th.c-scn { width: 24%; }
+    table.tc th.c-exp { width: 27%; }
+    table.tc th.c-act { width: 27%; }
+    table.tc th.c-res { width: 11%; }
+    table.tc th.c-tak { width: 11%; }
+    table.tc td.res { text-align: center; font-weight: bold; }
+    .passed { color: #1a7a1a; }
+    .scn-feat { font-weight: bold; }
+    .toc { margin: 16px 0 8px; font-size: 12px; }
+    .toc a { color: #00529b; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .legend { font-size: 11px; color: #333; margin: 6px 0 26px; }
+    @media print { body { padding: 0; } table.meta, table.tc { page-break-inside: auto; } tr { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1 class="doc-title">Black-Box Testing — Functional Test Case Specification</h1>
+<p class="doc-sub">Citiescapes Apartment Rental Management System · CS12L Major Project · Final Compiled Revision (2026-05-20)</p>
+
+<div class="toc">
+    <strong>Modules:</strong>
+    <a href="#m1">SS1 Room Operations</a> ·
+    <a href="#m2">SS2 Tenant Management</a> ·
+    <a href="#m3">SS3 Billing &amp; Collections</a> ·
+    <a href="#m4">SS4 Contract &amp; Lease Management</a> ·
+    <a href="#m5">SS5 Report &amp; Archive Management</a> ·
+    <a href="#m6">SS6 User Access &amp; Authentication</a> ·
+    <a href="#m7">SS7 Communications &amp; Notifications</a> ·
+    <a href="#m8">HTTP Responses &amp; Error Handling</a>
+</div>
+<p class="legend">
+    <strong>Test Result</strong> — Passed = scenario executed and verified against the running system (paired with an automated PHPUnit test where applicable).
+    Final run (2026-05-24): <strong>270 passed, 0 failed, 1 skipped</strong>. The skipped case is <code>BBT_HTTP_010</code> (POST without CSRF token returns 419) — Laravel&rsquo;s <code>VerifyCsrfToken</code> short-circuits via <code>runningUnitTests()</code> so the framework prevents PHPUnit from observing real 419 behaviour; CSRF enforcement itself is unchanged in production and verified by manual browser test.
+</p>
+
+<!-- ============================== SS1 ============================== -->
+<table class="meta" id="m1">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS1 — Room Operations</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Edit Room:</span> Append new photos / change amenities on an existing room.</td><td>Photos merged; <em>room_updated</em> audit row written; last_updated_by stamped.</td><td>Photos merged; audit row created; stamped.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Room:</span> Update an existing room's rate, max occupants and amenities.</td><td>Row updated; landing-page chips reflect the changes.</td><td>Row updated; chips reflected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Room:</span> Can't save if max occupants exceeds the limit (15 &gt; max 10).</td><td>Validation error displayed; row unchanged.</td><td>Validation error displayed; row unchanged.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Room Status:</span> Change an Available room to Under Maintenance.</td><td>Status flipped; timestamp + GM id stamped; <em>room_status_change</em> audited.</td><td>Status flipped; stamped; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Room Status:</span> Can't change status while a tenant occupies the room.</td><td>Change blocked; room stays Occupied with its tenant; flash error shown.</td><td>Change blocked; room unchanged.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Room Status:</span> Can't set a status outside the allowed set (e.g. "sold").</td><td>Validation rejects the value; status unchanged.</td><td>Validation rejected; status unchanged.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Public Room Cards:</span> Change price, add an amenity chip, and save.</td><td>JSON persisted; <em>room_cards_updated</em> audited; landing page reflects the chip.</td><td>Persisted; audited; landing page updated.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Public Room Cards:</span> Upload a valid JPG image to a card photo slot.</td><td>Stored under storage/app/public/room-type-cards/; URL written to the slot.</td><td>Stored; URL written.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Public Room Cards:</span> Can't upload an oversized / wrong-type image.</td><td>Validation rejects mime + size; "Image upload failed" flash shown.</td><td>Validation rejected; flash shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Room Listings:</span> Public visitor opens the landing page.</td><td>Both room-type cards render with correct "N available" badges.</td><td>Cards rendered with correct badges.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Room Listings:</span> A type with zero available rooms shows "0 available".</td><td>Compact shows "0 available"; spacious shows its real count.</td><td>Counts displayed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Room Type Detail:</span> Open the per-type detail page.</td><td>200 OK; gallery merged; amenities deduplicated; rate range shown.</td><td>Page rendered correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Room Type Detail:</span> Request an invalid room type (e.g. /rooms/penthouse).</td><td>404 Not Found — route type constraint rejects it.</td><td>404 returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Inquiry:</span> Public visitor submits a valid inquiry with email.</td><td>Inquiry row created; new-inquiry bell sent to GM; confirmation shown.</td><td>Inquiry stored; bell sent; confirmed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Inquiry:</span> Submit a valid inquiry without an email address.</td><td>Inquiry stored with null email; GM bell still fired.</td><td>Stored with null email; bell fired.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Inquiry:</span> Can't submit if name, contact, and message are empty.</td><td>Validation errors on name / contact / message; no row; no bell.</td><td>3 validation errors; 0 rows.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Inquiry:</span> Can't submit if the email format is invalid.</td><td>Validation error on the email field.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Inquiry:</span> Can't submit if the message exceeds 500 characters.</td><td>Validation error on message length.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GM on New Inquiry:</span> A new inquiry notifies every active GM.</td><td>One NotificationLog row of type new_inquiry per active GM.</td><td>One bell per active GM.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GM on New Inquiry:</span> Archived GMs are skipped.</td><td>Only the active GM is notified; archived GM receives nothing.</td><td>Only active GM notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View &amp; Filter Inquiry Log:</span> Open the inquiry log with no filter.</td><td>Page 1 of 15, latest inquiries first.</td><td>Rows shown in correct order.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View &amp; Filter Inquiry Log:</span> Filter inquiries by status (Responded).</td><td>Only Responded inquiries are listed.</td><td>Only Responded rows shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Email Reply:</span> Reply to an inquiry that has an email on file.</td><td>InquiryReplyMail sent; status set to Responded; GM notes saved.</td><td>Mail sent; status flipped.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Email Reply:</span> Can't compose a reply when the inquiry has no email.</td><td>Flash "no email on file"; compose modal does not open.</td><td>Flash shown; modal stayed closed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Email Reply:</span> Can't send if the body exceeds 3000 characters.</td><td>Validation error on body length.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Mark Inquiry Responded:</span> Manually mark an open inquiry as Responded.</td><td>Status set to Responded; responded_at / responded_by stamped; no email sent.</td><td>Status flipped; stamped.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Close Inquiry:</span> Close a finished inquiry.</td><td>Status set to Closed; inquiry drops from the default view.</td><td>Status set to Closed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Search Rooms:</span> Open the room manager with no filter.</td><td>Page 1 of 20, ordered by floor then room number.</td><td>Rooms listed in correct order.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Search Rooms:</span> Filter by floor and search by room number.</td><td>Only floor-2 rooms matching the search term are shown.</td><td>Correct subset returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Search Rooms:</span> Filter by status (Under Maintenance).</td><td>Only rooms under maintenance are returned.</td><td>Correct subset returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Occupancy Dashboard:</span> GM opens the dashboard.</td><td>Tiles show correct totals; revenue + bill-status charts render.</td><td>Tiles + charts correct.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Occupancy Dashboard:</span> A tenant cannot reach the admin dashboard.</td><td>403 Forbidden / redirected away from the admin route.</td><td>Access blocked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Archive Room:</span> Clear a room — archive snapshot + reset to available.</td><td>Room snapshot archived; tenant + contract archived if present; room reset to Available; <em>room_cleared</em> audited.</td><td>Room cleared and reset.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Permanently Delete Room:</span> Remove a room entirely from inventory.</td><td>Room force-deleted; <em>room_deleted</em> audited.</td><td>Room deleted; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Room Events:</span> Room actions all write audit rows.</td><td>Each room-affecting action writes an audit_logs row tagged SS1.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS2 ============================== -->
+<table class="meta" id="m2">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS2 — Tenant Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Create Tenant Account:</span> Create a tenant with a valid name and unused email.</td><td>User created (pending_activation); temporary password emailed; <em>tenant_created</em> audited.</td><td>Row created; mail queued; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Create Tenant Account:</span> Can't create a tenant with an email that already exists.</td><td>Validation error on email (unique); no insert; no mail.</td><td>Validation error; 0 mails.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Create Tenant Account:</span> Can't create a tenant if the email format is invalid.</td><td>Validation error on the email field.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Temporary Password Email:</span> A new tenant receives a temp password email.</td><td>One TempPasswordMail dispatched to the tenant.</td><td>One mail asserted.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Activate Account (OTP):</span> First login with the temporary password.</td><td>OTP record created; tenant redirected to the OTP screen.</td><td>OTP row created; redirected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Activate Account (OTP):</span> First login with a wrong password.</td><td>Login refused; failed_login_attempts incremented.</td><td>Refused; counter +1.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Own Profile:</span> Tenant opens their profile page.</td><td>Form pre-filled with name, email, contact, address, emergency contact.</td><td>Form pre-filled correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Own Profile:</span> Tenant updates contact number and address.</td><td>Row updated; <em>profile_updated</em> audited.</td><td>Row updated; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Own Profile:</span> Can't save if the full name field is empty.</td><td>Validation error on full_name (required).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Update Own Profile:</span> Can't save if the address exceeds 255 characters.</td><td>Validation error on address length.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GMs on Profile Update:</span> A profile update notifies the GMs.</td><td>One bell per active GM plus one self-confirmation bell to the tenant.</td><td>Bells written correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GMs on Profile Update:</span> Profile update works even with zero active GMs.</td><td>Only the self-confirmation bell is written; no errors raised.</td><td>Self bell only; no errors.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View &amp; Search Tenant List:</span> Open the tenant list with no search.</td><td>Page 1 of 15 tenants.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View &amp; Search Tenant List:</span> Search tenants by name/email/contact.</td><td>Only rows matching the search term across all columns are returned.</td><td>Correct matches returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Filter Tenants by Status:</span> Filter the list by status (Pending).</td><td>Only pending_activation tenants are returned.</td><td>Only pending rows shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Auto-Archive on Contract End:</span> Lease expiry auto-archives the tenant.</td><td>Tenant set to Archived; tenant_account Archive row created; room freed.</td><td>Tenant archived; room freed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Archive Tenant Account:</span> GM archives an active tenant.</td><td>Archive row created; user status set to archived; <em>tenant_archived</em> audited.</td><td>Archived; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Permanently Delete Tenant:</span> GM permanently deletes an archived tenant.</td><td>Tenant force-deleted; <em>tenant_deleted</em> audited.</td><td>Deleted; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Tenant Events:</span> Tenant actions all write audit rows.</td><td>Each tenant-affecting action writes an audit_logs row tagged SS2.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS3 ============================== -->
+<table class="meta" id="m3">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS3 — Billing &amp; Collections</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Record Initial Payment:</span> Record a move-in payment for an active contract.</td><td>InitialPayment row created; total computed; <em>initial_payment_recorded</em> audited.</td><td>Row created; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Record Initial Payment:</span> Can't record a second initial payment for the same contract.</td><td>Flash "already recorded"; no duplicate row.</td><td>Flash shown; 0 duplicates.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Record Initial Payment:</span> Amenity fees are summed into the total collected.</td><td>amenities_total computed; bill total includes the amenity sum.</td><td>Total computed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Bills (Tenant):</span> Tenant views their bills and initial receipt.</td><td>Bills listed latest-first; initial payment receipt visible.</td><td>Bills + receipt displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Bills (Tenant):</span> A tenant with no bills sees a clean empty state.</td><td>Empty state renders without error.</td><td>Empty state rendered.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Generate Monthly Bill:</span> Generate a bill with utility charges.</td><td>Utilities summed; total computed; period set; <em>bill_generated</em> audited.</td><td>Computed correctly; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Generate Monthly Bill:</span> Can't generate a bill without selecting a contract.</td><td>Validation error on contract; no insert.</td><td>Validation error; 0 bills.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Generate Monthly Bill:</span> Can't generate with a negative utility amount.</td><td>Validation error (numeric, min 0).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Generate Monthly Bill:</span> Can't generate a duplicate bill for the same period + contract.</td><td>Flash error; existing bill kept; no duplicate created.</td><td>Duplicate blocked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Bills:</span> Open the bills list with no filter.</td><td>Page 1 of 15, latest first.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Bills:</span> Filter bills by status (Overdue).</td><td>Only overdue bills are shown.</td><td>Only overdue rows shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Sort Bills:</span> Sorting toggles ascending / descending.</td><td>Clicking a column header twice toggles asc → desc order.</td><td>Sort toggled correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Grace Period (Day 1–3):</span> A bill 1 day overdue enters Grace and a reminder is sent.</td><td>Status set to Grace; grace_reminder bell sent on day 1.</td><td>Status + bell correct.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Grace Period (Day 2):</span> No reminder is sent on day 2.</td><td>Status stays Grace; no reminder sent.</td><td>No reminder sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Grace Period (Day 3):</span> A reminder fires on the last grace day.</td><td>Status stays Grace; reminder sent (last grace day).</td><td>Reminder sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Apply Penalty (Day 4):</span> Penalty starts accruing on day 4.</td><td>Penalty applied; status set to Overdue.</td><td>Penalty applied; Overdue.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Apply Penalty (Day 10):</span> Penalty accumulates per day past grace.</td><td>Penalty = (days − grace) × rate; status Overdue.</td><td>Penalty computed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Escalate to Delinquent (Day 14):</span> A bill 14 days overdue becomes Delinquent.</td><td>Status set to Delinquent; delinquent_notice bell sent once.</td><td>Status + bell correct.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Escalate to Delinquent (Day 13):</span> Not yet delinquent on day 13.</td><td>Status stays Overdue; no delinquent notice.</td><td>Still Overdue.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Escalate to Eviction (Day 30):</span> A bill 30 days overdue becomes Eviction.</td><td>Status set to Eviction; eviction_notice bell sent once.</td><td>Status + bell correct.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Escalate to Eviction (Day 31):</span> No duplicate eviction notice on re-run.</td><td>Status stays Eviction; no duplicate notice.</td><td>No duplicate notice.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Override / Waive Penalty:</span> GM waives a bill's penalty with a reason.</td><td>PenaltyOverride row created; penalty recomputed; <em>penalty_override</em> audited.</td><td>Override applied; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Override / Waive Penalty:</span> Can't override without a written reason.</td><td>Validation error on reason (required).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Override / Waive Penalty:</span> Can't set an adjusted penalty above the original.</td><td>Validation error — override may only lower the penalty.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Confirm Payment:</span> A full payment settles the bill.</td><td>Payment row created; status set to Paid; paid_at stamped; <em>payment_confirmed</em> audited.</td><td>Bill marked Paid; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Confirm Payment:</span> A partial payment keeps the bill open at its current status.</td><td>Payment recorded; balance reduced; status unchanged; <em>payment_partial</em> logged.</td><td>Partial recorded; balance updated.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Confirm Payment:</span> Can't enter a payment amount of zero.</td><td>Validation error (min 0.01); bill unchanged.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Confirm Payment:</span> Can't pay more than the remaining balance.</td><td>Overpayment rejected with a clear error.</td><td>Overpayment rejected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Request Payment Plan:</span> Tenant in eviction requests a payment plan.</td><td>Pre-filled tenant_request created; GMs notified; <em>payment_plan_requested</em> audited.</td><td>Request created; GMs notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Apply Deposit to Arrears:</span> GM credits the deposit against a delinquent bill.</td><td>Deposit credit applied as a payment; deposit_applied_amount incremented; bill balance reduced.</td><td>Deposit applied; balance reduced.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Mark for Termination:</span> GM terminates a contract from an eviction-status bill.</td><td>Contract terminated + archived; tenant archived; room freed; <em>contract_terminated_arrears</em> audited.</td><td>Contract terminated; room freed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Billing Events:</span> Billing actions all write audit rows.</td><td>Each billing action writes an audit_logs row tagged SS3.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS4 ============================== -->
+<table class="meta" id="m4">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS4 — Contract &amp; Lease Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Create Contract Draft:</span> Create a draft for an available tenant and room.</td><td>Draft contract row created; <em>contract_created</em> audited.</td><td>Draft created; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Create Contract Draft:</span> Upload a signed-contract scan (PDF / image / Word).</td><td>scan_file_path stored under storage/contracts/.</td><td>Scan path stored.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Create Contract Draft:</span> Can't save if the end date is before the start date.</td><td>Validation error (end date must be after start date).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Contract Draft:</span> Change a draft's house rules and save.</td><td>Row updated; <em>contract_updated</em> audited.</td><td>Row updated; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Edit Contract Draft:</span> Upload a replacement scan on a draft.</td><td>scan_file_path replaced with the new file.</td><td>Scan replaced.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Scanned Contract (GM):</span> GM opens the scan viewer for a contract.</td><td>Scan modal opens; PDF/image rendered inline (Word offered as download).</td><td>Scan rendered correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Request Scan Access (Tenant):</span> Tenant requests access to the signed scan.</td><td>scan_view_status set to pending; request timestamped; <em>contract_scan_view_requested</em> audited.</td><td>Request submitted; status pending.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Approve / Deny Scan Access (GM):</span> GM approves or denies a scan-access request.</td><td>Decision recorded with who/when; denial requires a reason; audited.</td><td>Decision recorded; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Approved Scan (Tenant):</span> Tenant views the scan after approval.</td><td>Approved: scan renders inline. Denied: reason shown with a "Request again" option.</td><td>Scan shown / reason shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Contract Summary:</span> Tenant opens their contract summary.</td><td>Summary renders room, dates, rent, deposit, penalty terms.</td><td>Summary rendered.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Contract Summary:</span> A tenant with no contract sees an empty state.</td><td>Empty state renders without error.</td><td>Empty state rendered.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Acknowledgement Step 1:</span> Tenant confirms the terms have been read.</td><td>step1_acknowledged_at stamped; Step 2 unlocked; <em>contract_step1_ack</em> audited.</td><td>Step 1 acknowledged; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Acknowledgement Step 1:</span> Re-clicking Step 1 does not overwrite the timestamp.</td><td>No-op; the original timestamp is preserved.</td><td>No change on re-click.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Acknowledgement Step 2:</span> Accepting the penalty clause activates the contract.</td><td>step2 stamped; contract set to Active; room linked to tenant; audited.</td><td>Contract activated.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Acknowledgement Step 2:</span> Step 2 is blocked until Step 1 is done.</td><td>No-op; contract stays Draft; no audit row written.</td><td>Step 2 blocked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Activate Contract (GM):</span> GM activates a draft contract directly.</td><td>Contract set to Active; room set to Occupied; acknowledgment timestamps mirrored; audited.</td><td>Activated; room occupied.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Activate Contract (GM):</span> Can't activate a draft without an uploaded signed scan.</td><td>Activation blocked; flash error asks the GM to upload the scan first.</td><td>Activation blocked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Sync Room / Contract:</span> Sync sets an active contract's room to Occupied.</td><td>Room set to Occupied; current_tenant_id set.</td><td>Room synced correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Sync Room / Contract:</span> Cleanup frees a room with no active contract.</td><td>Room set to Available; current_tenant_id cleared.</td><td>Room freed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Contracts:</span> Open the contract list with no filter.</td><td>Page 1 of 15, latest first.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Contracts:</span> Filter contracts by status (Active).</td><td>Only Active contracts are shown.</td><td>Only Active rows shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">30-Day Expiry Warning:</span> A contract near expiry triggers a 30-day warning.</td><td>Warning bell sent to tenant + GMs; warning_30 flag set.</td><td>Warning sent; flag set.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">30-Day Expiry Warning:</span> The 30-day warning is not sent twice.</td><td>Re-run sends no duplicate warning.</td><td>No duplicate sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">7-Day Expiry Warning:</span> A contract 5 days from expiry triggers an urgent warning.</td><td>Urgent warning bell sent; warning_7 flag set.</td><td>Urgent warning sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">7-Day Expiry Warning:</span> No 7-day warning when the contract is outside the window.</td><td>No 7-day warning sent.</td><td>No warning sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Renew Contract:</span> GM renews an expiring contract.</td><td>Old contract archived &amp; set Expired; a new draft is pre-filled for the next term.</td><td>Old archived; new draft created.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Terminate Contract:</span> GM terminates an active contract with a reason.</td><td>Contract Terminated &amp; archived; tenant archived; room freed; <em>contract_terminated</em> audited.</td><td>All side-effects applied.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Terminate Contract:</span> Can't terminate without a written reason.</td><td>Validation error; contract status unchanged.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Auto-Archive Expired Contract:</span> An expired contract is auto-archived by the cron.</td><td>Contract set Expired &amp; archived to SS5; tenant archived; room freed.</td><td>Auto-archived correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Contract Events:</span> Contract actions all write audit rows.</td><td>Each contract action writes an audit_logs row tagged SS4.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS5 ============================== -->
+<table class="meta" id="m5">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS5 — Report and Archive Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Ingest Archive Records:</span> Terminating a contract archives the contract + tenant.</td><td>Two Archive rows created — contract (SS4) and tenant_account (SS2).</td><td>Two archive rows created.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Ingest Archive Records:</span> Archiving a room writes a room archive row.</td><td>Archive row with record_type=room, source=SS1, archived_by=GM.</td><td>Archive row created.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Archive:</span> Open the archive with no filter.</td><td>Page 1 of 15, latest first, restored rows hidden.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Archive:</span> Filter the archive by source subsystem.</td><td>Only rows from the chosen subsystem are shown.</td><td>Correct subset shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Date-Range Filter:</span> Filter archive rows by a date range.</td><td>Only rows within the selected date range are returned.</td><td>Correct subset returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Export Archive to CSV:</span> Export the filtered archive list to CSV.</td><td>A CSV file is streamed; <em>archive_exported_csv</em> audited.</td><td>CSV downloaded; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Export Archive to CSV:</span> Export with zero-row filter.</td><td>An empty CSV (header row only) is streamed; <em>archive_exported_csv</em> audited with row count 0 for traceability.</td><td>Empty CSV streamed; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Export Archived Contract to PDF:</span> Export an archived contract as a PDF.</td><td>A PDF report is generated; <em>archive_contract_pdf</em> audited.</td><td>PDF downloaded; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Export Archived Contract to PDF:</span> PDF export is rejected for non-contract archives.</td><td>Flash "only for archived contracts"; no file generated.</td><td>Export rejected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Restore Archived Record:</span> Restore an archived tenant account.</td><td>Archive marked restored; tenant re-activated to Active; <em>record_restored</em> audited.</td><td>Tenant restored; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Restore Archived Record:</span> Restore is rejected for non-tenant archive types.</td><td>Flash error; room/contract/payment archives stay as immutable snapshots.</td><td>Restore rejected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Permanently Delete Archive:</span> Permanently delete an archive row.</td><td>Audit row written before deletion; the archive row is removed.</td><td>Audited; row deleted.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Archive Events:</span> Restore, delete and export actions all write audit rows.</td><td>Each archive action writes an audit_logs row tagged SS5.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS6 ============================== -->
+<table class="meta" id="m6">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS6 — User Access and Authentication</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">First Login (Temp Password):</span> Tenant logs in with the temporary password.</td><td>OTP record + email created; tenant redirected to the OTP screen.</td><td>Redirected; OTP row created.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">First Login (Temp Password):</span> Wrong password is refused.</td><td>Login refused; failed-login counter incremented; <em>failed_login</em> audited.</td><td>Counter +1.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Verify OTP &amp; Activate:</span> Correct OTP activates the account.</td><td>OTP marked used; user set to Active; <em>account_activated</em> audited; redirected.</td><td>Account activated.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Verify OTP &amp; Activate:</span> Wrong OTP digits are rejected.</td><td>Error on the OTP field; status unchanged.</td><td>Error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Verify OTP &amp; Activate:</span> An expired OTP is rejected.</td><td>Error: invalid / expired OTP.</td><td>Error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Resend OTP:</span> Tenant requests a fresh OTP.</td><td>New OTP + email issued; success flash shown.</td><td>New OTP issued.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Force First-Password Change:</span> A must-change-password user is redirected.</td><td>Redirected to the password-change page.</td><td>Redirected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Login:</span> Active GM logs in with correct credentials.</td><td>Session started; last_login_at stamped; redirected to the dashboard; <em>login</em> audited.</td><td>Logged in.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Login:</span> Active tenant logs in and reaches the tenant dashboard.</td><td>Redirected to the tenant dashboard.</td><td>Redirected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Login:</span> An unknown email is refused.</td><td>Error on email; <em>failed_login</em> recorded with no user.</td><td>Error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Auto-Unlock:</span> A locked account whose lock has expired can log in.</td><td>Status set back to Active; counter reset; login succeeds.</td><td>Login succeeded.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Auto-Unlock:</span> A still-locked account is refused.</td><td>Error: "Account locked. Try again in N minutes."</td><td>Error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Block Archived Login:</span> An archived account cannot log in.</td><td>Error: "Account archived…"; no session created.</td><td>Login blocked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Lock After 5 Failed:</span> Five failed attempts lock the account.</td><td>Account locked; locked_until = now + 15 min; five failed-login audits.</td><td>Account locked.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Lock After 5 Failed:</span> A correct password before the 5th attempt resets the counter.</td><td>Login succeeds; failed-login counter reset to 0.</td><td>Counter reset.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GMs on Lockout:</span> A lockout notifies the GMs.</td><td>One NotificationLog row of type account_locked per active GM.</td><td>GMs notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Change Password:</span> User changes their password with valid input.</td><td>Password updated; must_change cleared; <em>password_change</em> audited.</td><td>Password changed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Change Password:</span> Can't change with the wrong current password.</td><td>Error on the current_password field.</td><td>Error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Change Password:</span> Can't set a new password shorter than 8 characters.</td><td>Validation error (minimum 8 characters).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Audit Log:</span> GM opens the audit log with no filter.</td><td>Page 1 of 25, latest first.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Filter / Search Audit Log:</span> Filter by subsystem and search the details.</td><td>Only rows from the chosen subsystem matching the search are shown.</td><td>Correct subset shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Export Audit Log CSV:</span> Export the filtered audit log to CSV.</td><td>CSV download; <em>audit_log_exported</em> audited.</td><td>CSV downloaded; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Configure System Settings:</span> GM updates lockout settings.</td><td>Values persisted; <em>settings_updated</em> audited.</td><td>Settings saved; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Configure System Settings:</span> Can't set the lockout threshold below the minimum.</td><td>Validation error (below minimum allowed).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Configure System Settings:</span> Can't set the OTP expiry above the maximum.</td><td>Validation error (above maximum allowed).</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Auth Events:</span> Authentication actions all write audit rows.</td><td>Each auth action writes an audit_logs row tagged SS6.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS7 ============================== -->
+<table class="meta" id="m7">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS7 — Communications &amp; Notifications</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">Submit Request:</span> Tenant submits a valid maintenance request.</td><td>TenantRequest row created; GM bell + email sent; <em>tenant_request_submitted</em> audited.</td><td>Request created; GM notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Request:</span> Can't submit if the subject exceeds 150 characters.</td><td>Validation error on the subject field.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Request:</span> Can't submit if the message body is empty.</td><td>Validation error on the body field.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Submit Complaint:</span> Tenant submits a valid complaint.</td><td>TenantRequest row created with type = complaint.</td><td>Complaint row created.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GMs on New Request:</span> A new request notifies every active GM.</td><td>One NotificationLog row + one email per active GM.</td><td>One bell + email per GM.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify GMs on New Request:</span> Archived GMs are skipped.</td><td>Only the active GM receives a bell + email.</td><td>Only active GM notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Requests:</span> GM opens the request list with no filter.</td><td>Page 1 of 15, latest first.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View / Filter Requests:</span> Filter requests by type (Complaint).</td><td>Only complaint rows are shown.</td><td>Only complaint rows shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Search Requests:</span> Search requests across tenant / subject / message.</td><td>Only rows matching the search term are returned.</td><td>Correct matches returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Respond to Request:</span> GM responds and sets the status to In Progress.</td><td>Row updated; tenant bell + email sent; <em>tenant_request_responded</em> audited.</td><td>Updated; tenant notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Respond to Request:</span> Marking a request Resolved requires a written response.</td><td>Status set to Resolved only when a response is provided.</td><td>Resolved with response.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Respond to Request:</span> A resolved request is locked from further edits.</td><td>Flash "already Resolved"; no update; no notification.</td><td>Request unchanged.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify Tenant on Response:</span> A response notifies the tenant.</td><td>One NotificationLog row + one RequestResponseMail to the tenant.</td><td>Tenant notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify Tenant on Response:</span> When the tenant has no email, only the bell is written.</td><td>Bell written; email skipped gracefully.</td><td>Bell written; email skipped.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Notification Bell:</span> Bell shows the unread count.</td><td>Badge shows the unread count; menu lists the 10 latest.</td><td>Badge + menu correct.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Notification Bell:</span> The badge is hidden when there are no unread items.</td><td>No badge is shown.</td><td>Badge hidden.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Open Notification:</span> Opening a notification marks it read and redirects.</td><td>is_read set to true; user redirected to the action URL.</td><td>Marked read; redirected.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Open Notification:</span> A notification belonging to another user is a no-op.</td><td>No change; the row is left untouched.</td><td>No change.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Mark All Read:</span> Marking all read clears the badge.</td><td>All unread rows flipped to read; badge becomes 0; other users untouched.</td><td>All marked read.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Announcement:</span> GM broadcasts an announcement to all active tenants.</td><td>Announcement row created; one bell + email per recipient; <em>announcement_sent</em> audited.</td><td>Announcement sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Announcement:</span> GM sends an announcement to one specific tenant.</td><td>One bell + email to the chosen tenant; audit notes the tenant.</td><td>One bell + email sent.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Announcement:</span> Can't send to a non-existent specific recipient.</td><td>Validation error on the recipient field.</td><td>Validation error displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Send Announcement:</span> Can't send with an empty title and body.</td><td>Validation errors on both the title and body fields.</td><td>Validation errors displayed.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Notify Recipients on Announcement:</span> Each recipient gets a bell + email.</td><td>Per recipient: one NotificationLog row + one AnnouncementMail.</td><td>Recipients notified.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Announcement History:</span> GM opens the announcement history.</td><td>Page 1 of 15, latest first.</td><td>Rows listed correctly.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">View Announcement History:</span> Search announcements by keyword.</td><td>Only announcements matching the keyword are shown.</td><td>Correct matches shown.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Audit-Log Communications Events:</span> Communication actions all write audit rows.</td><td>Each communication action writes an audit_logs row tagged SS7.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+<!-- ============================== HTTP ============================== -->
+<table class="meta" id="m8">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">HTTP Responses &amp; Error Handling (Cross-Cutting)</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: Functional test case specification</p>
+<p class="summary-head">SUMMARY OF TEST CASES EXECUTED</p>
+
+<table class="tc">
+<thead><tr><th class="c-scn">SCENARIOS</th><th class="c-exp">EXPECTED RESULT</th><th class="c-act">ACTUAL RESULT</th><th class="c-res">TEST RESULT<br>(Passed/Failed)</th><th class="c-tak">ACTION TAKEN</th></tr></thead>
+<tbody>
+<tr><td><span class="scn-feat">200 OK — Public Home:</span> A guest opens the public landing page.</td><td>HTTP 200; the public room listings render.</td><td>200 OK returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">200 OK — Login Page:</span> A guest opens the login page.</td><td>HTTP 200; the login form renders.</td><td>200 OK returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">200 OK — Admin Dashboard:</span> An authenticated GM opens the dashboard.</td><td>HTTP 200; the dashboard renders.</td><td>200 OK returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">302 Redirect — Auth Guard:</span> A guest requests an admin route.</td><td>HTTP 302; redirected to the login page.</td><td>302 redirect to /login.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">302 Redirect — OTP Gate:</span> A pending-activation user requests a protected route.</td><td>HTTP 302; redirected to the OTP verification screen.</td><td>302 redirect to OTP screen.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">302 Redirect — Force Password Change:</span> A must-change-password user requests a route.</td><td>HTTP 302; redirected to the password-change page.</td><td>302 redirect to password change.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">403 Forbidden — Role Guard:</span> A tenant requests an admin route.</td><td>HTTP 403; the role middleware blocks access.</td><td>403 Forbidden returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">403 Forbidden — Role Guard:</span> A GM requests a tenant-only route.</td><td>HTTP 403; the role middleware blocks access.</td><td>403 Forbidden returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">404 Not Found:</span> Any user requests a route that does not exist.</td><td>HTTP 404; the Laravel not-found page is shown.</td><td>404 Not Found returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">419 CSRF Protection:</span> The CSRF middleware guards browser POST routes.</td><td>ValidateCsrfToken is registered on the web middleware group (a stale token yields 419 in production).</td><td>CSRF middleware present.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">500 Server Error:</span> An uncaught exception in a route surfaces as a 500.</td><td>HTTP 500; the error handler renders the error page.</td><td>500 Server Error returned.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">500 Server Error — No Leak:</span> A 500 page does not leak the raw exception message.</td><td>HTTP 500; the response body contains no raw exception text.</td><td>No exception text leaked.</td><td class="res passed">Passed</td><td></td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

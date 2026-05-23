@@ -43,7 +43,10 @@ Route::get('/', RoomListings::class)->name('home');
 | Auth Routes — SS6
 |--------------------------------------------------------------------------
 */
-Route::middleware('guest')->group(function () {
+// Login is throttled at 10 requests/min per IP. Per-account lockout (5 fails
+// → 15 min) still applies inside Login::login(); the throttle adds a coarser
+// IP-level cap that blunts credential-stuffing across many distinct accounts.
+Route::middleware(['guest', 'throttle:10,1'])->group(function () {
     Route::get('/login', Login::class)->name('login');
 });
 

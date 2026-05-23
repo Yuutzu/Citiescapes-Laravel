@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citiescapes — Use Case Diagrams &amp; Business Activity (All Subsystems)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:       #FBFAF7;
+    --paper-warm:  #F4F1EA;
+    --ink:         #1C1C1C;
+    --ink-soft:    #3A3A3A;
+    --ink-mute:    #6A6A6A;
+    --rule:        #C8C4BC;
+    --rule-soft:   #E5E1D8;
+    --accent:      #8B2331;
+    --accent-soft: #C9A0A6;
+
+    /* Diagram colours */
+    --dia-line:        #2A2A2A;
+    --dia-line-soft:   #555555;
+    --dia-ellipse-bg:  #FFFFFF;
+    --dia-module-bg:   rgba(244, 241, 234, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* === Title Page === */
+  .title-page {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .title-page-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 32px;
+  }
+  .title-page h1 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: clamp(32px, 4.5vw, 46px);
+    line-height: 1.15;
+    margin: 0 0 12px;
+    color: var(--ink);
+    max-width: 820px;
+  }
+  .title-page-sub {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+    margin-bottom: 56px;
+    max-width: 720px;
+  }
+  .title-page-members {
+    border-top: 1px solid var(--rule);
+    padding-top: 32px;
+    margin-top: 40px;
+    width: 100%;
+    max-width: 520px;
+  }
+  .title-page-members-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 16px;
+  }
+  .title-page-members ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    line-height: 2;
+    color: var(--ink-soft);
+  }
+  .title-page-foot {
+    margin-top: 56px;
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+  }
+
+  /* === Container === */
+  .doc-container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 60px 40px 100px;
+  }
+
+  /* === Top section heading === */
+  .doc-section-head {
+    text-align: center;
+    margin-bottom: 56px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .doc-section-head .doc-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .doc-section-head h2 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .doc-section-head .doc-blurb {
+    margin: 14px auto 0;
+    color: var(--ink-mute);
+    max-width: 640px;
+    font-size: 14px;
+  }
+
+  /* === Subsystem block === */
+  .subsystem {
+    margin-bottom: 80px;
+    scroll-margin-top: 24px;
+  }
+  .subsystem-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .subsystem-number {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .subsystem-header h3 {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+    color: var(--ink);
+  }
+  .subsystem-scope {
+    margin: 10px auto 0;
+    color: var(--ink-mute);
+    font-size: 13.5px;
+    max-width: 640px;
+    font-style: italic;
+  }
+
+  /* === Block titles === */
+  .block-label {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 17px;
+    margin: 36px 0 18px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--rule);
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .block-label::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  /* === Diagram container === */
+  .diagram-frame {
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 24px 12px;
+    margin: 0 0 8px;
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+  }
+  .diagram-frame svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .diagram-caption {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-mute);
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  /* === Business activity list === */
+  .activity-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .activity-list li {
+    position: relative;
+    padding: 8px 0 8px 24px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  .activity-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    color: var(--accent);
+    font-size: 11px;
+  }
+  .activity-list li ul {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .activity-list li ul li {
+    padding: 4px 0 4px 20px;
+    font-size: 14px;
+  }
+  .activity-list li ul li::before {
+    content: "○";
+    color: var(--ink-mute);
+    font-size: 9px;
+    top: 9px;
+  }
+  .activity-list strong { color: var(--ink); font-weight: 600; }
+  .activity-list em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* === Inline TOC === */
+  .toc {
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 28px 36px;
+    margin-bottom: 64px;
+  }
+  .toc-title {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  .toc ol {
+    margin: 0;
+    padding: 0 0 0 24px;
+    counter-reset: toc-counter;
+    list-style: none;
+  }
+  .toc li {
+    counter-increment: toc-counter;
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule-soft);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc-counter, decimal-leading-zero) ".";
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 28px;
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14.5px;
+    flex: 1;
+    transition: color .15s ease;
+  }
+  .toc a:hover { color: var(--accent); }
+
+  /* === Footer === */
+  .doc-footer {
+    text-align: center;
+    padding: 32px 40px;
+    border-top: 1px solid var(--rule);
+    color: var(--ink-mute);
+    font-size: 12.5px;
+  }
+  .doc-footer strong { color: var(--ink); }
+
+  /* === Print === */
+  @media print {
+    body { background: white; }
+    .subsystem { page-break-inside: avoid; }
+    .diagram-frame { page-break-inside: avoid; background: white; }
+    .title-page { min-height: auto; page-break-after: always; }
+    a { color: var(--ink); text-decoration: none; }
+  }
+
+  @media (max-width: 720px) {
+    .doc-container { padding: 36px 20px 60px; }
+    .title-page { padding: 40px 20px; min-height: auto; }
+  }
+
+  /* ============================================ */
+  /* === SVG DIAGRAM CONVENTIONS ================ */
+  /* ============================================ */
+  .uc-svg { font-family: 'Inter', system-ui, sans-serif; }
+  .uc-svg .system-boundary {
+    fill: var(--dia-module-bg);
+    stroke: var(--dia-line);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
+  .uc-svg .module-boundary {
+    fill: rgba(255, 255, 255, 0.5);
+    stroke: var(--dia-line-soft);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 3;
+  }
+  .uc-svg .system-label {
+    font-size: 12px;
+    font-style: italic;
+    fill: var(--dia-line);
+    font-weight: 500;
+  }
+  .uc-svg .module-label {
+    font-size: 11.5px;
+    font-style: italic;
+    fill: var(--dia-line-soft);
+    font-weight: 500;
+  }
+  .uc-svg .use-case {
+    fill: var(--dia-ellipse-bg);
+    stroke: var(--dia-line);
+    stroke-width: 1.5;
+  }
+  .uc-svg .uc-text {
+    font-size: 11.5px;
+    fill: var(--ink);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-weight: 400;
+  }
+  .uc-svg .conn-line {
+    stroke: var(--dia-line);
+    stroke-width: 1;
+    fill: none;
+  }
+  .uc-svg .actor-line {
+    stroke: var(--dia-line);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    fill: none;
+  }
+  .uc-svg .actor-fill {
+    fill: var(--dia-ellipse-bg);
+    stroke: var(--dia-line);
+    stroke-width: 1.4;
+  }
+  .uc-svg .actor-label {
+    font-size: 12px;
+    fill: var(--ink);
+    text-anchor: middle;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== TITLE PAGE ============== -->
+<section class="title-page">
+  <div class="title-page-eyebrow">CS12L · Major Project</div>
+  <h1>Compiled Documentation<br>Apartment Rental Management System</h1>
+  <div class="title-page-sub">Citiescapes Apartment — Use Case Diagrams &amp; Business Activity for All Subsystems</div>
+
+  <div class="title-page-members">
+    <div class="title-page-members-label">Members</div>
+    <ul>
+      <li>Liu, John Marlo</li>
+      <li>Suansing, John Carlo</li>
+      <li>Tagud, Ben Alexandre</li>
+      <li>Polinar, Justine Keith Q.</li>
+    </ul>
+  </div>
+
+  <div class="title-page-foot">University of Mindanao · Davao City · Revised 2026-05-16</div>
+</section>
+
+<div class="doc-container">
+
+  <!-- ============== TABLE OF CONTENTS ============== -->
+  <nav class="toc">
+    <p class="toc-title">Subsystems</p>
+    <ol>
+      <li><a href="#ss1">Room Operations</a></li>
+      <li><a href="#ss2">Tenant Management</a></li>
+      <li><a href="#ss3">Billing &amp; Collections</a></li>
+      <li><a href="#ss4">Contract &amp; Lease Management</a></li>
+      <li><a href="#ss5">Report and Archive Management</a></li>
+      <li><a href="#ss6">User Access and Authentication</a></li>
+      <li><a href="#ss7">Communications &amp; Notifications</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============== DOC HEAD ============== -->
+  <div class="doc-section-head">
+    <div class="doc-eyebrow">Compiled Reference</div>
+    <h2>Use Case Diagrams &amp; Business Activity</h2>
+    <p class="doc-blurb">For each of the seven subsystems: an illustrated UML use case diagram showing actors, sub-modules, and use cases, followed by the runtime business activity narrative.</p>
+  </div>
+
+
+  <!-- ====================================================== -->
+  <!-- ============= 1. ROOM OPERATIONS ===================== -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss1">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 01</div>
+      <h3>Room Operations</h3>
+      <p class="subsystem-scope">Public room listings &amp; inquiries, GM room inventory CRUD, public room type cards, occupancy dashboard, inquiry email replies, and system-automated GM notifications + audit trail.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 1110" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Room Operations use case diagram">
+
+        <rect class="system-boundary" x="170" y="20" width="500" height="1075" rx="14" ry="14"/>
+        <text class="system-label" x="200" y="44">Room Operations System</text>
+
+        <!-- Module 1: Public Visitor Flow -->
+        <rect class="module-boundary" x="200" y="65" width="440" height="180" rx="10" ry="10"/>
+        <text class="module-label" x="225" y="86">Public Visitor Flow</text>
+
+        <ellipse class="use-case" cx="420" cy="115" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="116">View Room Listings</text>
+
+        <ellipse class="use-case" cx="420" cy="165" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="166">View Room Type Detail</text>
+
+        <ellipse class="use-case" cx="420" cy="215" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="216">Submit Room Inquiry</text>
+
+        <!-- Module 2: GM Room Management -->
+        <rect class="module-boundary" x="200" y="265" width="440" height="420" rx="10" ry="10"/>
+        <text class="module-label" x="225" y="286">GM Room Management</text>
+
+        <ellipse class="use-case" cx="420" cy="315" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="316">View, Search &amp; Filter Rooms</text>
+
+        <ellipse class="use-case" cx="420" cy="365" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="366">Edit Room (Amenities &amp; Description)</text>
+
+        <ellipse class="use-case" cx="420" cy="465" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="466">Update Room Status</text>
+
+        <ellipse class="use-case" cx="420" cy="515" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="516">Edit Public Room Type Cards</text>
+
+        <ellipse class="use-case" cx="420" cy="565" rx="125" ry="22"/>
+        <text class="uc-text" x="420" y="566">View Occupancy Dashboard</text>
+
+        <ellipse class="use-case" cx="420" cy="615" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="616">Archive Room (Clear Tenancy)</text>
+
+        <ellipse class="use-case" cx="420" cy="665" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="666">Permanently Delete Room</text>
+
+        <!-- Module 3: GM Inquiry Management -->
+        <rect class="module-boundary" x="200" y="705" width="440" height="225" rx="10" ry="10"/>
+        <text class="module-label" x="225" y="726">GM Inquiry Management</text>
+
+        <ellipse class="use-case" cx="420" cy="755" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="756">View &amp; Filter Inquiry Log</text>
+
+        <ellipse class="use-case" cx="420" cy="805" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="806">Send Email Reply to Inquiry</text>
+
+        <ellipse class="use-case" cx="420" cy="855" rx="125" ry="22"/>
+        <text class="uc-text" x="420" y="856">Mark Inquiry Responded</text>
+
+        <ellipse class="use-case" cx="420" cy="905" rx="115" ry="22"/>
+        <text class="uc-text" x="420" y="906">Close Inquiry</text>
+
+        <!-- Module 4: System Automated -->
+        <rect class="module-boundary" x="200" y="950" width="440" height="135" rx="10" ry="10"/>
+        <text class="module-label" x="225" y="971">System Automated</text>
+
+        <ellipse class="use-case" cx="420" cy="1000" rx="135" ry="22"/>
+        <text class="uc-text" x="420" y="1001">Notify GMs on New Inquiry</text>
+
+        <ellipse class="use-case" cx="420" cy="1050" rx="125" ry="22"/>
+        <text class="uc-text" x="420" y="1051">Audit-Log Room Events</text>
+
+        <!-- Public Visitor Actor (LEFT, top) -->
+        <g transform="translate(80, 165)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Public Visitor</text>
+        </g>
+
+        <line class="conn-line" x1="95" y1="185" x2="305" y2="115"/>
+        <line class="conn-line" x1="95" y1="185" x2="305" y2="165"/>
+        <line class="conn-line" x1="95" y1="185" x2="305" y2="215"/>
+
+        <!-- General Manager Actor (RIGHT, middle) -->
+        <g transform="translate(740, 580)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="315"/>
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="415"/>
+        <line class="conn-line" x1="725" y1="600" x2="535" y2="465"/>
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="515"/>
+        <line class="conn-line" x1="725" y1="600" x2="545" y2="565"/>
+        <line class="conn-line" x1="725" y1="600" x2="535" y2="615"/>
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="665"/>
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="755"/>
+        <line class="conn-line" x1="725" y1="600" x2="555" y2="805"/>
+        <line class="conn-line" x1="725" y1="600" x2="545" y2="855"/>
+        <line class="conn-line" x1="725" y1="600" x2="535" y2="905"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(80, 1020)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="100" y1="1015" x2="285" y2="1000"/>
+        <line class="conn-line" x1="100" y1="1025" x2="295" y2="1050"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 1.1 — Room Operations use cases (Public Visitor Flow, GM Room Management, GM Inquiry Management, System Automated).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Edit Room (Amenities &amp; Description) —</strong> The <strong>GM</strong> edits room number, floor, type, rate, max occupants, status, description, and amenities from the Edit modal. Photos are no longer managed per-room — the public-facing photos live on the <em>Public Room Type Cards</em> instead, which is the only place the GM uploads images. The <strong>System</strong> writes <em>room_updated</em> to the audit log and stamps <code>last_updated_by</code> + <code>last_status_update</code>.</li>
+      <li><strong>Edit Public Room Type Cards —</strong> The <strong>GM</strong> opens the Public Cards editor and edits the two cards rendered on the landing page: title (max 60), subtitle, price, max occupants, amenity rows (icon picked from the FontAwesome catalog + label), and photo slots. Inline image upload validates mime (jpg/jpeg/png/webp) and size (≤2 MB), stores under <code>storage/app/public/room-type-cards/</code>, and writes the public URL into the photos slot. On save, all rules are validated, the JSON is persisted to <code>system_settings.room_type_cards</code>, and <em>room_cards_updated</em> is audit-logged.</li>
+      <li><strong>View Room Listings —</strong> Once the inventory and cards are in place, the <strong>Public Visitor</strong> opens the public landing page (no login required) and sees two Room Type Cards (Compact / Spacious) rendered with photos, subtitle, max occupants, amenity chips with FontAwesome icons, base price, and a live <em>available count</em> queried per type from the <code>rooms</code> table where status = <code>available</code>.</li>
+      <li><strong>View Room Type Detail —</strong> The <strong>Public Visitor</strong> can drill into a per-type detail page (<code>/rooms/{compact|spacious}</code>) showing every room of that type ordered by floor and room number, with combined photo gallery, deduplicated amenities list, available count, and rate range (min–max).</li>
+      <li><strong>Submit Room Inquiry —</strong> The <strong>Public Visitor</strong> fills the inquiry form (sender_name max 100, contact_number max 20, optional email, message max 500). The "Inquire about Compact/Spacious" buttons pre-select the preferred room type and scroll to the form. On submit, the <strong>System</strong> creates an <code>Inquiry</code> row, fans out a bell notification to every active GM, and shows a thank-you confirmation.</li>
+      <li><strong>Notify GMs on New Inquiry —</strong> The <strong>System</strong> writes a <code>NotificationLog</code> row of type <em>new_inquiry</em> for every active GM the moment the public form is submitted, so the bell badge increments without polling.</li>
+      <li><strong>View &amp; Filter Inquiry Log —</strong> The <strong>GM</strong> opens the Inquiry Log (15/page) showing every inquiry latest-first with sender info, preferred type, message, and status. Status filter drops to Open / Responded / Closed.</li>
+      <li><strong>Send Email Reply to Inquiry —</strong> The <strong>GM</strong> opens the Compose panel for an inquiry that has an email on file (otherwise blocked). Subject (required, max 150) is pre-filled to "Re: Your room inquiry…" and body (max 3000) starts with a greeting template. On Send, the <strong>System</strong> dispatches <code>InquiryReplyMail</code>, marks the inquiry <strong>Responded</strong>, stores the body in <code>gm_notes</code>, and stamps <code>responded_by</code> + <code>responded_at</code>.</li>
+      <li><strong>Mark Inquiry Responded —</strong> Alternatively the <strong>GM</strong> may manually mark an inquiry <strong>Responded</strong> without sending an in-app email (e.g., when the reply happened by phone), stamping <code>responded_by</code> and <code>responded_at</code>.</li>
+      <li><strong>Close Inquiry —</strong> The <strong>GM</strong> closes a finished inquiry; the <strong>System</strong> sets its status to <strong>Closed</strong> so it drops out of the default Open view. (If the inquiry leads to a lease, the flow continues into <em>SS4 Contract Management</em>.)</li>
+      <li><strong>Update Room Status (locked while occupied) —</strong> Throughout a tenancy the <strong>GM</strong> changes a room's status (available / occupied / under_maintenance) directly from the room row. While a tenant is occupying the room (<code>current_tenant_id</code> is set) the dropdown is <strong>locked</strong> — maintenance on an occupied room is handled in-place via a Tenant Request (SS7), not by flipping the room's status. Once the room is empty, the GM may switch to any state and the <strong>System</strong> automatically clears <code>current_tenant_id</code>; every change is stamped and audit-logged as <em>room_status_change</em>.</li>
+      <li><strong>View, Search &amp; Filter Rooms —</strong> The <strong>GM</strong> opens the Room Manager any time to monitor inventory: a paginated list (20/page) sorted by floor + room number, search box for room number, and dropdowns filtering by floor (1/2/3) and status (Available / Occupied / Under Maintenance).</li>
+      <li><strong>View Occupancy Dashboard —</strong> The <strong>GM</strong> opens <code>/admin/dashboard</code> at any time and sees totals (rooms, available, occupied, under maintenance), the full room list with current tenant + floor, expiring contracts (≤30 days), revenue-by-month chart, and a bill-status doughnut.</li>
+      <li><strong>Archive Room (Clear Tenancy) —</strong> Clicking <em>Archive</em> on a room now ends the current tenancy without removing the room from inventory. With a confirmation prompt, the <strong>System</strong>: (1) snapshots the room's current state into <code>archives</code> (record_type = <code>room</code>, source_subsystem = <code>SS1</code>); (2) if a tenant is occupying the room, archives the tenant account (record_type = <code>tenant_account</code>, source_subsystem = <code>SS2</code>) and flips the user to <strong>Archived</strong>; (3) terminates and archives any active contract on that room (record_type = <code>contract</code>, source_subsystem = <code>SS4</code>, scan path preserved); (4) resets the room itself — clears <code>current_tenant_id</code>, sets <code>status = available</code>, stamps <code>last_status_update</code>. The room <em>row</em> stays in inventory with its original number, floor, type, and rate intact — it can be edited and re-occupied immediately. Audit log entry: <em>room_cleared</em>. To remove a room entirely from the database, use <strong>Permanently Delete Room</strong> instead.</li>
+      <li><strong>Permanently Delete Room —</strong> Finally the <strong>GM</strong> may permanently delete a room via a stronger confirm prompt. The <strong>System</strong> performs a <code>forceDelete</code> — the action is irreversible and is recorded as <em>room_deleted</em> in the audit log.</li>
+      <li><strong>Audit-Log Room Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS1</code> for every room-affecting event: <em>room_updated</em>, <em>room_status_change</em>, <em>room_archived</em>, <em>room_deleted</em>, and <em>room_cards_updated</em> — capturing actor, role, timestamp, and a human-readable note for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+
+  <!-- ====================================================== -->
+  <!-- ============= 2. TENANT MANAGEMENT =================== -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss2">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 02</div>
+      <h3>Tenant Management</h3>
+      <p class="subsystem-scope">Tenant list, search &amp; filter, account creation, manual archive &amp; permanent deletion, tenant self-profile, first-login activation, and system-automated email / bell / audit / SS4 auto-archive.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 870" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Tenant Management use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="830" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">Tenant Management System</text>
+
+        <!-- Module 1: GM Account Management -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="305" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">GM Account Management</text>
+
+        <ellipse class="use-case" cx="435" cy="120" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="121">View &amp; Search Tenant List</text>
+
+        <ellipse class="use-case" cx="435" cy="175" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="176">Filter Tenants by Status</text>
+
+        <ellipse class="use-case" cx="435" cy="230" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="231">Create Tenant Account</text>
+
+        <ellipse class="use-case" cx="435" cy="285" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="286">Archive Tenant Account</text>
+
+        <ellipse class="use-case" cx="435" cy="340" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="341">Permanently Delete Tenant Account</text>
+
+        <!-- Module 2: Tenant Self-Service -->
+        <rect class="module-boundary" x="225" y="388" width="420" height="200" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="409">Tenant Self-Service</text>
+
+        <ellipse class="use-case" cx="435" cy="445" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="446">View Own Profile</text>
+
+        <ellipse class="use-case" cx="435" cy="500" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="501">Update Own Profile</text>
+
+        <ellipse class="use-case" cx="435" cy="555" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="556">Activate Account (First-Login OTP)</text>
+
+        <!-- Module 3: System Automated -->
+        <rect class="module-boundary" x="225" y="606" width="420" height="240" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="627">System Automated</text>
+
+        <ellipse class="use-case" cx="435" cy="660" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="661">Send Temporary Password Email</text>
+
+        <ellipse class="use-case" cx="435" cy="715" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="716">Notify GMs on Profile Update</text>
+
+        <ellipse class="use-case" cx="435" cy="770" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="771">Auto-Archive on Contract End</text>
+
+        <ellipse class="use-case" cx="435" cy="825" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="826">Audit-Log Tenant Events</text>
+
+        <!-- General Manager Actor (LEFT, top) -->
+        <g transform="translate(95, 215)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="235" x2="310" y2="120"/>
+        <line class="conn-line" x1="110" y1="235" x2="310" y2="175"/>
+        <line class="conn-line" x1="110" y1="235" x2="320" y2="230"/>
+        <line class="conn-line" x1="110" y1="235" x2="320" y2="285"/>
+        <line class="conn-line" x1="110" y1="235" x2="300" y2="340"/>
+
+        <!-- Tenant Actor (RIGHT, middle) -->
+        <g transform="translate(750, 495)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Tenant</text>
+        </g>
+
+        <line class="conn-line" x1="735" y1="515" x2="550" y2="445"/>
+        <line class="conn-line" x1="735" y1="515" x2="550" y2="500"/>
+        <line class="conn-line" x1="735" y1="515" x2="570" y2="555"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(95, 740)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="115" y1="730" x2="300" y2="660"/>
+        <line class="conn-line" x1="115" y1="735" x2="300" y2="715"/>
+        <line class="conn-line" x1="115" y1="745" x2="300" y2="770"/>
+        <line class="conn-line" x1="115" y1="750" x2="320" y2="825"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 2.1 — Tenant Management use cases (GM Account Management, Tenant Self-Service, System Automated).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Create Tenant Account —</strong> Starts after the contract is physically signed in <em>SS4</em>. The <strong>General Manager</strong> opens the Create modal and enters the tenant's <em>full name</em> and <em>email</em>. The <strong>System</strong> validates that the email is well-formed and unique, generates a random 10-character temporary password, hashes it for storage, sets the new account to <strong>Pending Activation</strong> with <code>must_change_password = true</code>, and dispatches the temp-password email. The form can also be cancelled, which closes the modal without persisting anything.</li>
+      <li><strong>Send Temporary Password Email —</strong> Immediately after Create Tenant Account succeeds, the <strong>System</strong> sends the <code>TempPasswordMail</code> to the tenant's address containing the plain-text temp password and login instructions. The plain-text password is never persisted — only the hash is stored.</li>
+      <li><strong>Activate Account (First-Login OTP) —</strong> Receiving the email, the <strong>Tenant</strong> logs in for the first time using the temporary password. The <strong>System</strong> (via <em>SS6</em>) sends a One-Time Password to the tenant's email. On correct OTP entry the account flips from <strong>Pending Activation</strong> to <strong>Active</strong> and the tenant is forced to set a new password before any portal screen renders.</li>
+      <li><strong>View Tenant Dashboard —</strong> Once active, the <strong>Tenant</strong> opens <code>/tenant/dashboard</code> and sees a cross-subsystem snapshot: their active contract + room (from <em>SS4</em>), their latest bill with unpaid-count badge (from <em>SS3</em>), their recorded initial payment receipt, and the 5 latest notifications (from <em>SS7</em>). It is the tenant's home screen after every successful login.</li>
+      <li><strong>View Own Profile —</strong> Once active, the <strong>Tenant</strong> opens the My Profile page and sees their full name, email, contact number, address, and emergency contact pre-filled from their account record.</li>
+      <li><strong>Update Own Profile —</strong> The <strong>Tenant</strong> edits their own full name, contact number, address, or emergency contact and submits. The <strong>System</strong> validates the inputs (full_name required &amp; max 100; contact_number max 20; address max 255; emergency_contact max 100), persists the changes, and shows a success flash. Email is read-only on this form.</li>
+      <li><strong>Notify GMs on Profile Update —</strong> When a tenant saves their profile, the <strong>System</strong> writes a self-confirmation bell entry for the tenant <em>and</em> dispatches a bell notification to <em>every</em> active GM ("{tenant} updated their profile."), so the GM-side stays in sync without polling.</li>
+      <li><strong>View &amp; Search Tenant List —</strong> The <strong>GM</strong> monitors tenants any time from the Tenant Manager — a paginated list (15/page) showing full name, email, status, and action buttons, with a debounced live search by <em>name or email</em>.</li>
+      <li><strong>Filter Tenants by Status —</strong> The <strong>GM</strong> filters the same list by account status: <strong>Pending Activation</strong>, <strong>Active</strong>, or <strong>Archived</strong>. The filter combines with the search term and re-paginates the result.</li>
+      <li><strong>Auto-Archive on Contract End —</strong> When the lease ends, the <code>contracts:auto-archive</code> scheduled command finds the expired contract and the <strong>System</strong> auto-archives the linked tenant account: status flips to <strong>Archived</strong>, an Archive row is created (record_type = <code>tenant_account</code>, reason = "Contract expired — auto-archived"), and the room is freed back to <strong>Available</strong>. Termination from <em>SS4</em> also triggers this archive flow.</li>
+      <li><strong>Archive Tenant Account —</strong> Alternatively the <strong>GM</strong> manually archives a tenant from the list (with a confirmation prompt). The <strong>System</strong> copies the user record into the <code>archives</code> table (record_type = <code>tenant_account</code>, source_subsystem = <code>SS2</code>) and flips the user's status to <strong>Archived</strong> with <code>archived_at</code> and <code>archived_by</code> stamped.</li>
+      <li><strong>Permanently Delete Tenant Account —</strong> Finally, the <strong>GM</strong> may permanently delete a tenant via a stronger confirmation prompt ("PERMANENTLY delete this tenant? This cannot be undone"). The <strong>System</strong> performs a <code>forceDelete</code> on the row — the action is irreversible and is recorded in the <em>SS6</em> audit trail.</li>
+      <li><strong>Audit-Log Tenant Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS2</code> for every tenant-affecting event: <em>tenant_created</em>, <em>tenant_archived</em>, <em>tenant_deleted</em>, and <em>profile_updated</em> — capturing actor ID, role, timestamp, and a human-readable note for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+
+  <!-- ====================================================== -->
+  <!-- ============= 3. BILLING & COLLECTIONS =============== -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss3">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 03</div>
+      <h3>Billing &amp; Collections</h3>
+      <p class="subsystem-scope">Tenant bill viewing, GM-driven initial-payment recording &amp; monthly bill generation, payment confirmation, penalty overrides, lease-end archive, and the daily cron that drives grace reminders and penalty escalation.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 970" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Billing and Collections use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="935" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">Billing &amp; Collections System</text>
+
+        <!-- Module 1: Tenant Billing View -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="80" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">Tenant Billing View</text>
+
+        <ellipse class="use-case" cx="435" cy="115" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="116">View Bills &amp; Initial Payment Receipt</text>
+
+        <!-- Module 2: GM Billing Operations -->
+        <rect class="module-boundary" x="225" y="165" width="420" height="395" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="186">GM Billing Operations</text>
+
+        <ellipse class="use-case" cx="435" cy="220" rx="145" ry="22"/>
+        <text class="uc-text" x="435" y="221">View, Search, Sort &amp; Filter Bills</text>
+
+        <ellipse class="use-case" cx="435" cy="275" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="276">Record Initial Payment</text>
+
+        <ellipse class="use-case" cx="435" cy="330" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="331">Generate Monthly Bill</text>
+
+        <ellipse class="use-case" cx="435" cy="385" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="386">Confirm Payment</text>
+
+        <ellipse class="use-case" cx="435" cy="440" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="441">Override / Waive Penalty</text>
+
+        <ellipse class="use-case" cx="435" cy="495" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="488">Apply Deposit to Arrears</text>
+        <text class="uc-text" x="435" y="504">Mark for Termination</text>
+
+        <!-- Module 3: System Automated (daily cron) -->
+        <rect class="module-boundary" x="225" y="580" width="420" height="365" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="601">System Automated (daily cron)</text>
+
+        <ellipse class="use-case" cx="435" cy="635" rx="170" ry="28"/>
+        <text class="uc-text" x="435" y="629">Apply Grace Period &amp; Send</text>
+        <text class="uc-text" x="435" y="644">Reminder (Days 1–3)</text>
+
+        <ellipse class="use-case" cx="435" cy="705" rx="155" ry="28"/>
+        <text class="uc-text" x="435" y="699">Apply Daily Penalty &amp;</text>
+        <text class="uc-text" x="435" y="714">Mark Overdue (Day 4–13)</text>
+
+        <ellipse class="use-case" cx="435" cy="775" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="776">Escalate to Delinquent (Day 14)</text>
+
+        <ellipse class="use-case" cx="435" cy="830" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="831">Escalate to Eviction (Day 30)</text>
+
+        <ellipse class="use-case" cx="435" cy="900" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="901">Audit-Log Billing Events</text>
+
+        <!-- Tenant Actor (LEFT, top) -->
+        <g transform="translate(95, 115)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Tenant</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="135" x2="280" y2="115"/>
+
+        <!-- General Manager Actor (RIGHT, middle) -->
+        <g transform="translate(750, 360)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="735" y1="380" x2="580" y2="220"/>
+        <line class="conn-line" x1="735" y1="380" x2="570" y2="275"/>
+        <line class="conn-line" x1="735" y1="380" x2="560" y2="330"/>
+        <line class="conn-line" x1="735" y1="380" x2="550" y2="385"/>
+        <line class="conn-line" x1="735" y1="380" x2="570" y2="440"/>
+        <line class="conn-line" x1="735" y1="380" x2="570" y2="495"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(95, 760)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="115" y1="755" x2="265" y2="635"/>
+        <line class="conn-line" x1="115" y1="758" x2="280" y2="705"/>
+        <line class="conn-line" x1="115" y1="763" x2="280" y2="775"/>
+        <line class="conn-line" x1="115" y1="768" x2="280" y2="830"/>
+        <line class="conn-line" x1="115" y1="773" x2="320" y2="900"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 3.1 — Billing &amp; Collections use cases (Tenant Billing View, GM Billing Operations, daily-cron System Automated).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Record Initial Payment —</strong> Billing begins on move-in: the <strong>GM</strong> opens the Initial Payment modal and picks a contract from those in <strong>draft</strong> or <strong>active</strong> status with no initial payment yet. Selecting a contract auto-fills the deposit, first-month rent, and room-key fee from <em>SS4</em> and pre-loads the contract's requested amenities (each with name + fee, editable add/remove rows). The <strong>System</strong> validates the date and payment method (cash / bank_transfer / e_wallet), refuses duplicates, computes total = deposit + first rent + key fee + amenities total, persists to <code>initial_payments</code>, and writes <em>initial_payment_recorded</em> to the audit log.</li>
+      <li><strong>View Bills &amp; Initial Payment Receipt —</strong> Once recorded, the <strong>Tenant</strong> opens <em>My Bills</em> and sees their initial-payment receipt plus every monthly bill issued latest-first (period, base rent, utilities, penalty, total, due date, status, paid_at). Note: the system does <em>not</em> accept online payments — payments are made offline and recorded by the GM.</li>
+      <li><strong>Generate Monthly Bill —</strong> Each month the <strong>GM</strong> opens the Generate Bill modal, selects an active contract, and enters this month's electricity, water, and wifi charges. The <strong>System</strong> validates, computes utilities = electricity + water + wifi, total = contract base_rent_rate + utilities, writes a <code>Bill</code> row for period <code>YYYY-MM</code> due at end-of-month, and audit-logs <em>bill_generated</em>.</li>
+      <li><strong>View, Search, Sort &amp; Filter Bills —</strong> The <strong>GM</strong> monitors collections from the Billing Manager — every bill paginated 15/page, joined with tenant name, with a search by tenant name, a status dropdown (Unpaid / Grace / Overdue / Delinquent / Eviction / Paid / Archived), and column headers that toggle ascending/descending sort.</li>
+      <li><strong>Apply Grace Period &amp; Send Reminder (Days 1–3) —</strong> If the due date passes unpaid, the daily cron <code>billing:apply-penalties</code> picks every bill with status in {unpaid, grace, overdue, delinquent} whose due date is in the past, computes <code>days_overdue</code>, and during the grace window (configurable per contract via <code>penalty_grace_days</code>, default 3) sets status = <strong>Grace</strong> and dispatches a <em>grace_reminder</em> bell on day 1 and the final grace day. No penalty is applied yet.</li>
+      <li><strong>Apply Daily Penalty &amp; Mark Overdue (Day 4–13) —</strong> Once <code>days_overdue</code> exceeds the grace days but is below the delinquent threshold (config <code>citiescapes.penalty.delinquent_day</code>, default 14), the <strong>System</strong> computes penalty_amount = penalty_rate × (daysOverdue − graceDays), updates total = base_rent + utilities + penalty, and sets status = <strong>Overdue</strong>.</li>
+      <li><strong>Escalate to Delinquent (Day 14) —</strong> When <code>days_overdue</code> reaches the delinquent threshold (default 14) and is below the eviction threshold (default 30), the <strong>System</strong> recomputes the penalty, sets status = <strong>Delinquent</strong>, and on the threshold day exactly dispatches a <em>delinquent_notice</em> bell.</li>
+      <li><strong>Escalate to Eviction (Day 30) —</strong> When <code>days_overdue</code> hits the eviction threshold (default 30, configurable), the <strong>System</strong> recomputes the penalty, sets status = <strong>Eviction</strong>, and on the threshold day exactly dispatches an <em>eviction_notice</em> bell flagging that proceedings may begin.</li>
+      <li><strong>Override / Waive Penalty —</strong> At any escalation stage the <strong>GM</strong> may override the penalty on a bill via the Override modal — a non-negative new amount and a written reason (max 500) are required. The <strong>System</strong> writes a <code>PenaltyOverride</code> row capturing original vs adjusted amount and reason, recomputes total = base_rent + utilities + new penalty, and audit-logs <em>penalty_override</em> with the before/after.</li>
+      <li><strong>Confirm Payment (partial-payment aware) —</strong> The <strong>GM</strong> opens the Confirm Payment modal for an unpaid bill, enters amount + method (cash / bank transfer / e-wallet) + optional reference. The <strong>System</strong> writes a <code>payments</code> row, then recomputes the bill's outstanding balance (<code>Bill::balance = total_amount − sum(payments)</code>). Only when the balance reaches zero does the bill flip to <strong>paid</strong>; otherwise the existing status (eviction / delinquent / overdue / unpaid) is preserved and the action is audit-logged as <em>payment_partial</em> with the remaining balance. This prevents the prior bug where a partial payment falsely cleared the bill.</li>
+      <li><strong>Request Payment Plan (Tenant) —</strong> A tenant whose bill is in <code>delinquent</code> or <code>eviction</code> sees a red banner on <em>My Bills</em>. Clicking <em>Request payment plan</em> creates a Tenant Request (SS7) with an auto-filled subject "Payment difficulty — Bill #N (period)" and a body summarising the balance. The <strong>System</strong> guards against duplicates (one open arrears request per bill), notifies every active GM via bell + email, and audit-logs <em>payment_plan_requested</em>.</li>
+      <li><strong>Apply Deposit to Arrears (GM) —</strong> On a bill in <code>delinquent</code> or <code>eviction</code> the <strong>GM</strong> clicks <em>Apply Deposit</em>. The <strong>System</strong> computes the deposit credit remaining (<code>contracts.deposit − contracts.deposit_applied_amount</code>), applies the smaller of (deposit remaining) or (bill balance), creates a <code>payments</code> row tagged <code>deposit_applied</code>, increments <code>deposit_applied_amount</code>, and stamps <code>deposit_applied_at</code> so the same deposit cannot be applied twice. If the credit clears the balance the bill flips to <strong>paid</strong>. Audit-logged as <em>deposit_applied_to_bill</em>.</li>
+      <li><strong>Mark for Termination (GM eviction shortcut) —</strong> If the tenant cannot or will not pay, the <strong>GM</strong> clicks <em>Mark for Termination</em> on the bill (with a strong confirm prompt). The <strong>System</strong> auto-fills a termination reason citing the bill, flips the linked contract to <strong>terminated</strong>, archives it to SS5 with the same reason, archives the tenant (SS2), and frees the room (SS1) — all in one call. Audit-logged as <em>contract_terminated_arrears</em> under SS3.</li>
+      <li><strong>Audit-Log Billing Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS3</code> for every billing event: <em>bill_generated</em>, <em>initial_payment_recorded</em>, <em>payment_confirmed</em>, and <em>penalty_override</em> — capturing actor, role, timestamp, and a human-readable note for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+
+  <!-- ====================================================== -->
+  <!-- ========== 4. CONTRACT & LEASE MANAGEMENT ============ -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss4">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 04</div>
+      <h3>Contract &amp; Lease Management</h3>
+      <p class="subsystem-scope">Contract draft + amenity catalog, scan upload, manual activation, renewal &amp; termination, two-step tenant acknowledgement, scheduled expiry warnings (30/7-day), and auto-archive + room/contract sync crons.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 1070" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Contract and Lease Management use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="1035" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">Contract &amp; Lease Management System</text>
+
+        <!-- Module 1: GM Contract Lifecycle -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="415" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">GM Contract Lifecycle</text>
+
+        <ellipse class="use-case" cx="435" cy="120" rx="145" ry="22"/>
+        <text class="uc-text" x="435" y="121">View, Search &amp; Filter Contracts</text>
+
+        <ellipse class="use-case" cx="435" cy="175" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="176">Create Contract Draft</text>
+
+        <ellipse class="use-case" cx="435" cy="230" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="231">Edit Contract Draft</text>
+
+        <ellipse class="use-case" cx="435" cy="285" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="286">Activate Contract</text>
+
+        <ellipse class="use-case" cx="435" cy="340" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="341">Renew Contract</text>
+
+        <ellipse class="use-case" cx="435" cy="395" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="396">Terminate Contract</text>
+
+        <ellipse class="use-case" cx="435" cy="450" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="443">View Scanned Contract (GM)</text>
+        <text class="uc-text" x="435" y="459">Approve / Deny / Revoke Scan</text>
+
+        <!-- Module 2: Tenant Acknowledgement -->
+        <rect class="module-boundary" x="225" y="500" width="420" height="200" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="521">Tenant Acknowledgement</text>
+
+        <ellipse class="use-case" cx="435" cy="555" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="556">View Contract Summary</text>
+
+        <ellipse class="use-case" cx="435" cy="610" rx="155" ry="28"/>
+        <text class="uc-text" x="435" y="604">Ack Step 1 —</text>
+        <text class="uc-text" x="435" y="619">Terms Read</text>
+
+        <ellipse class="use-case" cx="435" cy="675" rx="155" ry="28"/>
+        <text class="uc-text" x="435" y="669">Ack Step 2 —</text>
+        <text class="uc-text" x="435" y="684">Penalty Accepted (Activates)</text>
+
+        <!-- Module 3: System Automated -->
+        <rect class="module-boundary" x="225" y="720" width="420" height="325" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="741">System Automated (cron)</text>
+
+        <ellipse class="use-case" cx="435" cy="775" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="776">Send 30-Day Expiry Warning</text>
+
+        <ellipse class="use-case" cx="435" cy="830" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="831">Send 7-Day Expiry Warning</text>
+
+        <ellipse class="use-case" cx="435" cy="885" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="886">Auto-Archive Expired Contract</text>
+
+        <ellipse class="use-case" cx="435" cy="940" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="941">Sync Room–Contract Status</text>
+
+        <ellipse class="use-case" cx="435" cy="1000" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="1001">Audit-Log Contract Events</text>
+
+        <!-- General Manager Actor (LEFT, top) -->
+        <g transform="translate(95, 285)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="305" x2="290" y2="120"/>
+        <line class="conn-line" x1="110" y1="305" x2="300" y2="175"/>
+        <line class="conn-line" x1="110" y1="305" x2="310" y2="230"/>
+        <line class="conn-line" x1="110" y1="305" x2="310" y2="285"/>
+        <line class="conn-line" x1="110" y1="305" x2="310" y2="340"/>
+        <line class="conn-line" x1="110" y1="305" x2="310" y2="395"/>
+        <line class="conn-line" x1="110" y1="305" x2="300" y2="450"/>
+
+        <!-- Tenant Actor (RIGHT, middle) -->
+        <g transform="translate(750, 615)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Tenant</text>
+        </g>
+
+        <line class="conn-line" x1="735" y1="635" x2="570" y2="555"/>
+        <line class="conn-line" x1="735" y1="635" x2="590" y2="610"/>
+        <line class="conn-line" x1="735" y1="635" x2="590" y2="675"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(95, 880)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="115" y1="870" x2="280" y2="775"/>
+        <line class="conn-line" x1="115" y1="875" x2="280" y2="830"/>
+        <line class="conn-line" x1="115" y1="880" x2="280" y2="885"/>
+        <line class="conn-line" x1="115" y1="885" x2="280" y2="940"/>
+        <line class="conn-line" x1="115" y1="890" x2="310" y2="1000"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 4.1 — Contract &amp; Lease Management use cases (GM Contract Lifecycle, Tenant Acknowledgement, System Automated cron).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Create Contract Draft —</strong> After an SS1 inquiry is confirmed, the <strong>GM</strong> opens the Create modal and selects a tenant + room (the room's rate auto-fills <code>base_rent_rate</code>), then enters deposit, room key fee (default ₱200), start &amp; end dates, penalty rate, grace days (default 3), and house rules. Amenities are added from a fixed catalog (Air Conditioner, Extra Mattress, Extra Double Deck Frame, Aircon Remote, Extra Key, Extra Pillow) — picking the name auto-fills its default fee. The PDF/image scan can be uploaded now or later. The <strong>System</strong> validates the inputs, persists with status = <strong>Draft</strong>, and writes <em>contract_created</em> to the audit log.</li>
+      <li><strong>Edit Contract Draft —</strong> Before activation the <strong>GM</strong> may revise any field on the draft. The <strong>System</strong> validates and overwrites, replacing the scan path if a new file is uploaded, and audit-logs <em>contract_updated</em>.</li>
+      <li><strong>View Scanned Contract (GM) —</strong> Once a scan is uploaded the <strong>GM</strong> can open the scan viewer modal for any contract and the file is rendered inline (PDF or image) or downloaded (DOC / DOCX) without leaving the Contract Manager. Scan upload now accepts <code>.pdf</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.png</code>, <code>.webp</code>, <code>.doc</code>, <code>.docx</code> up to 10 MB.</li>
+      <li><strong>Request Scan Access (Tenant) —</strong> On <em>My Contract</em> the scan viewer is locked behind an approval gate. The <strong>Tenant</strong> clicks <em>Request access</em>; the <strong>System</strong> sets <code>scan_view_status = pending</code>, stamps <code>scan_view_requested_at</code>, and audit-logs <em>contract_scan_view_requested</em>.</li>
+      <li><strong>Approve / Deny Scan Access (GM) —</strong> The <strong>GM</strong> sees a "Tenant requested access" badge on the Contracts page. <em>Approve</em> opens a confirmation (with optional note); <em>Deny</em> requires a reason that the tenant will see. The <strong>System</strong> stamps <code>scan_view_decided_at</code> and <code>scan_view_decided_by</code>, stores the note, and audit-logs <em>contract_scan_view_approved</em> or <em>contract_scan_view_denied</em>.</li>
+      <li><strong>Revoke Scan Access (GM) —</strong> After approval the <strong>GM</strong> may revoke at any time; the <strong>System</strong> clears <code>scan_view_status</code>, audit-logs <em>contract_scan_view_revoked</em>, and the tenant's viewer returns to the locked state.</li>
+      <li><strong>View Approved Scanned Contract (Tenant) —</strong> Once approved, the <strong>Tenant</strong> sees the scan inline on <em>My Contract</em> — PDFs in an iframe, images via <code>&lt;img&gt;</code>, Word files as a download button. If denied, the viewer shows the reason and a <em>Request again</em> button.</li>
+      <li><strong>View Contract Summary —</strong> The <strong>Tenant</strong> logs in (via <em>SS6</em> first-login OTP from <em>SS2</em>) and opens <em>My Contract</em>, seeing their current draft or active contract — room, dates, base rent, deposit, key fee, penalty terms, house rules, and a link to the scanned signed file when present.</li>
+      <li><strong>Ack Step 1 — Terms Read —</strong> The <strong>Tenant</strong> clicks "I have read and understood the terms". The <strong>System</strong> stamps <code>step1_acknowledged_at</code>, writes <em>contract_step1_ack</em> to the audit log, and unlocks Step 2. Step 2 is blocked until Step 1 is recorded.</li>
+      <li><strong>Ack Step 2 — Penalty Accepted (Activates) —</strong> The <strong>Tenant</strong> clicks "I accept the penalty clause". The <strong>System</strong> stamps <code>step2_acknowledged_at</code>, flips the contract to <strong>Active</strong>, stamps <code>activated_at</code>, links the room's <code>current_tenant_id</code> to the tenant, audit-logs <em>contract_step2_ack</em>, and the lease cycle begins (which in turn unlocks <em>SS3</em> monthly billing).</li>
+      <li><strong>Activate Contract —</strong> Alternatively, the <strong>GM</strong> may activate a draft directly from the Contract Manager (e.g., for paper-only signings). The <strong>System</strong> flips the contract to <strong>Active</strong>, marks the linked room <strong>Occupied</strong> with <code>current_tenant_id</code>, stamps the room update fields, and audit-logs <em>contract_activated</em>.</li>
+      <li><strong>Sync Room–Contract Status —</strong> While leases are active, the cron <code>room:sync-status</code> reconciles the rooms table with active contracts: rooms with an active contract that aren't <strong>Occupied</strong> are flipped to Occupied with the right <code>current_tenant_id</code>; with the optional <code>--cleanup</code> flag, occupied rooms with no active contract are flipped back to Available — guaranteeing data integrity between SS1 and SS4.</li>
+      <li><strong>View, Search &amp; Filter Contracts —</strong> The <strong>GM</strong> monitors leases at any time from the Contract Manager — paginated 15/page latest first, search by tenant name, and a status dropdown for Draft / Active / Expired / Terminated.</li>
+      <li><strong>Send 30-Day Expiry Warning —</strong> As a lease nears its end, the cron <code>contracts:send-warnings</code> finds every active contract whose <code>end_date</code> is in (now + 7 days, now + 30 days] and whose <code>warning_30_sent</code> flag is false, dispatches a 30-day bell to the tenant <em>and</em> every active GM, then sets <code>warning_30_sent = true</code> so the warning is never duplicated.</li>
+      <li><strong>Send 7-Day Expiry Warning —</strong> The same cron then finds every active contract whose <code>end_date</code> is in (now, now + 7 days] and whose <code>warning_7_sent</code> flag is false, dispatches an URGENT 7-day bell to the tenant and every active GM, then sets <code>warning_7_sent = true</code>.</li>
+      <li><strong>Renew Contract —</strong> Before expiry the <strong>GM</strong> may renew an existing contract. The <strong>System</strong> archives the old contract (record_type = <code>contract</code>, source_subsystem = <code>SS4</code>, reason = "Renewed — old contract archived", scan path preserved), marks it <strong>Expired</strong>, and pre-fills a new draft inheriting tenant, room, rent, deposit, key fee, amenities, penalty terms, and house rules — with start = old end + 1 day and end = old end + 1 year.</li>
+      <li><strong>Terminate Contract —</strong> Alternatively the <strong>GM</strong> may terminate a contract early via the Terminate modal — a written reason is mandatory (max 500). The <strong>System</strong> sets status = <strong>Terminated</strong> with <code>terminated_at</code> + reason, archives the contract record (and its scan) to <em>SS5</em>, archives the tenant account (<em>SS2</em>) if still active, frees the room back to <strong>Available</strong>, and audit-logs <em>contract_terminated</em>. Note that SS3 also offers a <em>Mark for Termination</em> shortcut on eviction-status bills which calls the same logic with an auto-filled reason.</li>
+      <li><strong>Auto-Archive Expired Contract —</strong> If neither renewed nor terminated, the cron <code>contracts:auto-archive</code> picks every active contract whose <code>end_date</code> has passed, sets status = <strong>Expired</strong>, archives the contract (and scan) into <em>SS5</em> with <code>archived_by = null</code> (system), auto-archives the tenant account (<em>SS2</em>) if still active, and frees the room back to <strong>Available</strong>.</li>
+      <li><strong>Audit-Log Contract Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS4</code> for every contract event: <em>contract_created</em>, <em>contract_updated</em>, <em>contract_activated</em>, <em>contract_terminated</em>, <em>contract_step1_ack</em>, and <em>contract_step2_ack</em> — for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+
+  <!-- ====================================================== -->
+  <!-- ========= 5. REPORT AND ARCHIVE MANAGEMENT =========== -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss5">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 05</div>
+      <h3>Report and Archive Management</h3>
+      <p class="subsystem-scope">Always-on archive store fed by SS1–SS4 lifecycle events; GM-side filtered browser with tenant-account restore, permanent-delete, CSV export of the filtered list, and per-archived-contract PDF report — plus a complete audit trail of every archive action and export.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 700" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Report and Archive Management use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="660" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">Report &amp; Archive Management System</text>
+
+        <!-- Module 1: GM Archive Browser -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="200" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">GM Archive Browser</text>
+
+        <ellipse class="use-case" cx="435" cy="120" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="121">View, Filter &amp; Date-Range Archive</text>
+
+        <ellipse class="use-case" cx="435" cy="180" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="181">Restore Archived Tenant Account</text>
+
+        <ellipse class="use-case" cx="435" cy="240" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="241">Permanently Delete Archive Record</text>
+
+        <!-- Module 2: GM Export & Reports -->
+        <rect class="module-boundary" x="225" y="285" width="420" height="195" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="306">GM Export &amp; Reports</text>
+
+        <ellipse class="use-case" cx="435" cy="340" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="341">Export Archive to CSV</text>
+
+        <ellipse class="use-case" cx="435" cy="395" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="396">— (Excel export removed)</text>
+
+        <ellipse class="use-case" cx="435" cy="450" rx="170" ry="22"/>
+        <text class="uc-text" x="435" y="451">Export Archived Contract to PDF</text>
+
+        <!-- Module 3: System Automated -->
+        <rect class="module-boundary" x="225" y="500" width="420" height="170" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="521">System Automated</text>
+
+        <ellipse class="use-case" cx="435" cy="555" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="556">Auto-Archive from Rooms, Tenants, Billing &amp; Contracts</text>
+
+        <ellipse class="use-case" cx="435" cy="615" rx="170" ry="22"/>
+        <text class="uc-text" x="435" y="616">Audit-Log Restore, Delete &amp; Exports</text>
+
+        <!-- General Manager Actor (LEFT) -->
+        <g transform="translate(95, 280)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="300" x2="280" y2="120"/>
+        <line class="conn-line" x1="110" y1="300" x2="300" y2="180"/>
+        <line class="conn-line" x1="110" y1="300" x2="280" y2="240"/>
+        <line class="conn-line" x1="110" y1="300" x2="280" y2="340"/>
+        <line class="conn-line" x1="110" y1="300" x2="280" y2="395"/>
+        <line class="conn-line" x1="110" y1="300" x2="265" y2="450"/>
+
+        <!-- System Actor (RIGHT) -->
+        <g transform="translate(750, 580)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="730" y1="580" x2="590" y2="555"/>
+        <line class="conn-line" x1="730" y1="580" x2="605" y2="615"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 5.1 — Report &amp; Archive Management use cases (GM Archive Browser, GM Export &amp; Reports, System Automated archival + audit).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Auto-Archive from Rooms, Tenants, Billing &amp; Contracts —</strong> SS5 is always on and is the <em>first</em> step in its own lifecycle: records flow in automatically whenever any other subsystem flags one for archival — SS1 archives rooms (<code>record_type = room</code>), SS2 archives tenant accounts (<code>tenant_account</code>, both manually and via the SS4 expiry cron), SS3 archives bills on lease end (<code>payment</code>), and SS4 archives contracts (<code>contract</code>) on renewal, termination, or auto-archive — preserving the scan path. Each row stamps <code>source_subsystem</code>, <code>archive_reason</code>, the originating record's full payload, and <code>archived_by</code> (GM ID or null for system).</li>
+      <li><strong>View, Filter &amp; Date-Range Archive —</strong> Once records are in the archive, the <strong>GM</strong> opens the Archive screen and sees every archived (non-restored) record latest-first, paginated 15/page. Filters narrow the list by <em>record_type</em> (room, tenant_account, contract, payment), by <em>source_subsystem</em> (SS1–SS4), and by an inclusive date range (<em>From</em> / <em>To</em>) on the archive's <code>created_at</code>. Each archived contract row exposes a link to its preserved scan path.</li>
+      <li><strong>Export Archive to CSV —</strong> From the same Archive screen the <strong>GM</strong> clicks <em>Export CSV</em>. The <strong>System</strong> applies the current filters, streams a UTF-8 CSV (with BOM so Excel opens cleanly) containing Archive ID, Original ID, Record Type, Source Subsystem, Reason, Has Scan, Archived By, and Archived At — and audit-logs <em>archive_exported_csv</em>.</li>
+      <li><em>(Removed — Export Archive to Excel)</em> — The .xlsx exporter and the PhpSpreadsheet dependency were removed because CSV satisfies the same use case (Excel opens UTF-8 CSV files natively and reliably). The <em>Export CSV</em> button above is now the single export path for the archive list.</li>
+      <li><strong>Export Archived Contract to PDF —</strong> For any row whose <em>record_type</em> is <code>contract</code>, the <strong>GM</strong> clicks the <em>PDF</em> button. The <strong>System</strong> renders a printable A4 PDF via DomPDF including the contract data payload (tenant ID, room ID, dates, base rent, deposit, key fee, penalty terms, acknowledgement timestamps, requested amenities, house rules) and a reference to the preserved scan file path / URL — and audit-logs <em>archive_contract_pdf</em>. Useful for legal filing.</li>
+      <li><strong>Restore Archived Tenant Account —</strong> Restore is scoped to <em>tenant_account</em> archives only — the one record type where restoration is both impactful and safe. The <strong>GM</strong> clicks Restore on a tenant-account archive row; the <strong>System</strong> re-activates the underlying user (status = <strong>Active</strong>, clears <code>archived_at</code> &amp; <code>archived_by</code>) so the tenant can log in again, sets <code>restored = true</code> with <code>restored_at = now</code>, and audit-logs <em>record_restored</em> tagged SS5. <strong>Room, contract, and payment archives are immutable historical snapshots</strong> — they cannot be restored (un-terminating a contract or reviving a settled bill would collide with room occupancy and the penalty scheduler), so no Restore button is shown for those rows and the controller rejects any such attempt. To bring back a contract scenario, the GM creates a fresh contract draft (SS4) pre-filled from the archived data, which routes through the normal activation guards.</li>
+      <li><strong>Permanently Delete Archive Record —</strong> When a record is no longer needed, the <strong>GM</strong> may permanently delete it. The <strong>System</strong> writes <em>record_permanently_deleted</em> to the audit log <em>before</em> deletion (so the trace survives), then removes the row. The action is irreversible.</li>
+      <li><strong>Audit-Log Restore, Delete &amp; Exports —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS5</code> for every SS5 action: <em>record_restored</em>, <em>record_permanently_deleted</em>, <em>archive_exported_csv</em>, <em>archive_exported_xlsx</em>, and <em>archive_contract_pdf</em> — capturing actor, role, timestamp, the affected record type + ID, and (for exports) the row count, for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+
+  <!-- ====================================================== -->
+  <!-- ========= 6. USER ACCESS AND AUTHENTICATION ========== -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss6">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 06</div>
+      <h3>User Access and Authentication</h3>
+      <p class="subsystem-scope">First-time activation via emailed OTP, ongoing email/password login, forced &amp; voluntary password change, lockout after N failed attempts with auto-unlock, archived-account block, GM audit log + system settings, and the system audit trail.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 1040" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="User Access and Authentication use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="1005" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">User Access &amp; Authentication System</text>
+
+        <!-- Module 1: First-Time Activation -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="190" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">First-Time Activation</text>
+
+        <ellipse class="use-case" cx="435" cy="120" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="121">First Login with Temporary Password</text>
+
+        <ellipse class="use-case" cx="435" cy="175" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="176">Verify OTP &amp; Activate</text>
+
+        <ellipse class="use-case" cx="435" cy="230" rx="115" ry="22"/>
+        <text class="uc-text" x="435" y="231">Resend OTP</text>
+
+        <!-- Module 2: Ongoing Login & Password -->
+        <rect class="module-boundary" x="225" y="275" width="420" height="190" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="296">Ongoing Login &amp; Password</text>
+
+        <ellipse class="use-case" cx="435" cy="330" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="331">Login (Email &amp; Password)</text>
+
+        <ellipse class="use-case" cx="435" cy="385" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="386">Force First-Time Password Change</text>
+
+        <ellipse class="use-case" cx="435" cy="440" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="441">Change Password (Anytime)</text>
+
+        <!-- Module 3: Security & Lockout -->
+        <rect class="module-boundary" x="225" y="485" width="420" height="255" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="506">Security &amp; Lockout</text>
+
+        <ellipse class="use-case" cx="435" cy="540" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="541">Auto-Unlock if Lockout Expired</text>
+
+        <ellipse class="use-case" cx="435" cy="595" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="596">Block Login if Account Archived</text>
+
+        <ellipse class="use-case" cx="435" cy="650" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="651">Lock After 5 Failed Attempts</text>
+
+        <ellipse class="use-case" cx="435" cy="705" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="706">Notify GMs on Lockout</text>
+
+        <!-- Module 4: GM Administration -->
+        <rect class="module-boundary" x="225" y="760" width="420" height="135" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="781">GM Administration</text>
+
+        <ellipse class="use-case" cx="435" cy="815" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="816">View, Filter &amp; Search Audit Log</text>
+
+        <ellipse class="use-case" cx="435" cy="870" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="871">Configure System Settings</text>
+
+        <!-- Module 5: System Automated -->
+        <rect class="module-boundary" x="225" y="915" width="420" height="85" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="936">System Automated</text>
+
+        <ellipse class="use-case" cx="435" cy="970" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="971">Audit-Log Auth Events</text>
+
+        <!-- Tenant Actor (LEFT, top) -->
+        <g transform="translate(95, 200)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Tenant</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="220" x2="280" y2="120"/>
+        <line class="conn-line" x1="110" y1="220" x2="300" y2="175"/>
+        <line class="conn-line" x1="110" y1="220" x2="320" y2="230"/>
+        <line class="conn-line" x1="110" y1="220" x2="300" y2="330"/>
+        <line class="conn-line" x1="110" y1="220" x2="280" y2="385"/>
+        <line class="conn-line" x1="110" y1="220" x2="300" y2="440"/>
+
+        <!-- General Manager Actor (RIGHT, mid) -->
+        <g transform="translate(750, 600)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="735" y1="620" x2="570" y2="330"/>
+        <line class="conn-line" x1="735" y1="620" x2="590" y2="385"/>
+        <line class="conn-line" x1="735" y1="620" x2="570" y2="440"/>
+        <line class="conn-line" x1="735" y1="620" x2="590" y2="815"/>
+        <line class="conn-line" x1="735" y1="620" x2="570" y2="870"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(95, 700)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="115" y1="690" x2="280" y2="540"/>
+        <line class="conn-line" x1="115" y1="695" x2="280" y2="595"/>
+        <line class="conn-line" x1="115" y1="700" x2="280" y2="650"/>
+        <line class="conn-line" x1="115" y1="705" x2="300" y2="705"/>
+        <line class="conn-line" x1="115" y1="715" x2="310" y2="970"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 6.1 — User Access &amp; Authentication use cases (First-Time Activation, Ongoing Login &amp; Password, Security &amp; Lockout, GM Administration, System Automated).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>First Login with Temporary Password —</strong> Right after the GM creates a tenant account in <em>SS2</em>, the temp password is emailed. The <strong>Tenant</strong> enters their email + temp password on the login screen. The <strong>System</strong> validates them, audit-logs <em>login</em>, and because the account status is <strong>pending_activation</strong>, immediately generates a 6-digit OTP (Hash::make stored, expiry from <code>citiescapes.auth.otp_expiry_minutes</code>, default 10), dispatches <code>OtpMail</code>, and redirects to the OTP screen.</li>
+      <li><strong>Verify OTP &amp; Activate —</strong> The <strong>Tenant</strong> enters the 6-digit OTP. The <strong>System</strong> validates it (digits:6), looks up the latest unused, unexpired record for the user, hash-checks the entered code, marks the OTP <strong>used</strong>, flips the user to <strong>Active</strong> with <code>activated_at = now</code>, audit-logs <em>account_activated</em>, and redirects to the password-change screen.</li>
+      <li><strong>Resend OTP —</strong> If the OTP expired or never arrived, the <strong>Tenant</strong> can click Resend on the OTP screen. The <strong>System</strong> generates a fresh 6-digit code, stores its hash with a new expiry, and re-dispatches <code>OtpMail</code>.</li>
+      <li><strong>Force First-Time Password Change —</strong> Immediately after activation, because <code>must_change_password</code> is true, the <strong>System</strong> redirects the tenant to <em>Change Password</em> after every successful login until they set their own password.</li>
+      <li><strong>Login (Email &amp; Password) —</strong> From here on, both the <strong>Tenant</strong> and the <strong>General Manager</strong> log in with email + password (≥6 chars). The <strong>System</strong> validates, calls <code>autoUnlockIfExpired()</code>, refuses locked / archived accounts with explicit messages, hash-checks the password, on success resets <code>failed_login_attempts</code>, opens a remembered session, stamps <code>last_login_at</code>, audit-logs <em>login</em>, and redirects role-aware (<code>admin.dashboard</code> for GM, <code>tenant.dashboard</code> for tenant).</li>
+      <li><strong>Auto-Unlock if Lockout Expired —</strong> As a precondition on every login attempt the <strong>System</strong> calls <code>autoUnlockIfExpired()</code> on the user — if the account is locked but <code>locked_until</code> has passed, status flips back to <strong>Active</strong>, <code>locked_until</code> is cleared, and <code>failed_login_attempts</code> resets to 0.</li>
+      <li><strong>Block Login if Account Archived —</strong> Also as a precondition: if the user's status is <strong>archived</strong> (set by SS2 manual archive or the SS4 expiry cron), the <strong>System</strong> refuses the login with the message "Account archived. Contact the General Manager." and never opens a session.</li>
+      <li><strong>Lock After 5 Failed Attempts —</strong> On every failed password check the <strong>System</strong> calls <code>incrementFailedLogin()</code>, audit-logs <em>failed_login</em> with the attempt count, and once attempts reach the threshold (config <code>lockout_threshold</code>, default 5) sets status = <strong>locked</strong> with <code>locked_until = now + lockout_minutes</code> (default 15) — both values are configurable in System Settings.</li>
+      <li><strong>Notify GMs on Lockout —</strong> The moment a lockout is applied, the <strong>System</strong> writes a <code>NotificationLog</code> row of type <em>account_locked</em> for every active GM (bell badge), so administrators can see the event without polling logs.</li>
+      <li><strong>Change Password (Anytime) —</strong> Later in the lifecycle, voluntarily, the <strong>Tenant</strong> or <strong>GM</strong> submits current password + new password (min 8, confirmed). The <strong>System</strong> hash-checks the current password, hashes &amp; saves the new one, clears <code>must_change_password</code>, audit-logs <em>password_change</em>, and redirects role-aware to the dashboard.</li>
+      <li><strong>Logout —</strong> The <strong>Tenant</strong> or <strong>GM</strong> ends their session by POSTing to <code>/logout</code>. The <strong>System</strong> audit-logs <em>logout</em> tagged SS6 (capturing actor + IP), calls <code>auth()-&gt;logout()</code>, invalidates the session, regenerates the CSRF token, and redirects to <code>/login</code>. This is the only mutating route guaranteed to write an audit row even for guest-side request quirks.</li>
+      <li><strong>Activated-Account Gate (Middleware) —</strong> The <code>activated</code> middleware runs before every authenticated route. The <strong>System</strong> reads the user's status and: (1) auto-unlocks if the lockout window expired (UC 6.6); (2) if status is <strong>locked</strong>, logs the user out and redirects to <code>/login</code> with a temporary-lock flash; (3) if status is <strong>archived</strong>, logs out and redirects with the archived-account flash; (4) if status is <strong>pending_activation</strong>, redirects to <code>/otp/verify</code>; (5) if <code>must_change_password</code> is true and the user is not already on the password-change route, redirects to <code>/password/change</code>. Only after all gates pass does the request continue to the controller/Livewire component. This guarantees every other use case starts from a known-good account state.</li>
+      <li><strong>View, Filter &amp; Search Audit Log —</strong> Throughout operations the <strong>GM</strong> opens the Audit Log viewer (paginated 25/page, latest first). Filters narrow by <em>action</em> (drawn from distinct values in the table) and <em>subsystem</em> (SS1–SS7). A search box runs against the action's <code>details</code> and the linked user's full name simultaneously. An <em>Export CSV</em> button streams the currently filtered rows as UTF-8 CSV (ID, timestamp, subsystem, action, actor, role, IP, details); the export itself is audit-logged as <em>audit_log_exported</em> tagged SS6.</li>
+      <li><strong>Configure System Settings —</strong> Whenever policy needs adjustment, the <strong>GM</strong> opens System Settings and edits <em>session_timeout</em> (5–1440 min), <em>lockout_threshold</em> (3–20), <em>lockout_minutes</em> (5–120), <em>otp_expiry</em> (5–60), <em>penalty_grace_days</em> (0–30), and <em>default_penalty_rate</em> (≥0). The <strong>System</strong> validates each value and persists every key into <code>system_settings</code> with the GM's id as <code>updated_by</code>, then audit-logs <em>settings_updated</em>.</li>
+      <li><strong>Audit-Log Auth Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS6</code> for every auth/admin event: <em>login</em>, <em>logout</em>, <em>failed_login</em>, <em>account_activated</em>, <em>password_change</em>, <em>settings_updated</em>, and <em>audit_log_exported</em> — capturing actor, role, timestamp, IP, and details for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- ============= 7. COMMUNICATIONS & NOTIFICATIONS ======= -->
+  <!-- ====================================================== -->
+  <section class="subsystem" id="ss7">
+    <header class="subsystem-header">
+      <div class="subsystem-number">Subsystem 07</div>
+      <h3>Communications &amp; Notifications</h3>
+      <p class="subsystem-scope">Tenant-submitted requests &amp; complaints, GM response with status workflow + Resolved lock, broadcast / direct announcements, the in-app notification bell, and bell + email fan-out for every comms event.</p>
+    </header>
+
+    <div class="block-label">Use Case Diagram</div>
+    <div class="diagram-frame">
+      <svg class="uc-svg" viewBox="0 0 820 935" width="820" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Communications and Notifications use case diagram">
+
+        <rect class="system-boundary" x="200" y="20" width="470" height="900" rx="14" ry="14"/>
+        <text class="system-label" x="225" y="44">Communications &amp; Notifications System</text>
+
+        <!-- Module 1: Tenant Submissions -->
+        <rect class="module-boundary" x="225" y="65" width="420" height="135" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="86">Tenant Submissions</text>
+
+        <ellipse class="use-case" cx="435" cy="120" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="121">Submit Maintenance Request</text>
+
+        <ellipse class="use-case" cx="435" cy="175" rx="125" ry="22"/>
+        <text class="uc-text" x="435" y="176">Submit Complaint</text>
+
+        <!-- Module 2: GM Comms Management -->
+        <rect class="module-boundary" x="225" y="220" width="420" height="265" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="241">GM Comms Management</text>
+
+        <ellipse class="use-case" cx="435" cy="275" rx="170" ry="28"/>
+        <text class="uc-text" x="435" y="269">View, Filter &amp; Search</text>
+        <text class="uc-text" x="435" y="284">Tenant Requests</text>
+
+        <ellipse class="use-case" cx="435" cy="345" rx="170" ry="28"/>
+        <text class="uc-text" x="435" y="339">Respond to Request &amp;</text>
+        <text class="uc-text" x="435" y="354">Update Status</text>
+
+        <ellipse class="use-case" cx="435" cy="415" rx="155" ry="22"/>
+        <text class="uc-text" x="435" y="416">Compose &amp; Send Announcement</text>
+
+        <ellipse class="use-case" cx="435" cy="465" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="466">View Announcement History</text>
+
+        <!-- Module 3: Tenant Notification Bell -->
+        <rect class="module-boundary" x="225" y="505" width="420" height="190" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="526">Tenant Notification Bell</text>
+
+        <ellipse class="use-case" cx="435" cy="560" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="561">View Notification Bell</text>
+
+        <ellipse class="use-case" cx="435" cy="615" rx="155" ry="28"/>
+        <text class="uc-text" x="435" y="609">Open Notification</text>
+        <text class="uc-text" x="435" y="624">(marks read + redirects)</text>
+
+        <ellipse class="use-case" cx="435" cy="675" rx="135" ry="22"/>
+        <text class="uc-text" x="435" y="676">Mark All Read</text>
+
+        <!-- Module 4: System Automated -->
+        <rect class="module-boundary" x="225" y="715" width="420" height="190" rx="10" ry="10"/>
+        <text class="module-label" x="248" y="736">System Automated (bell + email)</text>
+
+        <ellipse class="use-case" cx="435" cy="775" rx="170" ry="22"/>
+        <text class="uc-text" x="435" y="776">Notify GMs on New Tenant Request</text>
+
+        <ellipse class="use-case" cx="435" cy="830" rx="170" ry="22"/>
+        <text class="uc-text" x="435" y="831">Notify Tenant on Request Response</text>
+
+        <ellipse class="use-case" cx="435" cy="885" rx="170" ry="22"/>
+        <text class="uc-text" x="435" y="886">Notify Recipients on Announcement</text>
+
+        <!-- Tenant Actor (LEFT, mid) -->
+        <g transform="translate(95, 400)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <text class="actor-label" x="0" y="74">Tenant</text>
+        </g>
+
+        <line class="conn-line" x1="110" y1="420" x2="280" y2="120"/>
+        <line class="conn-line" x1="110" y1="420" x2="310" y2="175"/>
+        <line class="conn-line" x1="110" y1="420" x2="300" y2="560"/>
+        <line class="conn-line" x1="110" y1="420" x2="280" y2="615"/>
+        <line class="conn-line" x1="110" y1="420" x2="300" y2="675"/>
+
+        <!-- General Manager Actor (RIGHT, M2 mid) -->
+        <g transform="translate(750, 350)">
+          <circle class="actor-fill" cx="0" cy="0" r="9"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="36"/>
+          <line class="actor-line" x1="-14" y1="20" x2="14" y2="20"/>
+          <line class="actor-line" x1="0" y1="36" x2="-12" y2="54"/>
+          <line class="actor-line" x1="0" y1="36" x2="12" y2="54"/>
+          <line class="actor-line" x1="0" y1="9" x2="0" y2="25" stroke-width="2.4"/>
+          <text class="actor-label" x="0" y="74">General Manager</text>
+        </g>
+
+        <line class="conn-line" x1="735" y1="370" x2="605" y2="275"/>
+        <line class="conn-line" x1="735" y1="370" x2="605" y2="345"/>
+        <line class="conn-line" x1="735" y1="370" x2="590" y2="415"/>
+        <line class="conn-line" x1="735" y1="370" x2="570" y2="465"/>
+
+        <!-- System Actor (LEFT, bottom) -->
+        <g transform="translate(95, 830)">
+          <rect class="actor-fill" x="-16" y="-12" width="32" height="22" rx="2"/>
+          <rect class="actor-fill" x="-20" y="10" width="40" height="3"/>
+          <line class="actor-line" x1="-12" y1="-8" x2="12" y2="-8"/>
+          <line class="actor-line" x1="-12" y1="-4" x2="12" y2="-4"/>
+          <line class="actor-line" x1="-12" y1="0" x2="12" y2="0"/>
+          <text class="actor-label" x="0" y="34">System</text>
+        </g>
+
+        <line class="conn-line" x1="115" y1="820" x2="265" y2="775"/>
+        <line class="conn-line" x1="115" y1="830" x2="265" y2="830"/>
+        <line class="conn-line" x1="115" y1="840" x2="265" y2="885"/>
+
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 7.1 — Communications &amp; Notifications use cases (Tenant Submissions, GM Comms Management, Tenant Notification Bell, System Automated bell + email).</p>
+
+    <div class="block-label">Business Activity</div>
+    <ul class="activity-list">
+      <li><strong>Submit Maintenance Request —</strong> Communications begin tenant-side: the <strong>Tenant</strong> opens <em>My Requests</em>, picks type = <em>request</em>, fills subject (max 150) and body (max 2000), and submits. The <strong>System</strong> persists a <code>TenantRequest</code> with the tenant_id, then fans out a bell + email (<code>TenantRequestMail</code>) to every active GM, then shows the "Submitted" confirmation modal.</li>
+      <li><strong>Submit Complaint —</strong> The same form with type = <em>complaint</em>. Validation, persistence, and GM bell + email fan-out are identical, and the modal label switches to "Complaint".</li>
+      <li><strong>Notify GMs on New Tenant Request —</strong> Immediately on submit, the <strong>System</strong> writes one <code>NotificationLog</code> row of type <em>tenant_request</em> for every active GM and dispatches <code>TenantRequestMail</code> to each — bell + email in one fan-out.</li>
+      <li><strong>View, Filter &amp; Search Tenant Requests —</strong> Notified, the <strong>GM</strong> opens <em>Tenant Requests</em> (paginated 15/page, latest first). Dropdowns filter by status (Pending / In Progress / Resolved) and type (Request / Complaint); a search box matches subject or tenant full name.</li>
+      <li><strong>Respond to Request &amp; Update Status —</strong> The <strong>GM</strong> opens a request, types an admin reply (max 2000), and picks a new status (Pending / In Progress / Resolved). The <strong>System</strong> validates, persists <code>admin_response</code> + <code>responded_by</code> + <code>responded_at</code>, then fans out a tenant bell + <code>RequestResponseMail</code>. <strong>Resolved is final</strong> — once a request is saved as Resolved, the modal refuses further edits ("This request is already marked Resolved and can no longer be edited").</li>
+      <li><strong>Notify Tenant on Request Response —</strong> Triggered by the response, the <strong>System</strong> writes a <code>NotificationLog</code> row of type <em>request_response</em> for the tenant and dispatches <code>RequestResponseMail</code> with the new status.</li>
+      <li><strong>View Notification Bell —</strong> The <strong>Tenant</strong> (or any signed-in user) sees the bell with an unread badge counting their unread <code>NotificationLog</code> rows; opening the menu shows the 10 latest notifications.</li>
+      <li><strong>Open Notification (marks read + redirects) —</strong> Clicking a notification entry calls <code>NotificationBell::open()</code>: the <strong>System</strong> marks the row <code>is_read = true</code>, then resolves a role-aware action URL via <code>NotificationLog::actionUrl()</code> and navigates to it (e.g., a tenant clicking a <em>request_response</em> goes to their request thread; a GM clicking <em>tenant_request</em> goes to the request viewer).</li>
+      <li><strong>Mark All Read —</strong> The user clicks <em>Mark all read</em> and the <strong>System</strong> bulk-updates every unread <code>NotificationLog</code> row for that user to <code>is_read = true</code>, clearing the badge.</li>
+      <li><strong>Compose &amp; Send Announcement —</strong> Independently of the tenant-driven flow, the <strong>GM</strong> may broadcast: opening the announcement composer, entering title (max 150) and body (max 2000), and picking recipients — <em>All active tenants</em> or one <em>specific tenant</em>. The <strong>System</strong> validates (specific requires a valid user id), writes the <code>Announcement</code> row with <code>email_sent = true</code>, and per recipient writes a <code>NotificationLog</code> row + dispatches <code>AnnouncementMail</code>. The success flash reports the recipient count.</li>
+      <li><strong>Notify Recipients on Announcement —</strong> Driven by the same send action, the <strong>System</strong> iterates the resolved recipients and per recipient writes a <code>NotificationLog</code> row of type <em>announcement</em> + dispatches <code>AnnouncementMail</code>.</li>
+      <li><strong>View Announcement History —</strong> Afterwards the <strong>GM</strong> reviews every prior announcement (paginated 15/page, latest first) with sender, recipient (or "All"), and timestamp. A search box matches title or body.</li>
+      <li><strong>Audit-Log Communications Events —</strong> Cross-cutting at every step, the <strong>System</strong> writes an <code>AuditLog</code> entry tagged source = <code>SS7</code> for every comms event: <em>tenant_request_submitted</em> (tenant), <em>tenant_request_responded</em> (GM), and <em>announcement_sent</em> (GM) — capturing actor, role, timestamp, and a human-readable note for traceability and BBT verification.</li>
+    </ul>
+  </section>
+
+</div>
+
+<!-- ============== FOOTER ============== -->
+<footer class="doc-footer">
+  <strong>Citiescapes Apartment Rental Management System</strong> · CS12L Major Project · University of Mindanao<br>
+  Liu, John Marlo · Suansing, John Carlo · Tagud, Ben Alexandre · Polinar, Justine Keith Q.
+</footer>
+
+</body>
+</html>

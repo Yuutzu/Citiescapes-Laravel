@@ -1,0 +1,862 @@
+================================================================================
+  CITIESCAPES - WHITE BOX TESTING DOCUMENTATION
+  CS12L Major Project - May 12, 2026
+================================================================================
+
+PROJECT INFORMATION:
+  Project: Citiescapes - Apartment Rental Management System
+  Technology Stack: Laravel 11 + Livewire 3 + MySQL 8
+  Testing Methodology: White-Box Testing
+  Testing Technique: Branch Coverage (Structural Testing)
+  Last Updated: May 12, 2026
+  Status: Complete ✅
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+1. INTRODUCTION TO WHITE-BOX TESTING
+2. BRANCH COVERAGE TECHNIQUE
+3. PLANNING METHODOLOGY
+4. SS1 - ROOM OPERATIONS
+5. SS2 - TENANT MANAGEMENT
+6. SS3 - BILLING & COLLECTIONS
+7. SS4 - CONTRACT & LEASE MANAGEMENT
+8. SS5 - REPORT AND ARCHIVE MANAGEMENT
+9. SS6 - USER ACCESS AND AUTHENTICATION
+10. SS7 - COMMUNICATIONS & NOTIFICATIONS
+11. TEST EXECUTION PROCEDURES
+12. TEST ACCOUNT CREDENTIALS
+
+================================================================================
+1. INTRODUCTION TO WHITE-BOX TESTING
+================================================================================
+
+DEFINITION:
+  White-box testing (structural testing, glass-box testing) examines the
+  INTERNAL LOGIC of code. The tester knows the source code and designs test
+  cases that exercise specific statements, branches, and paths.
+
+  The term "white-box" comes from the idea that the internal logic is visible
+  and transparent, unlike the hidden internals of black-box testing.
+
+PURPOSE:
+  - Validate internal logic paths execute correctly
+  - Test decision branches (if/else/switch)
+  - Verify loop execution
+  - Find code-level bugs
+  - Achieve high code coverage
+  - Test error handling paths
+
+ADVANTAGES:
+  ✓ Finds code-level bugs
+  ✓ Tests all execution paths
+  ✓ Can test error handling
+  ✓ Identifies untested code
+  ✓ Ensures complete branch coverage
+  ✓ Detects unreachable code
+
+DISADVANTAGES:
+  ✗ Requires code knowledge
+  ✗ Time-consuming to write tests
+  ✗ Tests implementation, not specification
+  ✗ Cannot test user experience
+  ✗ May miss business logic errors
+
+WHEN TO USE:
+  - Testing internal logic and calculations
+  - Ensuring all branches execute
+  - Verifying error handling
+  - After black-box testing
+  - For critical modules
+  - In code review process
+
+DIFFERENCE FROM BLACK-BOX:
+
+  Black-Box (User Perspective):
+    ✓ Tests "what the system does"
+    ✓ Tests user-facing features
+    ✓ Focuses on functionality
+    ✓ No code knowledge needed
+
+  White-Box (Developer Perspective):
+    ✓ Tests "how the system works"
+    ✓ Tests internal logic
+    ✓ Focuses on implementation
+    ✓ Requires code knowledge
+
+  Ideal Testing: Use BOTH together for complete coverage
+
+================================================================================
+2. BRANCH COVERAGE TECHNIQUE
+================================================================================
+
+CONCEPT - WHAT IS A BRANCH?
+
+  A "branch" is one of two or more execution paths through code created by
+  a decision point (conditional logic).
+
+  Decision Points:
+    - if statement: 2 paths (true or false)
+    - if/else: 2 paths (if branch or else branch)
+    - if/elseif/else: 3+ paths (one per condition or else)
+    - switch statement: N paths (one per case)
+    - ternary (?:): 2 paths (true or false)
+    - Logical && or ||: 2 paths (short-circuit or continue)
+
+  BRANCH COVERAGE = All branches must be executed at least once
+
+IDENTIFYING BRANCHES:
+
+  Step 1: Find All Decision Points
+  ---------------------------------
+  Read through source code and identify every:
+    - if / elseif / else
+    - switch / case
+    - ternary ? :
+    - &&, ||, !
+    - loops (while, for)
+
+  Example Code:
+    ```php
+    if ($daysOverdue <= 3) {          // DECISION POINT 1
+        // Grace period
+        if ($daysOverdue === 1 || $daysOverdue === 3) {  // DECISION POINT 2
+            sendGraceReminder();
+        }
+    } elseif ($daysOverdue < 14) {    // DECISION POINT 3
+        // Overdue
+    } else {                           // DECISION POINT 4
+        // Delinquent
+    }
+    ```
+
+  Step 2: Number Each Branch Outcome
+  -----------------------------------
+  Label decisions and their outcomes:
+
+    Decision 1 ($daysOverdue <= 3):
+      B1 = true (1-3 days overdue)
+      B1F = false (4+ days overdue)
+
+    Decision 2 ($daysOverdue === 1 || === 3):
+      B1a = true (day 1 or 3)
+      B1aF = false (day 2)
+
+    Decision 3 ($daysOverdue < 14):
+      B2 = true (4-13 days overdue)
+      B2F = false (14+ days overdue)
+
+    Decision 4 (else):
+      B3 = true (automatically true if B2 false)
+
+  Step 3: Create Test for Each Branch
+  ------------------------------------
+  For every branch outcome, design a test that forces execution:
+
+    Test 1 (B1 = true): Input daysOverdue = 1
+    Test 2 (B1 = false): Input daysOverdue = 14
+    Test 3 (B1a = true): Input daysOverdue = 1 (also covers B1a = true)
+    Test 4 (B1a = false): Input daysOverdue = 2
+    Test 5 (B2 = true): Input daysOverdue = 10
+    Test 6 (B3 = true): Input daysOverdue = 30
+
+COMPLETE BRANCH COVERAGE:
+
+  100% Branch Coverage Means:
+    ✓ Every if/else branch executed at least once
+    ✓ Every switch case executed at least once
+    ✓ Every ternary branch executed
+    ✓ Every loop executed AND skipped (for edge cases)
+    ✓ All error paths tested
+
+  Example Achievement:
+    Original code has 5 decision points = 8 possible branches
+    Write 8 tests, one for each branch outcome
+    Run all tests and measure coverage
+    Result: 100% branch coverage achieved
+
+TESTING BOTH BRANCHES:
+
+  CRITICAL: Test both TRUE and FALSE outcomes
+
+  ✗ WRONG (Only tests true branch):
+    if ($user->isAdmin()) {
+        $user->deleteAccount();  // Only test this
+    }
+
+  ✓ CORRECT (Tests both branches):
+    Test 1: isAdmin() = true → deleteAccount() executes
+    Test 2: isAdmin() = false → deleteAccount() does NOT execute
+
+BOUNDARY CONDITIONS IN BRANCHES:
+
+  At Boundaries, Test:
+    - Just before boundary (branch false)
+    - Exactly at boundary (may switch branch)
+    - Just after boundary (branch true)
+
+  Example - Days Overdue <= 3:
+    Test 1: days = 3 (at boundary, branch true)
+    Test 2: days = 4 (just after, branch false)
+
+NESTED BRANCHES:
+
+  When branches contain other branches, test all combinations:
+
+  ```php
+  if ($user->isLocked()) {           // B1
+      if (now() > $lockExpiry) {     // B1a
+          $user->unlock();
+      } else {
+          denyLogin();
+      }
+  } else {
+      allowLogin();
+  }
+  ```
+
+  Test Cases Needed:
+    1. B1 = false → allowLogin()
+    2. B1 = true, B1a = true → unlock()
+    3. B1 = true, B1a = false → denyLogin()
+
+  Total: 3 tests for 2 nested decisions (not 4 or 5)
+
+================================================================================
+3. PLANNING METHODOLOGY
+================================================================================
+
+STEP-BY-STEP PROCESS:
+
+STEP 1: SELECT MODULE TO TEST
+  Pick one method/function (unit) to test
+  Example: ApplyBillingPenalties::handle()
+  File: app/Console/Commands/ApplyBillingPenalties.php
+
+STEP 2: READ SOURCE CODE
+  Analyze the method/function:
+  - What inputs does it accept?
+  - What logic does it contain?
+  - What decisions are made?
+  - What outputs does it produce?
+  - What side effects does it have?
+
+STEP 3: IDENTIFY ALL BRANCHES
+  Find every decision point and number them:
+    B1: if (daysOverdue <= 3)
+    B1a: if (daysOverdue === 1 || daysOverdue === 3)
+    B2: elseif (daysOverdue < 14)
+    B3: elseif (daysOverdue < 30)
+    B4: else
+
+STEP 4: DESIGN TEST INPUTS
+  For each branch outcome, design minimum input to execute it:
+
+    B1 true: daysOverdue = 1, 2, or 3
+    B1 false: daysOverdue = 4+
+    B1a true: daysOverdue = 1 or 3
+    B1a false: daysOverdue = 2
+    etc.
+
+STEP 5: CREATE TEST CASES
+  Document each test with:
+    - Test ID
+    - Branch(es) covered
+    - Input/Preconditions
+    - Expected output
+    - Actual output (filled during testing)
+    - Pass/Fail status
+
+STEP 6: EXECUTE TESTS
+  - Run each test via PHPUnit
+  - Capture coverage metrics
+  - Verify each branch executed
+
+STEP 7: VERIFY COVERAGE
+  - Check coverage report
+  - Identify untested branches
+  - Add tests for gaps
+  - Achieve 100% branch coverage
+
+================================================================================
+4. SS1 - ROOM OPERATIONS
+================================================================================
+
+MODULE: RoomListings::submitInquiry()
+FILE: app/Livewire/Public/RoomListings.php
+
+SOURCE CODE ANALYSIS:
+
+  Decision Points Identified:
+    B1: $this->validate(...) - validation passes (true) or fails (false)
+    B2: foreach($gms as $gm) - 0 GMs (skip loop) vs 1+ GMs (execute loop)
+
+BRANCHES TO COVER:
+
+  B1 - Validation Passes:
+    true: All validation rules pass, inquiry inserted
+    false: Validation fails, error returned, no inquiry inserted
+
+  B2 - GM Loop:
+    true: At least 1 GM exists, notification created for each
+    false: No GMs exist, loop skipped
+
+WHITE-BOX TEST CASES:
+
+WBT_SS1_INQ_001 - Validation Passes With 1 GM
+  Branches: B1 (true), B2 (true, executes once)
+  Precondition: 1 GM exists in database
+  Input: All valid: sender_name="Maria", contact="09171234567",
+         email="maria@test.com", message="Available?"
+  Expected: Inquiry inserted, 1 notification_log created
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS1_INQ_002 - Validation Fails (Empty Name)
+  Branches: B1 (false)
+  Precondition: N/A
+  Input: sender_name="", contact="09171234567", rest valid
+  Expected: Validation error, no inquiry inserted
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS1_INQ_003 - GM Loop With 0 GMs
+  Branches: B1 (true), B2 (false, skipped)
+  Precondition: No GMs in database
+  Input: All valid data
+  Expected: Inquiry inserted, no notification_log created
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS1_INQ_004 - GM Loop With Multiple GMs
+  Branches: B1 (true), B2 (true, executes N times)
+  Precondition: 2+ GMs in database
+  Input: All valid data
+  Expected: Inquiry inserted, N notification_log entries (one per GM)
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+5. SS2 - TENANT MANAGEMENT
+================================================================================
+
+MODULE: TenantManager::save()
+FILE: app/Livewire/Admin/Tenants/TenantManager.php
+
+DECISION POINTS IDENTIFIED:
+
+  B1: if ($this->editingId === null)
+    true: Create new tenant
+    false: Update existing tenant
+
+  B2: if ($tenant->hasActiveContract())
+    true: Cannot archive
+    false: Can archive
+
+WHITE-BOX TEST CASES:
+
+WBT_SS2_TEN_001 - Create New Tenant
+  Branches: B1 (true)
+  Precondition: editingId is null
+  Input: form data for new tenant
+  Expected: New user record created with role="tenant"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS2_TEN_002 - Update Existing Tenant
+  Branches: B1 (false)
+  Precondition: editingId = 5, user 5 exists
+  Input: Modified form data
+  Expected: User 5 updated, full_name changed, other preserved
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS2_TEN_003 - Archive Tenant (No Active Contract)
+  Branches: B2 (false)
+  Precondition: Tenant has no active contracts
+  Input: Archive action
+  Expected: Tenant status changed to "archived"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS2_TEN_004 - Cannot Archive Tenant (Has Active Contract)
+  Branches: B2 (true)
+  Precondition: Tenant has 1+ active contracts
+  Input: Archive action
+  Expected: Error shown, archive blocked, status unchanged
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+6. SS3 - BILLING & COLLECTIONS
+================================================================================
+
+MODULE: ApplyBillingPenalties::handle()
+FILE: app/Console/Commands/ApplyBillingPenalties.php
+
+CONFIGURATION:
+  grace_days = 3
+  delinquent_day = 14
+  eviction_day = 30
+  penalty_rate = 100.00
+
+SOURCE CODE STRUCTURE:
+
+  if (daysOverdue <= 3) {                        // B1
+      status = 'grace'
+      if (daysOverdue === 1 || daysOverdue === 3) {  // B1a
+          sendGraceReminder()
+      }
+  } elseif (daysOverdue < 14) {                  // B2
+      status = 'overdue'
+      penalty = calculatePenalty()
+  } elseif (daysOverdue < 30) {                  // B3
+      status = 'delinquent'
+      if (daysOverdue === 14) {                  // B3a
+          sendDelinquentNotice()
+      }
+  } else {                                       // B4
+      status = 'eviction'
+      if (daysOverdue === 30) {                  // B4a
+          sendEvictionNotice()
+      }
+  }
+
+DECISION BRANCHES:
+
+  B1 (daysOverdue <= 3):
+    true: Grace period (1-3 days)
+    false: Past grace (4+ days)
+
+  B1a (daysOverdue === 1 || === 3):
+    true: First or last day of grace (send reminder)
+    false: Middle of grace (day 2, no reminder)
+
+  B2 (daysOverdue < 14):
+    true: Overdue period (4-13 days)
+    false: Past overdue (14+ days)
+
+  B3 (daysOverdue < 30):
+    true: Delinquent period (14-29 days)
+    false: Eviction period (30+ days)
+
+  B3a (daysOverdue === 14):
+    true: First day delinquent (send notice)
+    false: Later in delinquent (no notice)
+
+  B4 (else):
+    true: Eviction period (30+ days)
+
+  B4a (daysOverdue === 30):
+    true: First day eviction (send notice)
+    false: Later in eviction (no notice)
+
+WHITE-BOX TEST CASES:
+
+WBT_SS3_PEN_001 - B1 True (Grace Period - Day 1)
+  Branch: B1 (true), B1a (true)
+  Input: daysOverdue = 1
+  Expected: status="grace", penalty=0, grace_reminder logged
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_002 - B1 True (Grace Period - Day 2)
+  Branch: B1 (true), B1a (false)
+  Input: daysOverdue = 2
+  Expected: status="grace", penalty=0, no reminder
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_003 - B1 True (Grace Period - Day 3)
+  Branch: B1 (true), B1a (true)
+  Input: daysOverdue = 3
+  Expected: status="grace", penalty=0, grace_reminder logged
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_004 - B1 False, B2 True (Overdue - Day 4)
+  Branch: B1 (false), B2 (true)
+  Input: daysOverdue = 4
+  Expected: status="overdue", penalty=100
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_005 - B2 True (Overdue - Middle)
+  Branch: B2 (true)
+  Input: daysOverdue = 10
+  Expected: status="overdue", penalty=700
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_006 - B2 True (Overdue - Day 13)
+  Branch: B2 (true)
+  Input: daysOverdue = 13
+  Expected: status="overdue", penalty=1000
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_007 - B2 False, B3 True (Delinquent - Day 14)
+  Branch: B2 (false), B3 (true), B3a (true)
+  Input: daysOverdue = 14
+  Expected: status="delinquent", penalty=1100, notice logged
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_008 - B3 True (Delinquent - Day 20)
+  Branch: B3 (true), B3a (false)
+  Input: daysOverdue = 20
+  Expected: status="delinquent", penalty=1700, no notice
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_009 - B3 True (Delinquent - Day 29)
+  Branch: B3 (true)
+  Input: daysOverdue = 29
+  Expected: status="delinquent", penalty=2600
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_010 - B3 False, B4 True (Eviction - Day 30)
+  Branch: B3 (false), B4 (true), B4a (true)
+  Input: daysOverdue = 30
+  Expected: status="eviction", penalty=2700, notice logged
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_011 - B4 True (Eviction - Day 45)
+  Branch: B4 (true), B4a (false)
+  Input: daysOverdue = 45
+  Expected: status="eviction", penalty=4200, no duplicate notice
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS3_PEN_012 - Query Filter (Already Paid Bills)
+  Branch: Query filtering (skip already paid)
+  Input: Bill with status="paid"
+  Expected: Bill excluded from penalty updates, remains untouched
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+7. SS4 - CONTRACT & LEASE MANAGEMENT
+================================================================================
+
+MODULE: Contract::getTimerBadgeAttribute()
+FILE: app/Models/Contract.php
+
+SOURCE CODE:
+
+  public function getTimerBadgeAttribute(): string {
+      if ($this->status !== 'active') return 'gray';     // B1
+      $d = $this->days_remaining;
+      if ($d <= 0)   return 'gray';                      // B2
+      if ($d <= 7)   return 'red';                       // B3
+      if ($d <= 30)  return 'amber';                     // B4
+      return 'green';                                    // B5
+  }
+
+DECISION BRANCHES:
+
+  B1 (status !== 'active'):
+    true: Non-active contract → return 'gray'
+    false: Active contract → continue checks
+
+  B2 (days_remaining <= 0):
+    true: Expired or past → return 'gray'
+    false: Still valid → continue checks
+
+  B3 (days_remaining <= 7):
+    true: Critical (1-7 days) → return 'red'
+    false: More than 7 days → continue
+
+  B4 (days_remaining <= 30):
+    true: Warning (8-30 days) → return 'amber'
+    false: Safe (31+ days) → return 'green' (B5)
+
+WHITE-BOX TEST CASES:
+
+WBT_SS4_TIM_001 - B1 True (Non-Active Contract)
+  Branch: B1 (true)
+  Input: status="draft", days_remaining=60
+  Expected: Badge = "gray"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_002 - B1 True (Terminated Contract)
+  Branch: B1 (true)
+  Input: status="terminated", days_remaining=60
+  Expected: Badge = "gray"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_003 - B1 False, B2 True (Expired - 0 Days)
+  Branch: B1 (false), B2 (true)
+  Input: status="active", days_remaining=0
+  Expected: Badge = "gray"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_004 - B2 True (Expired - Negative Days)
+  Branch: B2 (true)
+  Input: status="active", days_remaining=-5
+  Expected: Badge = "gray"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_005 - B2 False, B3 True (Critical - 1 Day)
+  Branch: B2 (false), B3 (true)
+  Input: status="active", days_remaining=1
+  Expected: Badge = "red"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_006 - B3 True (Critical - 7 Days)
+  Branch: B3 (true)
+  Input: status="active", days_remaining=7
+  Expected: Badge = "red"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_007 - B3 False, B4 True (Warning - 8 Days)
+  Branch: B3 (false), B4 (true)
+  Input: status="active", days_remaining=8
+  Expected: Badge = "amber"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_008 - B4 True (Warning - 30 Days)
+  Branch: B4 (true)
+  Input: status="active", days_remaining=30
+  Expected: Badge = "amber"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_009 - B4 False, B5 True (Safe - 31 Days)
+  Branch: B4 (false), B5 (true)
+  Input: status="active", days_remaining=31
+  Expected: Badge = "green"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS4_TIM_010 - B5 True (Safe - Far Future)
+  Branch: B5 (true)
+  Input: status="active", days_remaining=365
+  Expected: Badge = "green"
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+8. SS5 - REPORT AND ARCHIVE MANAGEMENT
+================================================================================
+
+MODULE: ReportGenerator::generateReport()
+FILE: app/Livewire/Admin/Reports/ReportGenerator.php
+
+DECISION BRANCHES:
+
+  B1: if ($reportType === 'billing')
+    true: Generate billing report with filters
+    false: Generate other report types
+
+  B2: if ($dateRange)
+    true: Apply date range filters
+    false: Include all dates
+
+  B3: if ($statusFilter === 'active')
+    true: Show only active records
+    false: Show active and archived or all
+
+WHITE-BOX TEST CASES:
+
+WBT_SS5_REP_001 - Generate Billing Report With Filters
+  Branch: B1 (true), B2 (true), B3 (true)
+  Input: type="billing", from="2026-01-01", to="2026-05-12", status="active"
+  Expected: Report generated with billing data, date range filtered, status filtered
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS5_REP_002 - Generate Report Without Date Range
+  Branch: B2 (false)
+  Input: from="", to="", rest valid
+  Expected: Report includes all dates
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS5_REP_003 - Generate Report With All Statuses
+  Branch: B3 (false)
+  Input: status="all"
+  Expected: Report includes active and archived records
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+9. SS6 - USER ACCESS AND AUTHENTICATION
+================================================================================
+
+MODULE: User::isLocked() and incrementFailedLogin()
+FILE: app/Models/User.php
+
+DECISION BRANCHES:
+
+  B1: if (failed_login_count >= 5)
+    true: User locked
+    false: User not locked
+
+  B2: if (now() > locked_at + 30 minutes)
+    true: Lock expired, auto-unlock
+    false: Lock still active
+
+WHITE-BOX TEST CASES:
+
+WBT_SS6_LOCK_001 - User Not Locked (Attempts < 5)
+  Branch: B1 (false)
+  Input: failed_login_count=3
+  Expected: isLocked() returns false, can login
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_002 - User Locked (Within Lock Window)
+  Branch: B1 (true), B2 (false)
+  Input: failed_login_count=5, locked_at=now-10 mins
+  Expected: isLocked() returns true, cannot login
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_003 - Lock Expired, Auto-Unlock
+  Branch: B1 (true), B2 (true)
+  Input: failed_login_count=5, locked_at=now-31 mins
+  Expected: autoUnlockIfExpired() resets failed_login_count=0,
+            isLocked() returns false
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_004 - Lock Still Active (At Boundary)
+  Branch: B1 (true), B2 (false at boundary)
+  Input: failed_login_count=5, locked_at=now-30 mins (exactly)
+  Expected: isLocked() returns true
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_005 - Increment Failed Attempts
+  Branch: Successful increment
+  Input: failed_login_count=4, login failure
+  Expected: failed_login_count incremented to 5
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_006 - Set Lock on 5th Failure
+  Branch: Lock timestamp set
+  Input: failed_login_count=4, 5th failure
+  Expected: locked_at set to now, failed_login_count=5
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+WBT_SS6_LOCK_007 - Successful Login Resets Counter
+  Branch: Reset on success
+  Input: failed_login_count=3, successful login
+  Expected: failed_login_count reset to 0, locked_at=null
+  Actual: [To be filled]
+  Status: Pass/Fail
+
+================================================================================
+11. TEST EXECUTION PROCEDURES
+================================================================================
+
+SETUP PHASE:
+
+  1. Navigate to project:
+     cd c:\laragon\www\citiescapes
+
+  2. Wipe database (preserve GM and rooms):
+     php artisan db:wipe-test --no-confirm
+
+  3. Seed White-Box test data:
+     php artisan db:seed --class=WhiteBoxTestScenarioSeeder --force
+
+EXECUTION PHASE (AUTOMATED):
+
+  For Unit Tests (PHPUnit):
+
+    1. Run all White-Box tests:
+       php artisan test:subsystem all --white-box
+
+    2. Run specific subsystem:
+       php artisan test:subsystem SS3
+
+    3. Run specific test file:
+       php artisan test tests/Unit/SS3_BillingPenaltiesTest.php
+
+    4. Run with coverage:
+       php artisan test --coverage
+
+  For Each Test Case:
+
+    1. Run test method
+    2. Observe output and assertions
+    3. Verify test passed or failed
+    4. If failed: Review assertion and code
+    5. Fix code or test as needed
+    6. Re-run to verify fix
+
+DOCUMENTATION:
+
+  For each test, record:
+    - Actual Output: What the code actually did
+    - Status: Pass or Fail
+    - Notes: Any issues or unexpected behavior
+
+================================================================================
+12. TEST ACCOUNT CREDENTIALS
+================================================================================
+
+WHITE-BOX TESTING ACCOUNTS:
+
+  White-Box Testing GM:
+    Email: wb.gm.one@test.local
+    Password: password
+    Role: GM
+
+  White-Box Testing Tenant:
+    Email: wb.tenant.create@test.local
+    Password: password
+    Role: Tenant
+
+  Additional White-Box Tenants:
+    wb.tenant.update@test.local / password
+    wb.tenant.lock@test.local / password
+    wb.tenant.unlock@test.local / password
+
+================================================================================
+SUMMARY
+================================================================================
+
+White-Box testing focuses on:
+  ✓ Internal logic and decision points
+  ✓ All execution branches
+  ✓ Boundary conditions in logic
+  ✓ Error handling paths
+  ✓ Complete code coverage
+
+Technique used:
+  ✓ Branch Coverage - Ensure every if/else/switch path is executed
+
+Total White-Box Test Cases: 148+ branch cases (see white_box_testing_all_subsystems.html for the per-row table)
+Subsystems Covered: 7 (SS1-SS7)
+Coverage Target: 90%+ branch coverage
+
+Note: This plain-text companion currently details branch lists for SS1-SS6.
+      SS7 (Communications & Notifications) branch coverage is fully detailed
+      in docs/white_box_testing_all_subsystems.html (19 branches across
+      RequestViewer, AnnouncementManager, TenantRequestManager, and
+      NotificationBell control flow).
+
+Key Differences from Black-Box:
+  Black-Box: Tests WHAT (user sees)
+  White-Box: Tests HOW (code works)
+
+Ideal Approach: Combine both for complete, robust testing
+
+================================================================================
+END OF WHITE-BOX TESTING DOCUMENTATION
+================================================================================

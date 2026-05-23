@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Citiescapes — White-Box Testing (Branch Coverage)</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        color: #000;
+        background: #fff;
+        margin: 0;
+        padding: 32px 40px 64px;
+        line-height: 1.4;
+    }
+    h1.doc-title { font-size: 20px; margin: 0 0 4px; }
+    p.doc-sub { font-size: 12px; color: #333; margin: 0 0 24px; }
+
+    table.meta { border-collapse: collapse; width: 760px; margin: 40px 0 6px; }
+    table.meta td { border: 1px solid #000; padding: 4px 8px; vertical-align: top; font-size: 12px; }
+    table.meta td.label { font-weight: bold; width: 150px; }
+    table.meta td.value { font-weight: bold; }
+    .course-line { font-size: 11px; font-weight: bold; margin: 2px 0 0; }
+    .milestone-line { font-size: 11px; margin: 2px 0 4px; }
+    .module-sub { font-size: 12px; font-weight: bold; text-align: center; margin: 14px 0 8px; }
+
+    table.tc { border-collapse: collapse; width: 100%; margin: 0 0 40px; }
+    table.tc th, table.tc td {
+        border: 1px solid #000;
+        padding: 5px 7px;
+        vertical-align: top;
+        font-size: 11px;
+    }
+    table.tc thead th { background: #cfcfcf; text-align: center; font-weight: bold; }
+    table.tc th.c-id   { width: 9%; }
+    table.tc th.c-feat { width: 19%; }
+    table.tc th.c-tech { width: 9%; }
+    table.tc th.c-pre  { width: 14%; }
+    table.tc th.c-in   { width: 14%; }
+    table.tc th.c-exp  { width: 19%; }
+    table.tc th.c-act  { width: 9%; }
+    table.tc th.c-stat { width: 7%; }
+    table.tc td.id   { font-family: 'Courier New', monospace; font-size: 10px; }
+    table.tc td.stat { text-align: center; font-weight: bold; }
+    .passed { color: #1a7a1a; }
+    code { font-family: 'Courier New', monospace; font-size: 10.5px; }
+    .toc { margin: 16px 0 8px; font-size: 12px; }
+    .toc a { color: #00529b; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .legend { font-size: 11px; color: #333; margin: 6px 0 26px; }
+    @media print { body { padding: 0; } tr { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1 class="doc-title">White Box Testing — Branch Coverage Test Case Specification</h1>
+<p class="doc-sub">Citiescapes Apartment Rental Management System · CS12L Major Project · Final Compiled Revision (2026-05-20)</p>
+
+<div class="toc">
+    <strong>Modules:</strong>
+    <a href="#m1">SS1 Room Operations</a> ·
+    <a href="#m2">SS2 Tenant Management</a> ·
+    <a href="#m3">SS3 Billing &amp; Collections</a> ·
+    <a href="#m4">SS4 Contract &amp; Lease Management</a> ·
+    <a href="#m5">SS5 Report &amp; Archive Management</a> ·
+    <a href="#m6">SS6 User Access &amp; Authentication</a> ·
+    <a href="#m7">SS7 Communications &amp; Notifications</a> ·
+    <a href="#m8">HTTP Responses &amp; Error Handling</a>
+</div>
+<p class="legend">
+    <strong>Technique:</strong> Branch Coverage — every decision path (if / elseif / else / case / short-circuit boolean) is exercised at least once.
+    <strong>Status:</strong> Pass = branch covered by a green automated unit test.
+    Final run (2026-05-24): <strong>270 passed, 0 failed, 1 skipped</strong>. The skipped case is the BBT-side CSRF-token assertion (see <code>BBT_HTTP_010</code>); Laravel&rsquo;s <code>VerifyCsrfToken</code> short-circuits in the PHPUnit runtime, so the test is documented as skipped rather than failing.
+</p>
+
+<!-- ============================== SS1 ============================== -->
+<table class="meta" id="m1">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS1 — Room Operations</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Room Operations Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS1_001</td><td>RoomManager::save (editing = true)</td><td>Branch Coverage</td><td>editing = true, editId set.</td><td>valid room fields.</td><td>if branch: existing room updated; room_updated audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_002</td><td>RoomManager::save (editing = false)</td><td>Branch Coverage</td><td>editing = false.</td><td>valid room fields.</td><td>else branch: Room::create executed; room_created audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_003</td><td>RoomManager::updateStatus (occupied guard true)</td><td>Branch Coverage</td><td>Room has current_tenant_id.</td><td>newStatus = 'available'.</td><td>if (occupied) true: flash error; status change blocked.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_004</td><td>RoomManager::updateStatus (occupied guard false)</td><td>Branch Coverage</td><td>Room is empty.</td><td>newStatus = 'under_maintenance'.</td><td>guard false: status updated; room_status_change audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_005</td><td>RoomManager::archiveRoom (tenant present)</td><td>Branch Coverage</td><td>Room occupied by a tenant.</td><td>archiveRoom(id).</td><td>if (tenant) true: tenant + contract archived; room reset to available.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_006</td><td>RoomManager::archiveRoom (no tenant)</td><td>Branch Coverage</td><td>Room is empty.</td><td>archiveRoom(id).</td><td>tenant branch skipped; only the room snapshot archived.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_007</td><td>RoomManager::updatedCardPhotoFile (no slot)</td><td>Branch Coverage</td><td>cardPhotoSlot is null.</td><td>upload triggered.</td><td>guard true: early return; no file stored.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_008</td><td>RoomManager::updatedCardPhotoFile (invalid slot)</td><td>Branch Coverage</td><td>cardPhotoSlot = 'penthouse.0'.</td><td>upload triggered.</td><td>in_array() false: slot rejected; early return.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_009</td><td>RoomManager::updatedCardPhotoFile (happy)</td><td>Branch Coverage</td><td>Valid slot recorded.</td><td>valid image file.</td><td>all guards false: file stored; URL written into the photos slot.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_010</td><td>RoomManager::loadRoomCards (saved photos exist)</td><td>Branch Coverage</td><td>system_settings has a saved photos key.</td><td>loadRoomCards().</td><td>array_key_exists true: saved photos used verbatim, not defaults.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_011</td><td>RoomManager::loadRoomCards (no saved photos)</td><td>Branch Coverage</td><td>card never edited.</td><td>loadRoomCards().</td><td>array_key_exists false: default photos used.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_012</td><td>RoomListings::submitInquiry (validation pass)</td><td>Branch Coverage</td><td>1 active GM.</td><td>all required fields valid.</td><td>validate() passes; Inquiry::create executed; foreach fans out.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_013</td><td>RoomListings::submitInquiry (validation fail)</td><td>Branch Coverage</td><td>—</td><td>name = ''.</td><td>validate() throws; create + foreach skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_014</td><td>RoomListings::submitInquiry (foreach GMs &gt; 0)</td><td>Branch Coverage</td><td>3 active GMs.</td><td>valid inquiry.</td><td>foreach iterates 3 times; 3 notification bells created.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_015</td><td>RoomListings::submitInquiry (foreach GMs = 0)</td><td>Branch Coverage</td><td>0 active GMs.</td><td>valid inquiry.</td><td>foreach body skipped; 0 bells created.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_016</td><td>RoomListings::inquireAbout (type in set)</td><td>Branch Coverage</td><td>—</td><td>type = 'compact'.</td><td>in_array() true: preferred type set; event dispatched.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_017</td><td>RoomListings::inquireAbout (type not in set)</td><td>Branch Coverage</td><td>—</td><td>type = 'penthouse'.</td><td>in_array() false: no-op.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_018</td><td>RoomListings::render (fallback coalesce)</td><td>Branch Coverage</td><td>0 compact rooms available.</td><td>render().</td><td>?? fallback selects the first compact room of any status.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_019</td><td>InquiryManager::compose (inquiry not found)</td><td>Branch Coverage</td><td>id not in inquiries.</td><td>compose(99999).</td><td>!inquiry true: flash 'no email on file'; composing id stays null.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_020</td><td>InquiryManager::compose (inquiry has no email)</td><td>Branch Coverage</td><td>Inquiry email = null.</td><td>compose(id).</td><td>!email true: flash + early return.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_021</td><td>InquiryManager::compose (happy)</td><td>Branch Coverage</td><td>Inquiry has an email.</td><td>compose(id).</td><td>both guards false: composing id set; subject/body pre-filled.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_022</td><td>InquiryManager::sendEmail (no email)</td><td>Branch Coverage</td><td>Inquiry email cleared.</td><td>sendEmail().</td><td>guard fires: flash error; no mail sent.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS1_023</td><td>InquiryManager::sendEmail (happy)</td><td>Branch Coverage</td><td>Inquiry has email; valid input.</td><td>sendEmail().</td><td>mail dispatched; status set to responded; GM notes saved.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS2 ============================== -->
+<table class="meta" id="m2">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS2 — Tenant Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Tenant Management Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS2_001</td><td>TenantManager::store (validation pass)</td><td>Branch Coverage</td><td>email unique.</td><td>valid name + email.</td><td>validate() passes; User::create + temp-password mail + audit row.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_002</td><td>TenantManager::store (validation fail)</td><td>Branch Coverage</td><td>email already exists.</td><td>duplicate email.</td><td>validate() throws; create + mail + audit skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_003</td><td>TenantManager::archiveTenant (found)</td><td>Branch Coverage</td><td>Tenant exists.</td><td>archiveTenant(id).</td><td>findOrFail succeeds; Archive::create + update + audit executed.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_004</td><td>TenantManager::archiveTenant (not found)</td><td>Branch Coverage</td><td>id missing.</td><td>archiveTenant(99999).</td><td>findOrFail throws 404; no Archive row created.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_005</td><td>TenantManager::deleteTenant</td><td>Branch Coverage</td><td>Tenant exists.</td><td>deleteTenant(id).</td><td>forceDelete executed; audit row written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_006</td><td>TenantManager::render (search branch)</td><td>Branch Coverage</td><td>search = 'maria'.</td><td>render().</td><td>when(search) closure fires; query filters across all columns.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_007</td><td>TenantManager::render (filterStatus branch)</td><td>Branch Coverage</td><td>filterStatus = 'active'.</td><td>render().</td><td>when(filterStatus) closure fires; query filters by status.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_008</td><td>TenantManager::render (no filters)</td><td>Branch Coverage</td><td>both empty.</td><td>render().</td><td>both when() closures skipped; query returns all tenants.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_009</td><td>Profile::save (validation pass)</td><td>Branch Coverage</td><td>Tenant authenticated.</td><td>valid profile fields.</td><td>validate() passes; user update executed; audit row.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_010</td><td>Profile::save (validation fail)</td><td>Branch Coverage</td><td>Tenant authenticated.</td><td>full_name = ''.</td><td>validate() throws; update + audit + bell fan-out skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_011</td><td>Profile::save (GM foreach &gt; 0)</td><td>Branch Coverage</td><td>2 active GMs.</td><td>valid save.</td><td>foreach iterates twice; 2 GM bells + 1 self bell.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_012</td><td>Profile::save (GM foreach = 0)</td><td>Branch Coverage</td><td>0 active GMs.</td><td>valid save.</td><td>foreach body skipped; only the self bell written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_013</td><td>Profile::mount (coalesce defaults)</td><td>Branch Coverage</td><td>User contact_number = null.</td><td>mount().</td><td>?? '' fallback chain assigns empty strings.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS2_014</td><td>Profile::mount (non-null fields)</td><td>Branch Coverage</td><td>User has full contact info.</td><td>mount().</td><td>?? left-hand values used; no fallback.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS3 ============================== -->
+<table class="meta" id="m3">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS3 — Billing &amp; Collections</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Billing &amp; Collections Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS3_001</td><td>BillingManager::recordInitial (validation pass)</td><td>Branch Coverage</td><td>Active contract, no initial payment.</td><td>valid fields.</td><td>validate passes; duplicate check passes; InitialPayment::create + audit.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_002</td><td>BillingManager::recordInitial (duplicate)</td><td>Branch Coverage</td><td>Initial payment already exists.</td><td>recordInitial().</td><td>exists() true: flash + early return; no duplicate.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_003</td><td>BillingManager::updatedInitContractId (value null)</td><td>Branch Coverage</td><td>—</td><td>value = null.</td><td>ternary false: initAmenities set to empty array.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_004</td><td>BillingManager::updatedInitContractId (value set)</td><td>Branch Coverage</td><td>Contract with requested amenities.</td><td>value = contract id.</td><td>ternary true: amenities pre-filled from the contract.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_005</td><td>BillingManager::generateBill (valid)</td><td>Branch Coverage</td><td>Active contract.</td><td>valid utilities.</td><td>validate passes; status + duplicate guards pass; Bill::create + audit.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_006</td><td>BillingManager::generateBill (invalid)</td><td>Branch Coverage</td><td>—</td><td>electricity = -50.</td><td>validate throws; create + audit skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_007</td><td>BillingManager::generateBill (duplicate period guard)</td><td>Branch Coverage</td><td>A bill for this period already exists.</td><td>generateBill().</td><td>duplicate check true: flash error; no second bill created.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_008</td><td>BillingManager::confirmPayment (full payment)</td><td>Branch Coverage</td><td>Bill total fully covered.</td><td>amount = bill total.</td><td>is_fully_paid true: bill flipped to Paid; payment_confirmed audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_009</td><td>BillingManager::confirmPayment (partial payment)</td><td>Branch Coverage</td><td>Payment less than the balance.</td><td>amount &lt; balance.</td><td>is_fully_paid false: status unchanged; payment_partial logged.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_010</td><td>BillingManager::confirmPayment (invalid amount)</td><td>Branch Coverage</td><td>—</td><td>amount = 0.</td><td>validate throws; payment + update + audit skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_011</td><td>BillingManager::confirmPayment (overpayment guard)</td><td>Branch Coverage</td><td>Bill balance lower than the amount.</td><td>amount &gt; balance.</td><td>overpayment guard true: addError; no payment recorded.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_012</td><td>BillingManager::applyDepositToArrears (deposit remains)</td><td>Branch Coverage</td><td>Contract has unused deposit.</td><td>applyDepositToArrears(id).</td><td>deposit-remaining branch: credit payment created; deposit_applied_amount incremented.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_013</td><td>BillingManager::saveOverride (valid)</td><td>Branch Coverage</td><td>Bill with a penalty.</td><td>reason provided, amount within cap.</td><td>validate passes; PenaltyOverride::create; bill update; audit.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_014</td><td>BillingManager::saveOverride (invalid)</td><td>Branch Coverage</td><td>—</td><td>reason = ''.</td><td>validate throws; override + audit skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_015</td><td>ApplyBillingPenalties (foreach = 0)</td><td>Branch Coverage</td><td>No overdue bills.</td><td>Run cron.</td><td>foreach body skipped; "0 overdue bills" reported.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_016</td><td>ApplyBillingPenalties (Grace, day 1)</td><td>Branch Coverage</td><td>Bill 1 day overdue; grace = 3.</td><td>Run cron.</td><td>1st if true → Grace; inner if (day = 1) true → reminder sent.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_017</td><td>ApplyBillingPenalties (Grace, mid)</td><td>Branch Coverage</td><td>Bill 2 days overdue; grace = 3.</td><td>Run cron.</td><td>1st if true → Grace; inner if false → no reminder.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_018</td><td>ApplyBillingPenalties (Grace, last day)</td><td>Branch Coverage</td><td>Bill 3 days overdue; grace = 3.</td><td>Run cron.</td><td>1st if true → Grace; inner if (day = grace) true → reminder.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_019</td><td>ApplyBillingPenalties (Overdue, day 4)</td><td>Branch Coverage</td><td>Bill 4 days overdue.</td><td>Run cron.</td><td>elseif &lt; delinquent → penalty applied; status Overdue.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_020</td><td>ApplyBillingPenalties (Overdue, day 13)</td><td>Branch Coverage</td><td>Bill 13 days overdue.</td><td>Run cron.</td><td>same elseif true; penalty accumulates per day.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_021</td><td>ApplyBillingPenalties (Delinquent, day 14)</td><td>Branch Coverage</td><td>Bill exactly 14 days overdue.</td><td>Run cron.</td><td>elseif &lt; eviction → Delinquent; inner if true → notice bell once.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_022</td><td>ApplyBillingPenalties (Delinquent, day 20)</td><td>Branch Coverage</td><td>Bill 20 days overdue.</td><td>Run cron.</td><td>elseif true; inner if false → no duplicate notice.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_023</td><td>ApplyBillingPenalties (Eviction, day 30)</td><td>Branch Coverage</td><td>Bill exactly 30 days overdue.</td><td>Run cron.</td><td>else → Eviction; inner if true → eviction bell once.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_024</td><td>ApplyBillingPenalties (Eviction, day 31)</td><td>Branch Coverage</td><td>Bill 31 days overdue.</td><td>Re-run cron.</td><td>else; inner if false → no duplicate eviction notice.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_025</td><td>BillingManager::sortBy (toggle direction)</td><td>Branch Coverage</td><td>Same column already sorted.</td><td>sortBy(same column).</td><td>if same-column true: direction toggles desc → asc.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS3_026</td><td>BillingManager::sortBy (new column)</td><td>Branch Coverage</td><td>Different column.</td><td>sortBy(new column).</td><td>if same-column false: sortBy reset; direction set to asc.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS4 ============================== -->
+<table class="meta" id="m4">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS4 — Contract &amp; Lease Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Contract &amp; Lease Management Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS4_001</td><td>ContractManager::save (editing = true)</td><td>Branch Coverage</td><td>editing = true, editId set.</td><td>valid fields.</td><td>if branch: existing contract updated; contract_updated audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_002</td><td>ContractManager::save (editing = false)</td><td>Branch Coverage</td><td>editing = false.</td><td>valid fields.</td><td>else branch: status = draft; Contract::create; contract_created audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_003</td><td>ContractManager::save (scan provided)</td><td>Branch Coverage</td><td>—</td><td>scanFile attached.</td><td>if scanFile branch: file stored; scan_file_path saved.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_004</td><td>ContractManager::save (no scan)</td><td>Branch Coverage</td><td>—</td><td>scanFile = null.</td><td>scan branch skipped; existing path preserved.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_005</td><td>ContractManager::updatedRoomId (no value)</td><td>Branch Coverage</td><td>—</td><td>value = null.</td><td>early return; base rent untouched.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_006</td><td>ContractManager::updatedRoomId (room found)</td><td>Branch Coverage</td><td>Room exists.</td><td>value = valid id.</td><td>if (room) true: base rent rate set from the room's rate.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_007</td><td>ContractManager::activate (not a draft)</td><td>Branch Coverage</td><td>Contract status != draft.</td><td>activate(id).</td><td>status guard true: flash error; activation aborted.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_008</td><td>ContractManager::activate (no scan)</td><td>Branch Coverage</td><td>Draft has no signed scan.</td><td>activate(id).</td><td>scan guard true: flash error; activation aborted.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_009</td><td>ContractManager::activate (room conflict)</td><td>Branch Coverage</td><td>Room occupied by another tenant.</td><td>activate(id).</td><td>conflict guard true: flash error; activation aborted.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_010</td><td>ContractManager::activate (happy)</td><td>Branch Coverage</td><td>Valid draft with a scan.</td><td>activate(id).</td><td>all guards false: contract Active; room Occupied; ack timestamps mirrored.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_011</td><td>ContractManager::terminate (validation fail)</td><td>Branch Coverage</td><td>—</td><td>reason = ''.</td><td>validate throws; status not flipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_012</td><td>ContractManager::terminate (tenant active)</td><td>Branch Coverage</td><td>Tenant status = active.</td><td>valid reason.</td><td>if true: tenant flipped to Archived.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_013</td><td>ContractManager::terminate (tenant not active)</td><td>Branch Coverage</td><td>Tenant status = locked.</td><td>valid reason.</td><td>tenant branch skipped; contract still archived.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_014</td><td>ContractManager::terminate (room owned by tenant)</td><td>Branch Coverage</td><td>Room current_tenant_id matches.</td><td>valid reason.</td><td>if true: room freed to Available.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_015</td><td>ContractManager::terminate (room owned by other)</td><td>Branch Coverage</td><td>Room current_tenant_id differs.</td><td>valid reason.</td><td>room branch skipped; other tenant kept.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_016</td><td>ContractView::acknowledgeStep1 (no contract)</td><td>Branch Coverage</td><td>contract = null.</td><td>call ack1.</td><td>early return; nothing updated; no audit.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_017</td><td>ContractView::acknowledgeStep1 (already acked)</td><td>Branch Coverage</td><td>step1 already set.</td><td>call ack1.</td><td>guard true: early return; timestamp not overwritten.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_018</td><td>ContractView::acknowledgeStep1 (happy)</td><td>Branch Coverage</td><td>contract set, step1 null.</td><td>call ack1.</td><td>guard false: update + audit row.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_019</td><td>ContractView::acknowledgeStep2 (step1 missing)</td><td>Branch Coverage</td><td>contract set, step1 null.</td><td>call ack2.</td><td>guard true: early return; contract stays Draft.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_020</td><td>ContractView::acknowledgeStep2 (happy)</td><td>Branch Coverage</td><td>step1 set, step2 null.</td><td>call ack2.</td><td>update; contract Active; room linked; audit row.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_021</td><td>ContractManager::submitScanDecision (deny)</td><td>Branch Coverage</td><td>scanDecisionAction = deny.</td><td>note empty.</td><td>deny branch: note is required → validate throws.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_022</td><td>ContractManager::submitScanDecision (approve)</td><td>Branch Coverage</td><td>scanDecisionAction = approve.</td><td>valid input.</td><td>approve branch: scan_view_status set to approved; audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_023</td><td>SendContractExpiryWarnings (30-day foreach)</td><td>Branch Coverage</td><td>1 contract 15 days from expiry.</td><td>Run command.</td><td>foreach iterates once; 30-day warning sent; flag set.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_024</td><td>SendContractExpiryWarnings (7-day foreach)</td><td>Branch Coverage</td><td>1 contract 5 days from expiry.</td><td>Run command.</td><td>2nd foreach iterates once; urgent 7-day warning sent.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_025</td><td>AutoArchiveExpiredContracts (tenant active)</td><td>Branch Coverage</td><td>Expired contract; tenant active.</td><td>Run command.</td><td>if true: tenant archived; Archive row written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_026</td><td>AutoArchiveExpiredContracts (tenant not active)</td><td>Branch Coverage</td><td>Tenant already archived.</td><td>Run command.</td><td>tenant branch skipped; contract still archived.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS4_027</td><td>SyncRoomContractStatus (--cleanup branch)</td><td>Branch Coverage</td><td>Occupied room with no active contract.</td><td>Run with <code>--cleanup</code>.</td><td>cleanup option true: cleanup loop frees the room.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS5 ============================== -->
+<table class="meta" id="m5">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS5 — Report and Archive Management</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Report &amp; Archive Management Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS5_001</td><td>ReportManager::restore (tenant_account)</td><td>Branch Coverage</td><td>Archive record_type = tenant_account.</td><td>restore(id).</td><td>type guard passes; user re-activated to Active; restored flag set.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_002</td><td>ReportManager::restore (non-tenant type)</td><td>Branch Coverage</td><td>Archive record_type = room.</td><td>restore(id).</td><td>type guard true: flash error; archive left unchanged.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_003</td><td>ReportManager::restore (user missing)</td><td>Branch Coverage</td><td>tenant_account archive; user already deleted.</td><td>restore(id).</td><td>User::find = null: flash error; no re-activation.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_004</td><td>ReportManager::permanentDelete</td><td>Branch Coverage</td><td>Archive exists.</td><td>permanentDelete(id).</td><td>findOrFail succeeds; audit row written before delete; row removed.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_005</td><td>ReportManager::exportContractPdf (not contract)</td><td>Branch Coverage</td><td>Archive record_type = room.</td><td>exportContractPdf(id).</td><td>if != contract true: flash error; return null.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_006</td><td>ReportManager::exportContractPdf (contract, scan)</td><td>Branch Coverage</td><td>Contract archive with a scan path.</td><td>exportContractPdf(id).</td><td>scan URL set; PDF generated; archive_contract_pdf audited.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_007</td><td>ReportManager::exportContractPdf (no scan)</td><td>Branch Coverage</td><td>Contract archive, scan path null.</td><td>exportContractPdf(id).</td><td>scan URL null branch; PDF still generated with an empty-state note.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_008</td><td>ReportManager::filteredQuery (no filters)</td><td>Branch Coverage</td><td>All filter strings empty.</td><td>filteredQuery().</td><td>all four when() closures skipped; returns all non-restored rows.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_009</td><td>ReportManager::filteredQuery (filterType)</td><td>Branch Coverage</td><td>filterType = room.</td><td>filteredQuery().</td><td>1st when() closure fires; filters by record_type.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_010</td><td>ReportManager::filteredQuery (filterSubsystem)</td><td>Branch Coverage</td><td>filterSubsystem = SS4.</td><td>filteredQuery().</td><td>2nd when() closure fires; filters by source subsystem.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_011</td><td>ReportManager::filteredQuery (dateFrom)</td><td>Branch Coverage</td><td>dateFrom set.</td><td>filteredQuery().</td><td>3rd when() closure fires; whereDate &gt;= from.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_012</td><td>ReportManager::filteredQuery (dateTo)</td><td>Branch Coverage</td><td>dateTo set.</td><td>filteredQuery().</td><td>4th when() closure fires; whereDate &lt;= to.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_013</td><td>ReportManager::exportCsv (rows &gt; 0)</td><td>Branch Coverage</td><td>Filtered query returns rows.</td><td>exportCsv().</td><td>foreach writes a CSV data row per archive; <em>archive_exported_csv</em> audited with the row count.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_014</td><td>ReportManager::exportCsv (rows = 0)</td><td>Branch Coverage</td><td>Filtered query empty.</td><td>exportCsv().</td><td>foreach skipped; an empty CSV (header row only) is streamed; <em>archive_exported_csv</em> still audited with row count 0 for traceability (no empty-guard short-circuit in current code).</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS5_015</td><td>ReportManager::restore (audit row)</td><td>Branch Coverage</td><td>tenant_account archive.</td><td>restore(id).</td><td>record_restored audit row written after re-activation.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS6 ============================== -->
+<table class="meta" id="m6">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS6 — User Access and Authentication</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">User Access &amp; Authentication Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS6_001</td><td>Login::login (user not found)</td><td>Branch Coverage</td><td>Email not in users.</td><td>unknown email.</td><td>if !user true: failed_login audited with null user; addError on email.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_002</td><td>Login::login (auto-unlock branch)</td><td>Branch Coverage</td><td>User locked, lock expired.</td><td>valid email + correct password.</td><td>autoUnlockIfExpired returns true; isLocked now false; flow continues.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_003</td><td>Login::login (still locked)</td><td>Branch Coverage</td><td>User locked, lock in future.</td><td>any password.</td><td>isLocked true: addError "Account locked. Try again in N min".</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_004</td><td>Login::login (archived)</td><td>Branch Coverage</td><td>User status = archived.</td><td>any password.</td><td>if true: addError "Account archived…"; no session created.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_005</td><td>Login::login (wrong password → lock)</td><td>Branch Coverage</td><td>User active, 4 prior failures.</td><td>wrong password.</td><td>Hash::check false; increment → locked; just-locked inner if → notify GMs.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_006</td><td>Login::login (wrong password, not yet locked)</td><td>Branch Coverage</td><td>User active, 0 prior failures.</td><td>wrong password.</td><td>increment; not yet locked; inner if false → standard invalid-credentials error.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_007</td><td>Login::login (pending activation)</td><td>Branch Coverage</td><td>User status = pending_activation.</td><td>correct temp password.</td><td>if true: OTP sent; redirect to otp.verify.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_008</td><td>Login::login (must change password)</td><td>Branch Coverage</td><td>Active user, must_change_password = true.</td><td>correct password.</td><td>if true: redirect to password.change.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_009</td><td>Login::login (role is GM)</td><td>Branch Coverage</td><td>Active GM.</td><td>correct password.</td><td>ternary true: redirect to admin.dashboard.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_010</td><td>Login::login (role is tenant)</td><td>Branch Coverage</td><td>Active tenant.</td><td>correct password.</td><td>ternary false: redirect to tenant.dashboard.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_011</td><td>OtpVerify::verify (no record)</td><td>Branch Coverage</td><td>No unused OTP for the user.</td><td>any 6 digits.</td><td>if !record true: addError on otp; status unchanged.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_012</td><td>OtpVerify::verify (wrong digits)</td><td>Branch Coverage</td><td>OTP record exists.</td><td>wrong digits.</td><td>Hash::check false: addError on otp.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_013</td><td>OtpVerify::verify (happy)</td><td>Branch Coverage</td><td>Fresh OTP record.</td><td>correct digits.</td><td>both guards false: OTP used; user Active; audit; redirect.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_014</td><td>OtpVerify::verify (expired record)</td><td>Branch Coverage</td><td>OTP expires_at in the past.</td><td>valid digits.</td><td>expiry filter returns 0 rows; treated as no record.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_015</td><td>ChangePassword::save (wrong current)</td><td>Branch Coverage</td><td>Authenticated user.</td><td>current = wrong.</td><td>if !Hash::check true: addError on current_password.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_016</td><td>ChangePassword::save (happy)</td><td>Branch Coverage</td><td>Authenticated user.</td><td>current correct, new valid.</td><td>guard false: password updated; must_change cleared; audit; redirect.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_017</td><td>User::isLocked (true case)</td><td>Branch Coverage</td><td>status = locked, lock in future.</td><td>isLocked().</td><td>both conditions true: returns true.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_018</td><td>User::isLocked (false case)</td><td>Branch Coverage</td><td>status = active.</td><td>isLocked().</td><td>short-circuit: status check false → returns false.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_019</td><td>User::autoUnlockIfExpired (true branch)</td><td>Branch Coverage</td><td>status = locked, lock expired.</td><td>autoUnlockIfExpired().</td><td>both conditions true: account unlocked; returns true.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_020</td><td>User::autoUnlockIfExpired (false branch)</td><td>Branch Coverage</td><td>status = active OR lock in future.</td><td>autoUnlockIfExpired().</td><td>compound condition false: returns false; no update.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_021</td><td>User::incrementFailedLogin (below threshold)</td><td>Branch Coverage</td><td>attempts = 3, threshold = 5.</td><td>increment.</td><td>increment to 4; if (4 &gt;= 5) false → account not locked.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_022</td><td>User::incrementFailedLogin (at threshold)</td><td>Branch Coverage</td><td>attempts = 4, threshold = 5.</td><td>increment.</td><td>increment to 5; if (5 &gt;= 5) true → account locked.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_023</td><td>SystemSettings::save (validation fail)</td><td>Branch Coverage</td><td>—</td><td>otp_expiry above the maximum.</td><td>validate throws; setValue calls + audit skipped.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS6_024</td><td>SystemSettings::save (happy)</td><td>Branch Coverage</td><td>GM authenticated.</td><td>all fields valid.</td><td>validate passes; settings persisted; audit row written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== SS7 ============================== -->
+<table class="meta" id="m7">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">SS7 — Communications &amp; Notifications</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">Communications &amp; Notifications Test Cases</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_SS7_001</td><td>RequestManager::submit (valid)</td><td>Branch Coverage</td><td>Tenant authenticated.</td><td>valid type/subject/body.</td><td>validate passes; TenantRequest::create; audit; foreach over GMs.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_002</td><td>RequestManager::submit (invalid)</td><td>Branch Coverage</td><td>—</td><td>subject too long.</td><td>validate throws; nothing persisted; no fan-out.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_003</td><td>RequestManager::submit (foreach GMs &gt; 0)</td><td>Branch Coverage</td><td>3 active GMs.</td><td>valid submit.</td><td>foreach iterates 3 times; 3 bells + 3 emails.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_004</td><td>RequestManager::submit (GM email branch)</td><td>Branch Coverage</td><td>GM with an email.</td><td>valid submit.</td><td>if (gm-&gt;email) true: bell + email both sent.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_005</td><td>RequestViewer::respond (validation fail)</td><td>Branch Coverage</td><td>—</td><td>newStatus invalid.</td><td>validate throws; no update; no notification.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_006</td><td>RequestViewer::respond (already resolved)</td><td>Branch Coverage</td><td>Request status = resolved.</td><td>respond().</td><td>if resolved true: flash + close; no update.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_007</td><td>RequestViewer::respond (tenant email present)</td><td>Branch Coverage</td><td>Pending request; tenant has email.</td><td>respond().</td><td>if tenant-&gt;email true: response email dispatched.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_008</td><td>RequestViewer::respond (no tenant email)</td><td>Branch Coverage</td><td>Pending request; tenant email null.</td><td>respond().</td><td>email branch skipped; bell still written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_009</td><td>AnnouncementManager::send (validation pass)</td><td>Branch Coverage</td><td>GM authenticated.</td><td>title, body, type = all.</td><td>validate passes; Announcement::create; foreach + audit row.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_010</td><td>AnnouncementManager::send (validation fail)</td><td>Branch Coverage</td><td>—</td><td>title = ''.</td><td>validate throws; nothing persisted; no audit.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_011</td><td>AnnouncementManager::resolveRecipients (all)</td><td>Branch Coverage</td><td>recipientType = all.</td><td>resolveRecipients().</td><td>if true: returns all active tenants.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_012</td><td>AnnouncementManager::resolveRecipients (specific)</td><td>Branch Coverage</td><td>recipientType = specific.</td><td>resolveRecipients().</td><td>else branch: returns the one chosen tenant.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_013</td><td>AnnouncementManager::send (recipient email present)</td><td>Branch Coverage</td><td>Recipient tenant has an email.</td><td>send.</td><td>if recipient-&gt;email true: announcement email dispatched.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_014</td><td>AnnouncementManager::send (no recipient email)</td><td>Branch Coverage</td><td>Recipient tenant email null.</td><td>send.</td><td>email branch skipped; bell still written.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_015</td><td>NotificationBell::open (not found)</td><td>Branch Coverage</td><td>Notification id not for this user.</td><td>open(id).</td><td>if !notif true: early return; no update; no redirect.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_016</td><td>NotificationBell::open (already read)</td><td>Branch Coverage</td><td>Notification is_read = true.</td><td>open(id).</td><td>if !is_read false: update skipped; redirect still attempted.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_017</td><td>NotificationBell::open (unread + URL)</td><td>Branch Coverage</td><td>Unread; action URL resolves.</td><td>open(id).</td><td>mark read; if (url) true: redirect.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_018</td><td>NotificationBell::open (no URL)</td><td>Branch Coverage</td><td>Unread; action URL null.</td><td>open(id).</td><td>mark read; if (url) false: nothing returned; user stays.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_SS7_019</td><td>NotificationBell::markAllRead</td><td>Branch Coverage</td><td>Mixed read / unread per user.</td><td>markAllRead().</td><td>bulk update only where is_read = false; other users untouched.</td><td>As expected.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+<!-- ============================== HTTP ============================== -->
+<table class="meta" id="m8">
+    <tr><td class="label">Group Name:</td><td class="value">Citiescapes Apartment Rental Management System</td></tr>
+    <tr><td class="label">Proponents:</td><td class="value">Liu, John Marlo<br>Suansing, John Carlo<br>Tagud, Ben Alexandre<br>Polinar, Justine Keith Q.</td></tr>
+    <tr><td class="label">Module Name:</td><td class="value">HTTP Responses &amp; Error Handling (Cross-Cutting)</td></tr>
+</table>
+<p class="course-line">CS12L: MAJOR PROJECT</p>
+<p class="milestone-line">Milestone 6: White-Box (Branch Coverage) Test Case Specification</p>
+<p class="module-sub">HTTP Responses &amp; Error Handling — Middleware Branch Coverage</p>
+
+<table class="tc">
+<thead><tr><th class="c-id">Test Case ID</th><th class="c-feat">Feature / Module (method)</th><th class="c-tech">Testing Technique</th><th class="c-pre">Preconditions</th><th class="c-in">Test Input</th><th class="c-exp">Expected Output</th><th class="c-act">Actual Output</th><th class="c-stat">Status</th></tr></thead>
+<tbody>
+<tr><td class="id">WBT_HTTP_001</td><td>EnsureUserHasRole::handle (no user)</td><td>Branch Coverage</td><td>Request has no authenticated user.</td><td>handle(req, next, 'gm').</td><td>B1a true: abort(403) — HttpException with status 403.</td><td>403 thrown.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_002</td><td>EnsureUserHasRole::handle (role mismatch)</td><td>Branch Coverage</td><td>Authenticated tenant.</td><td>handle(req, next, 'gm').</td><td>B1b true: role differs → abort(403).</td><td>403 thrown.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_003</td><td>EnsureUserHasRole::handle (role match)</td><td>Branch Coverage</td><td>Authenticated GM.</td><td>handle(req, next, 'gm').</td><td>B1c: role matches → next() returned; no abort.</td><td>200 pass-through.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_004</td><td>EnsureAccountActivated::handle (no user)</td><td>Branch Coverage</td><td>No authenticated user.</td><td>handle(req, next).</td><td>B2a: redirect to the login route.</td><td>Redirect → login.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_005</td><td>EnsureAccountActivated::handle (locked)</td><td>Branch Coverage</td><td>User status = locked.</td><td>handle(req, next).</td><td>B2b: logout + redirect to login with a flash.</td><td>Logged out, redirected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_006</td><td>EnsureAccountActivated::handle (archived)</td><td>Branch Coverage</td><td>User status = archived.</td><td>handle(req, next).</td><td>B2c: logout + redirect to login.</td><td>Logged out, redirected.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_007</td><td>EnsureAccountActivated::handle (pending)</td><td>Branch Coverage</td><td>User status = pending_activation.</td><td>handle(req, next).</td><td>B2d: redirect to otp.verify.</td><td>Redirect → otp.verify.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_008</td><td>EnsureAccountActivated::handle (must change pw)</td><td>Branch Coverage</td><td>must_change_password = true, not on change route.</td><td>handle(req, next).</td><td>B2e: redirect to password.change.</td><td>Redirect → password.change.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_009</td><td>EnsureAccountActivated::handle (on change route)</td><td>Branch Coverage</td><td>must_change_password = true, already on change route.</td><td>handle(req, next).</td><td>B2f: pass-through — no redirect loop.</td><td>200 pass-through.</td><td class="stat passed">Pass</td></tr>
+<tr><td class="id">WBT_HTTP_010</td><td>EnsureAccountActivated::handle (fully active)</td><td>Branch Coverage</td><td>Active, activated, no flags.</td><td>handle(req, next).</td><td>B2g: pass-through — next() returned.</td><td>200 pass-through.</td><td class="stat passed">Pass</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

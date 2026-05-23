@@ -1,0 +1,779 @@
+﻿================================================================================
+CITIESCAPES — REVISED EVENT TABLES, DATA DICTIONARY & PROCESS DESCRIPTIONS
+Apartment Rental Management System | CS12L Major Project
+Last revised: 2026-05-17 (re-aligned to use_cases_all_subsystems.html)
+================================================================================
+
+Document conventions
+--------------------
+- SS1  Room Operations (Public listing, inquiries, room inventory, room type cards)
+- SS2  Tenant Management
+- SS3  Billing & Collections
+- SS4  Contract & Lease Management
+- SS5  Report and Archive Management
+- SS6  User Access and Authentication
+- SS7  Communications & Notifications
+- PK   Primary Key   |   FK   Foreign Key
+- All inter-subsystem signals flow through the system bus; "System" is shown as
+  the actor when no human user originates the action.
+
+================================================================================
+SS1 — ROOM OPERATIONS
+================================================================================
+
+ENTITIES
++------------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| Entity           | Alt. Name   | Description                                                  | Input Data Flows           | Output Data Flows          |
++------------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| Public Visitor   | Tenant      | Any unauthenticated visitor who browses the public landing   | Room Listings Display,     | Room Inquiry, Type         |
+|                  | (Visitor)   | page and may submit an inquiry. Has no account.              | Card Image, Response       | Preference                 |
++------------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| General Manager  | Admin       | Sole administrator. Owns all room CRUD, room status, room    | Inquiry, Status Command,   | Inquiry Response, Updated  |
+|                  |             | type card image management, inquiry handling, archives.      | Card Image Upload          | Room, Updated Card,        |
+|                  |             |                                                              |                            | Archive Command            |
++------------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| System           | Automated   | Renders public listing, sends inquiry notifications, stores  | Card Image Upload, Inquiry | Notification, File Stored, |
+|                  | Platform    | uploaded card files, re-renders landing page on change.      | Event                      | Listing Re-rendered        |
++------------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+
+PROCESSES
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                                        | Output                                             |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| 1.1  | Display Room Listings           | Visitor page load                            | Public landing with two cards (Compact / Spacious) |
+| 1.2  | Receive & Log Inquiry           | Inquiry form data                            | Inquiry row + Admin notification                   |
+| 1.3  | Confirm Availability            | Inquiry, current room status                 | Tenant informed; SS4 contract draft started        |
+| 1.4  | Set Room Rate & Amenities       | Rate, amenities, photos                      | Room record updated                                |
+| 1.5  | Update Room Status              | Admin status command                         | Room.status persisted (Available/Occupied/Maint.)  |
+| 1.6  | View Occupancy Dashboard        | Admin view request                           | Full occupancy panel rendered                      |
+| 1.7  | View & Manage Inquiry Log       | Admin view request                           | Inquiry list with Respond/Close actions            |
+| 1.8  | Manage Room Type Card  (NEW)    | Card image upload from Admin (Settings page) | RoomTypeCard row updated; image stored;            |
+|      |                                 |                                              | landing page re-rendered next request              |
+| 1.9  | Archive Room Record             | Admin archive command                        | Record moved to SS5 archive DB                     |
+| 1.10 | Delete Room Record              | Admin delete command (confirmed)             | Record permanently removed; logged in audit trail  |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Event                         | Trigger                  | Source          | Activity                                                     | Response                         | Destination                |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| View Room Listings            | Visitor opens website    | Public Visitor  | System renders both Room Type Cards with current image,      | Landing page displayed; no login | Public Visitor             |
+|                               |                          |                 | floor, specs, amenities, rate, availability count.           | required                         |                            |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Submit Room Inquiry           | Visitor sends form       | Public Visitor  | Inquiry validated; row written to inquiries table; bell      | Inquiry log entry; Admin pinged  | GM + Inquiry Log           |
+|                               |                          |                 | notification + email dispatched to GM.                       |                                  |                            |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Notify Admin                  | Inquiry persisted        | System          | Bell badge incremented; email queued.                        | Admin notified                   | GM                         |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Respond to Inquiry            | GM submits reply form    | GM              | Inquiry status -> responded; reply persisted; email sent.    | Visitor / tenant informed        | Inquiry Log + Mail Queue   |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Set Rate & Amenities          | GM saves room edit       | GM              | Validation + persistence; audit row written.                 | Listing reflects new data        | Rooms DB + Audit Log       |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Update Room Status            | GM changes status        | GM              | Status persisted with timestamp + GM ID.                     | Listing visibility recomputed    | Rooms DB                   |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Manage Room Type Card  (NEW)  | GM uploads image in      | GM              | File validated (mime/size), stored under                     | Card image saved; version bumped | RoomTypeCards DB +         |
+|                               | System Settings page     |                 | storage/app/public/room-type-cards/; row updated.            |                                  | Public file storage        |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Re-render Public Listing      | Card record updated      | System          | Cache invalidated; next public request fetches new asset.    | Landing page shows new image     | Public Listing             |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| View Occupancy Dashboard      | GM opens dashboard       | GM              | System aggregates Rooms + Tenants and renders dashboard.     | Full occupancy overview shown    | GM                         |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Close Inquiry                 | GM clicks Close          | GM              | Inquiry status -> closed.                                    | Inquiry closed                   | Inquiry Log                |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Archive Room Record           | GM clicks Archive after  | GM              | Room record exported to SS5; remains in rooms table marked   | Archive copy created             | SS5 Archive DB             |
+|                               | tenant vacate            |                 | archived; audit row written.                                 |                                  |                            |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+| Delete Room Record            | GM confirms hard delete  | GM              | Record permanently deleted; deletion logged.                 | Record removed                   | System Audit Log           |
++-------------------------------+--------------------------+-----------------+--------------------------------------------------------------+----------------------------------+----------------------------+
+
+DATA FLOWS
++--------------------------+--------------------------------------------------------------+--------------------+----------------------+----------------------+
+| Data Flow                | Description                                                  | Origin             | Destination          | Volume / Frequency   |
++--------------------------+--------------------------------------------------------------+--------------------+----------------------+----------------------+
+| Room Listings Display    | Full public listing rendered with cards, photos, status.     | System / Rooms DB  | Public Visitor       | Continuous           |
+| Room Inquiry             | Form submission with name, contact, preferred type.          | Public Visitor     | Process 1.2          | ~10 / month          |
+| Card Image Upload (NEW)  | Multipart-form image file (jpg/png/webp, <=2 MB).            | GM (Settings)      | Process 1.8          | Rare; on demand      |
+| Card Image Asset (NEW)   | Public URL pointing to the latest stored card image.         | Storage            | Public Visitor       | Continuous           |
+| Rate & Amenity Update    | Room edit form payload.                                      | GM                 | Process 1.4          | ~4-6 / month         |
+| Room Status Update       | Manual GM action; saved with timestamp + GM ID.              | GM                 | Process 1.5          | ~15-20 / month       |
+| Occupancy Dashboard Data | Aggregated Rooms + Tenants summary.                          | System             | GM                   | Several times daily  |
+| Inquiry Log Data         | All inquiries grouped by status.                             | System             | GM                   | On demand            |
+| Archived Room Record     | Room export payload sent to SS5.                             | Process 1.9        | SS5                  | ~2-4 / month         |
++--------------------------+--------------------------------------------------------------+--------------------+----------------------+----------------------+
+
+DATA STORES
++-------------------+----------------------+----------------------------------------------+---------------------------------------------------------------+-----------------------------+
+| Store             | Alt. Name            | Description                                  | Key Attributes                                                | Volume / Frequency          |
++-------------------+----------------------+----------------------------------------------+---------------------------------------------------------------+-----------------------------+
+| Room Listings     | rooms table          | Each physical room with manual status,       | Room ID (PK), Room Number, Floor, Type, Photos[], Amenities,  | 22 rooms; ~15-20            |
+|                   |                      | rate, photos, occupant.                      | Rate, Max Occupants, Status, Updated By, Updated At,          | status updates / mo         |
+|                   |                      |                                              | Tenant ID (FK -> SS2)                                         |                             |
++-------------------+----------------------+----------------------------------------------+---------------------------------------------------------------+-----------------------------+
+| Inquiry Log       | inquiries table      | Submissions from public visitors.            | Inquiry ID (PK), Sender Name, Contact, Email, Preferred Type, | ~10-15 / month              |
+|                   |                      |                                              | Message, Inquiry Date, Status, Response, Responded At, Notes  |                             |
++-------------------+----------------------+----------------------------------------------+---------------------------------------------------------------+-----------------------------+
+| Room Type Cards   | room_type_cards      | Public landing cards (Compact / Spacious).   | Card ID (PK), Slug (compact|spacious), Title, Subtitle, Body, | 2 rows total; image         |
+|   (NEW)           | table                | Image-only editable by GM via Settings.      | Image Path, Image Updated At, Updated By (GM ID), Version     | replaced rarely             |
++-------------------+----------------------+----------------------------------------------+---------------------------------------------------------------+-----------------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 1.1 — DISPLAY ROOM LISTINGS
+- Renders the public landing on every page visit.
+- Composes the two Room Type Cards from the room_type_cards table (image, title,
+  subtitle, body) and the live availability count from the rooms table.
+- No authentication required.
+
+PROCESS 1.2 — RECEIVE & LOG INQUIRY
+- Validates inquiry form input; persists an inquiries row.
+- Dispatches an in-app bell notification + email to the GM.
+
+PROCESS 1.3 — CONFIRM AVAILABILITY
+- GM reads the room's current status from rooms and contacts the visitor.
+- On confirm, GM proceeds to SS4 to create a contract draft.
+- Room status does not change here; it remains Available until GM manually
+  flips it after physical move-in.
+
+PROCESS 1.4 — SET ROOM RATE AND AMENITIES
+- GM enters room rate, amenities list, max occupancy, photos.
+- Saved to rooms; public listing reflects changes immediately.
+
+PROCESS 1.5 — UPDATE ROOM STATUS
+- GM picks one of: Available / Occupied / Under Maintenance.
+- Every change records timestamp and GM's user ID. No automatic transitions.
+
+PROCESS 1.6 — VIEW OCCUPANCY DASHBOARD
+- GM accesses an aggregated summary of all 22 rooms with status, tenant,
+  floor, and last status update.
+
+PROCESS 1.7 — VIEW & MANAGE INQUIRY LOG
+- GM lists inquiries grouped by Pending / Responded / Closed.
+- Marks responded with a free-text note; resolved -> Closed.
+
+PROCESS 1.8 — MANAGE ROOM TYPE CARD  (NEW)
+- GM opens System Settings > Room Type Cards.
+- For each card (Compact, Spacious) GM may upload a new image.
+- System validates mimetype (jpg|png|webp) and size (<= 2 MB).
+- File stored under storage/app/public/room-type-cards/{slug}-{timestamp}.{ext}.
+- room_type_cards.image_path updated; image_updated_at and updated_by stamped.
+- Action audited in SS6 audit log.
+- The public landing fetches the new asset on the next request; no manual
+  cache bust required.
+
+PROCESS 1.9 — ARCHIVE ROOM RECORD
+- GM archives a room's historical record once a tenant vacates and all
+  billing/contract records are finalized.
+- Record copied to SS5; room continues to exist in active table with current
+  status.
+
+PROCESS 1.10 — DELETE ROOM RECORD
+- GM permanently removes a room record.
+- Irreversible; logged in SS6 audit trail with GM ID and timestamp.
+
+================================================================================
+SS2 — TENANT MANAGEMENT
+================================================================================
+
+ENTITIES
++----------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| Entity         | Alt. Name   | Description                                                  | Input Data Flows           | Output Data Flows          |
++----------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| Tenant         | Holder      | Account holder after contract is signed. Activates via OTP,  | Temp Password, OTP,        | OTP Response, Profile      |
+|                |             | views profile, and manages their own account.                | Notifications              | Update                    |
++----------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| GM             | Admin       | Creates accounts, views profiles, and archives accounts.     | Tenant Info, Archive Cmd   | Account, Status, Archive   |
++----------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+| System         | Automated   | Generates temp password, dispatches OTP via SS6, and         | Account Created, SS4       | Email, Auto-Archive        |
+|                |             | auto-archives on contract end.                               | End Signal                 |                            |
++----------------+-------------+--------------------------------------------------------------+----------------------------+----------------------------+
+
+PROCESSES
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                                        | Output                                             |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| 2.1  | Create Tenant Account           | GM-entered name + email                      | Account; temporary password emailed                |
+| 2.2  | Activate Account                | Temp password + OTP                          | Account Active; first-login forced password change |
+| 2.3  | View Tenant Profile             | GM or tenant request                         | Profile rendered                                   |
+| 2.4  | Update Tenant Profile           | Tenant profile form                          | Profile persisted; GM notified                     |
+| 2.5  | View Tenant Dashboard  (NEW)    | Tenant login                                 | Cross-subsystem snapshot: active contract (SS4),   |
+|      |                                 |                                              | latest bill + unpaid count (SS3), initial payment  |
+|      |                                 |                                              | receipt, 5 latest notifications (SS7)              |
+| 2.9  | Archive / Delete Account        | GM command / SS4 contract end signal         | Account archived in SS5 or permanently deleted     |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+| Event                   | Trigger                 | Source        | Activity                                         | Response                    | Destination          |
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+| Create Tenant Account   | SS4 contract signed     | GM            | Account row written; temp password emailed.      | Account created             | Tenant (via email)   |
+| Account Activation      | First login + OTP entry | Tenant+System | OTP validated by SS6; account marked Active.     | Tenant in portal            | Tenant               |
+| View Profile            | Profile page accessed   | GM / Tenant   | Profile data retrieved.                          | Profile shown               | GM / Tenant          |
+| Update Profile          | Tenant submits change   | Tenant        | Validation; row updated; GM notified.            | Profile updated             | DB + GM              |
+| Auto-Archive Account    | SS4 contract end signal | System        | Account flagged archived; record copied to SS5.  | Account archived            | SS5                  |
+| Manual Archive / Delete | GM command              | GM            | Archive or permanent delete with audit row.      | Archived / removed          | SS5 / Audit Log      |
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow             | Description                                                 | Origin         | Destination     | Frequency          |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Contract Signed Sig.  | SS4 -> SS2 trigger to create account.                       | SS4            | Process 2.1     | ~5-8 / month       |
+| Temporary Password    | Auto-generated, emailed on account creation.                | System         | Tenant (email)  | ~5-8 / month       |
+| OTP Verification      | Sent by SS6 for first login.                                | SS6            | Tenant          | ~5-8 / month       |
+| Profile Data          | Stored personal details rendered to user.                   | System         | GM / Tenant     | Continuous         |
+| Profile Update        | Updated contact / personal info from tenant.                | Tenant         | DB              | ~3-5 / month       |
+| Contract End Signal   | SS4 -> SS2 trigger to auto-archive.                         | SS4            | Process 2.9     | ~5-8 / month       |
+| Archived Account      | Account export to SS5.                                      | Process 2.9    | SS5             | ~5-8 / month       |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Store             | Description                                  | Key Attributes                                                 | Frequency             |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Tenant Accounts   | Login credentials + status.                  | Tenant ID (PK), Email, Hashed Password, Status, Created At,    | ~5-8 new / month      |
+|                   |                                              | Activated At, Contract ID (FK), Archived By, Archived At       |                       |
+| Tenant Profiles   | Personal info; editable by tenant.           | Profile ID (PK), Tenant ID (FK), Full Name, Contact, Address,  | ~5 updates / month    |
+|                   |                                              | Emergency Contact, Move-In, Lease End (from SS4)               |                       |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 2.1 — CREATE TENANT ACCOUNT
+- After SS4 records a signed contract, GM enters full name + email.
+- A temporary password is generated, hashed, persisted, and emailed.
+
+PROCESS 2.2 — ACTIVATE ACCOUNT
+- Tenant logs in with the temporary password.
+- SS6 sends an OTP; on correct entry the account moves to Active.
+- Tenant is forced to change password before any portal screen renders.
+
+PROCESS 2.3 / 2.4 — VIEW / UPDATE PROFILE
+- Both GM and tenant can view; only the owning tenant can update.
+- Updates write to the profile table; GM notified via bell.
+
+PROCESS 2.9 — ARCHIVE / DELETE ACCOUNT
+- Manual: GM clicks Archive or Delete.
+- Auto: SS4 contract end signal triggers an archive flow.
+- Archives copy the record to SS5 and revoke login.
+
+================================================================================
+SS3 — BILLING & COLLECTIONS
+================================================================================
+
+ENTITIES
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Entity    | Description                                                  | Input Data Flows            | Output Data Flows           |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Tenant    | Makes initial payment, views bills + receipts, marks         | Bill, Receipt, Notification | Initial Payment, View       |
+|           | unpaid count.                                                |                             | Requests                    |
+| GM        | Generates bills, confirms payments, applies penalty          | Contract, Payment Proof,    | Bill, Override, Archive Cmd |
+|           | overrides, archives at lease end.                            | Override Reason             |                             |
+| System    | Activates billing on contract start, applies daily penalties,| Contract Active Signal,     | Penalty, Reminder,          |
+|           | sends reminders, escalates delinquency, sends notices.       | Daily Schedule              | Escalation, Notice          |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+
+PROCESSES
++------+---------------------------------+----------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                                  | Output                                             |
++------+---------------------------------+----------------------------------------+----------------------------------------------------+
+| 3.1  | Activate Billing                | SS4 Contract Active signal             | Billing profile created                            |
+| 3.2  | Record Initial Payment          | Tenant initial payment details         | InitialPayment row + receipt                       |
+| 3.3  | Generate Monthly Bill           | Billing cycle trigger + contract rate  | Bill row; tenant notified                          |
+| 3.4  | Confirm Payment                 | GM payment proof confirmation          | Bill.status=Paid; receipt logged                   |
+| 3.5  | Apply Grace Reminder            | Day 1-3 unpaid                         | Reminder notification                              |
+| 3.6  | Apply Penalty                   | Day 4+ unpaid (daily scheduler)        | Bill.penalty + Bill.status=Overdue                 |
+| 3.7  | Escalate Status                 | Day 14 / Day 30 unpaid                 | Delinquent / Eviction notice                       |
+| 3.8  | Penalty Override / Waive        | GM action + written reason             | Bill adjusted; override row                        |
+| 3.9  | Archive Billing                 | Lease end / GM command                 | Records exported to SS5                            |
++------+---------------------------------+----------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++-----------------------+--------------------------+----------+-----------------------------------------------------+-----------------------------+----------------------+
+| Event                 | Trigger                  | Source   | Activity                                            | Response                    | Destination          |
++-----------------------+--------------------------+----------+-----------------------------------------------------+-----------------------------+----------------------+
+| Billing Activated     | Contract Active (SS4)    | System   | Billing profile initialized using contract rate.    | Ready for first bill        | Billing DB           |
+| Record Initial Fees   | Tenant moves in          | GM       | Deposit + first rent + key fee recorded.            | Receipt generated           | GM                   |
+| Generate Monthly Bill | Billing cycle            | GM       | Itemized bill created.                              | Tenant notified             | Tenant               |
+| Payment Received      | Tenant pays              | Tenant   | GM confirms; payment + date logged.                 | Bill marked Paid            | DB                   |
+| Grace Reminder        | Day 1-3 unpaid           | System   | Overdue counter starts; automated reminders sent.   | Counter visible             | Tenant               |
+| Penalty Applied       | Day 4+ unpaid            | System   | Daily penalty added to bill.                        | Bill -> Overdue             | Tenant               |
+| Formal Notice         | Day 14 / Day 30          | System   | Status escalation + formal notice + eviction flag.  | GM + tenant notified        | GM + Tenant          |
+| Penalty Override      | GM action                | GM       | Adjustment + written reason logged.                 | Override row                | Override Log         |
+| Archive Payment Recs  | Lease end                | GM       | Billing records exported.                           | Archive copy in SS5         | SS5                  |
++-----------------------+--------------------------+----------+-----------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow              | Description                                                 | Origin         | Destination     | Frequency          |
++------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Contract Active Signal | SS4 -> SS3 to initialize billing profile.                   | SS4            | Process 3.1     | ~5-8 / month       |
+| Initial Payment Data   | Deposit + first rent + key fee.                             | Tenant / GM    | Process 3.2     | ~5-8 / month       |
+| Monthly Bill           | Itemized rent + utilities + penalties.                      | Process 3.3    | Tenant          | ~22 / month        |
+| Penalty Application    | Daily computed penalty on overdue bills.                    | System         | Bill row        | Daily              |
+| Reminder Notification  | Bell + email reminders during grace.                        | System         | Tenant          | As needed          |
+| Escalation Notice      | Formal Delinquent / Eviction message.                       | System         | Tenant + GM     | As needed          |
+| Override Reason        | GM-supplied free-text justification.                        | GM             | Override Log    | As needed          |
+| Archived Billing       | Records exported on lease end.                              | Process 3.9    | SS5             | ~5-8 / month       |
++------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++-------------------+----------------------------------------------+-----------------------------------------------------------------+-----------------------+
+| Store             | Description                                  | Key Attributes                                                  | Frequency             |
++-------------------+----------------------------------------------+-----------------------------------------------------------------+-----------------------+
+| Bills             | Monthly bills per contract.                  | Bill ID (PK), Contract ID (FK), Period, Base Rent, Utilities,   | ~22 / month           |
+|                   |                                              | Penalty, Total, Status, Due Date, Paid At, Confirmed By         |                       |
+| Initial Payments  | One-time move-in fees.                       | IP ID (PK), Contract ID (FK), Deposit, First Rent, Key Fee,     | ~5-8 / month          |
+|                   |                                              | Amenity Fees, Paid At, Receipt File                             |                       |
+| Override Log      | Penalty adjustments with reasons.            | Override ID (PK), Bill ID (FK), Old Penalty, New Penalty,       | Rare                  |
+|                   |                                              | Reason, GM ID, Created At                                       |                       |
++-------------------+----------------------------------------------+-----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 3.1 — ACTIVATE BILLING
+- On SS4 signal "Contract Active", billing profile created with the contract
+  rate as the base for all future bills.
+
+PROCESS 3.2 — RECORD INITIAL PAYMENT
+- GM records security deposit, first month's rent, and key fee on move-in.
+- Receipt PDF generated and saved.
+
+PROCESS 3.3 — GENERATE MONTHLY BILL
+- Each cycle GM creates an itemized bill: rent + utilities + outstanding
+  penalty + total. Tenant notified.
+
+PROCESS 3.4 — CONFIRM PAYMENT
+- GM verifies receipt and marks the bill as Paid with date.
+
+PROCESS 3.5 — GRACE REMINDER (Day 1-3)
+- System starts an overdue counter on the tenant's dashboard.
+- Daily reminders sent; no penalty yet.
+
+PROCESS 3.6 — APPLY PENALTY (Day 4+)
+- Daily penalty computed using the SS6 setting penalty_rate.
+- Bill status -> Overdue.
+
+PROCESS 3.7 — ESCALATE STATUS
+- Day 14 -> Delinquent (formal notice).
+- Day 30 -> Eviction flag (eviction notice).
+
+PROCESS 3.8 — PENALTY OVERRIDE / WAIVE
+- GM may reduce or waive any penalty with a written reason.
+- Override + reason saved for audit.
+
+PROCESS 3.9 — ARCHIVE BILLING RECORDS
+- On lease end, GM moves all bills + initial payments + overrides to SS5.
+
+================================================================================
+SS4 — CONTRACT & LEASE MANAGEMENT
+================================================================================
+
+ENTITIES
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Entity    | Description                                                  | Input Data Flows            | Output Data Flows           |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| GM        | Drafts, prints, scans, uploads, renews, terminates           | SS1 Avail Confirmation,     | Contract Draft, Scan,       |
+|           | contracts. Owns the contract lifecycle.                      | Tenant Info, Scan           | Renewal / Termination       |
+| Tenant    | Signs the paper contract, then digitally acknowledges        | Contract Summary, Timer,    | Physical Signature,         |
+|           | terms (Step 1) and penalty clause (Step 2). Views timer.     | Expiry Notification         | Step 1 / 2 Acknowledgement  |
+| System    | Activates contracts after both acknowledgements, runs the    | Acknowledgements, Dates     | Activation, Timer, Expiry   |
+|           | daily timer, sends expiry warnings, auto-archives on expiry. |                             | Notifications, SS3/SS2/SS5  |
+|           |                                                              |                             | signals                     |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+
+PROCESSES
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                               | Output                                             |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| 4.1  | Create Contract Draft           | SS1 availability, agreed terms      | Contract draft saved; PDF ready                    |
+| 4.2  | Print & Record Physical Sign    | Finalized draft                     | Paper contract signed; logged                      |
+| 4.3  | Upload Scanned Contract         | Scanned PDF/image                   | Scan stored + linked to SS5                        |
+| 4.4  | Display Contract Summary        | Tenant login                        | Terms + scan link rendered                         |
+| 4.5  | Record Step 1 Acknowledgement   | Tenant click                        | Step 1 timestamp saved                             |
+| 4.6  | Record Step 2 Penalty Ack.      | Tenant click                        | Contract Active; SS3 billing activated; timer init |
+| 4.7  | Maintain Contract Timer         | Current date, contract end_date     | Days remaining + colour badge refreshed daily      |
+| 4.8  | Send Expiry Warnings            | Days remaining = 30 or 7            | Notifications to GM + tenant                       |
+| 4.9  | Renew Contract                  | GM renewal command + new dates      | New draft; old contract archived                   |
+| 4.10 | Terminate Contract              | GM termination command + reason     | Contract Terminated; SS2 account archived          |
+| 4.11 | Auto-Archive Expired            | Scheduler past end_date             | Contract Expired; archive to SS5                   |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++----------------------+--------------------------+--------------+-------------------------------------------------------+-----------------------------+----------------------+
+| Event                | Trigger                  | Source       | Activity                                              | Response                    | Destination          |
++----------------------+--------------------------+--------------+-------------------------------------------------------+-----------------------------+----------------------+
+| Contract Initiated   | SS1 confirms availability| GM           | Draft created with all agreed terms.                  | Draft saved                 | GM                   |
+| Physical Signing     | Terms agreed             | GM + Tenant  | Both sign the printed paper contract in person.       | Legally binding             | GM (paper copy)      |
+| Upload Scan          | After physical signing   | GM           | PDF/image stored; linked to contract + SS5.           | Digital scan stored         | System + SS5         |
+| Account Creation     | After physical signing   | SS4 -> SS2   | Trigger to create SS2 account.                        | SS2 account flow started    | SS2                  |
+| View Contract Summary| Tenant login             | Tenant       | Full terms + scan + penalty schedule shown.           | Summary shown               | Tenant               |
+| Ack Step 1           | Tenant clicks "I read"   | Tenant       | Step 1 timestamp saved; Step 2 unlocked.              | Step 2 enabled              | System               |
+| Ack Step 2           | Tenant clicks "I accept" | Tenant       | Contract -> Active; billing activated; timer started. | SS3 billing activated       | System -> SS3        |
+| Timer Initialized    | Contract Active          | System       | Days remaining + badge initialized.                   | Timer visible               | Tenant Dashboard     |
+| 30-Day Warning       | 30 days before end       | System       | Single unified notification to GM + tenant.           | Both notified               | GM + Tenant          |
+| 7-Day Warning        | 7 days before end        | System       | Urgent notification; badge -> Red.                    | Both notified               | GM + Tenant          |
+| Contract Renewed     | GM renewal               | GM           | New draft + restart; old archived.                    | New cycle                   | SS4 + SS5            |
+| Contract Terminated  | GM termination           | GM           | Marked Terminated; SS2 account archived; SS5 updated. | Archived                    | SS2 + SS5            |
+| Contract Expired     | end_date passes          | System       | Marked Expired; auto-archived to SS5 with scan.       | Archived                    | SS5 + SS2            |
++----------------------+--------------------------+--------------+-------------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++-------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow               | Description                                                 | Origin         | Destination     | Frequency          |
++-------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Contract Draft Data     | Agreed rate, dates, rules, penalty schedule.                | GM             | Process 4.1     | ~5-8 / month       |
+| Scanned Contract Upload | PDF / image of signed paper contract.                       | GM             | DB + SS5        | ~5-8 / month       |
+| Contract Summary        | Full terms shown to tenant in portal.                       | Process 4.4    | Tenant          | Once per new       |
+|                         |                                                             |                |                 | contract           |
+| Step 1 / 2 Ack          | Tenant click events with timestamps.                        | Tenant         | Acknowledgement | Once per contract  |
+|                         |                                                             |                | Log             |                    |
+| Timer & Status Data     | Daily countdown + colour badge.                             | System         | Tenant          | Daily              |
+| Expiry Warnings         | Unified 30d / 7d notifications.                             | System         | GM + Tenant     | 2 per cycle        |
+| Billing Activation Sig. | Trigger to SS3 on Step 2 acknowledgement.                   | Process 4.6    | SS3             | Once per cycle     |
+| Archived Contract Pkg   | Full record + scan exported to SS5.                         | 4.9/4.10/4.11  | SS5             | ~5-8 / month       |
++-------------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++----------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Store                | Description                                  | Key Attributes                                                 | Frequency             |
++----------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Contracts            | All lease contracts; timer uses dates only.  | Contract ID (PK), Tenant ID, Room ID, Base Rent, Deposit,      | ~5-8 new / month      |
+|                      |                                              | Key Fee, Start, End, Status, Penalty Rate, Grace Days,         |                       |
+|                      |                                              | Step1 Acked At, Step2 Acked At, Scan Path                      |                       |
+| Contract Scans       | Uploaded scan files; read-only.              | Scan ID (PK), Contract ID (FK), File Name, Path, Upload Date,  | ~5-8 / month          |
+|                      |                                              | Uploaded By, File Size                                         |                       |
+| Acknowledgement Log  | 2 rows per contract (Step 1, Step 2).        | Ack ID (PK), Contract ID (FK), Tenant ID, Step (1|2),          | 2 per contract        |
+|                      |                                              | Acknowledged At, Session Token                                 |                       |
+| Notification Log     | Expiry warnings (delivery + dedupe).         | Notif ID (PK), Contract ID (FK), Type (30/7/Expired), Sent At, | ~10-16 / month        |
+|                      |                                              | Recipient, Status                                              |                       |
++----------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 4.1 — CREATE CONTRACT DRAFT
+- GM enters agreed terms — rate, move-in date, lease period, rules, penalty
+  clause. Draft saved; PDF prepared for printing.
+
+PROCESS 4.2 — PRINT & PHYSICAL SIGNING
+- GM prints; GM and tenant sign in person. This is the legally binding step.
+
+PROCESS 4.3 — UPLOAD SCANNED CONTRACT
+- GM scans the signed paper and uploads PDF/image. File linked to the
+  contract entry and mirrored to SS5.
+
+PROCESS 4.4 — DISPLAY CONTRACT SUMMARY
+- After tenant activates account (SS2), full terms + scan link appear in the
+  portal.
+
+PROCESS 4.5 / 4.6 — TENANT ACKNOWLEDGEMENT
+- Two explicit click steps: (1) "I read and understand", (2) "I accept the
+  penalty clause". After Step 2 the contract becomes Active, SS3 billing is
+  activated, and the lease timer initializes.
+
+PROCESS 4.7 — MAINTAIN CONTRACT TIMER
+- Daily scheduler computes days remaining; renders colour badge:
+  Green > 30 d, Amber <= 30 d, Red <= 7 d, Gray = Expired.
+
+PROCESS 4.8 — SEND EXPIRY WARNINGS
+- Single unified notification at 30 d and 7 d to both GM and tenant.
+  Displayed via SS2; not duplicated by SS2.
+
+PROCESS 4.9 — RENEW CONTRACT
+- GM can renew before expiry. New draft created; old contract archived;
+  timer resets.
+
+PROCESS 4.10 — TERMINATE CONTRACT
+- GM ends a contract early with a reason. SS2 account archived; SS5 updated.
+
+PROCESS 4.11 — AUTO-ARCHIVE ON EXPIRY
+- Daily scheduler: when end_date passes without renewal, contract -> Expired,
+  archive package sent to SS5, SS2 account archived, room released.
+
+================================================================================
+SS5 — REPORT AND ARCHIVE MANAGEMENT
+================================================================================
+
+ENTITIES
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Entity    | Description                                                  | Input Data Flows            | Output Data Flows           |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| GM        | Sole user. Generates / exports reports, browses archive,     | Report Type + Filters,      | Generated Report, Export    |
+|           | restores or permanently deletes records.                     | Restore / Delete Commands   | File, Restored Record       |
+| System    | Receives auto-archive feeds from SS1-SS4 and stores them.    | Archive Records from SS1-4  | Archive Confirmation        |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+
+PROCESSES
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                               | Output                                             |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| 5.1  | Receive & Store Archived Record | Flagged record from SS1-SS4         | Stored in archive DB                               |
+| 5.2  | Generate Report                 | Type + filters                      | Filtered report rendered                           |
+| 5.3  | Filter & Export Report          | Report data + export choice         | CSV (archive list) or PDF (single contract)        |
+| 5.4  | View Archived Records           | GM request                          | Archive listing with type labels                   |
+| 5.5  | View Scanned Contract           | Selected contract archive           | Scan displayed                                     |
+| 5.6  | Restore Record                  | GM restore command                  | Record back in originating active DB               |
+| 5.7  | Permanently Delete Record       | GM hard-delete confirmation         | Removed; logged in SS6 audit                       |
+| 5.8  | Export Archive to CSV    (NEW)  | GM clicks Export CSV                | Filtered rows streamed as UTF-8 CSV;               |
+|      |                                 |                                     | <em>archive_exported_csv</em> audited              |
+| 5.9  | (Removed) Export to Excel       | -                                   | The .xlsx exporter and PhpSpreadsheet dependency   |
+|      |                                 |                                     | were dropped; Excel opens UTF-8 CSV (5.8) cleanly. |
+| 5.10 | Export Contract to PDF   (NEW)  | GM clicks PDF on a contract row     | Printable A4 PDF (DomPDF) with contract data +     |
+|      |                                 |                                     | scan path; <em>archive_contract_pdf</em> audited   |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++----------------------+--------------------------+----------+----------------------------------------------------+-----------------------------+----------------------+
+| Event                | Trigger                  | Source   | Activity                                           | Response                    | Destination          |
++----------------------+--------------------------+----------+----------------------------------------------------+-----------------------------+----------------------+
+| Auto-Archive Record  | Record flagged by SS1-4  | System   | Flagged record moved to SS5 archive DB.            | Archived; accessible        | SS5 Archive DB       |
+| Generate Report      | GM picks type + filters  | GM       | Query against archive + active records.            | Report rendered             | GM                   |
+| Export Report        | GM clicks Export         | GM       | Stream archive list as CSV, or one contract as PDF.| File downloaded             | GM                   |
+| View Archived Record | GM opens module          | GM       | List rendered with type / date filters.            | Archive list shown          | GM                   |
+| View Scanned Contract| GM opens record          | GM       | Linked scan retrieved and displayed.               | Scan shown                  | GM                   |
+| Restore Record       | GM restore action        | GM       | Record returned to originating active DB.          | Active row re-created       | Originating SS       |
+| Permanently Delete   | GM confirms hard delete  | GM       | Removed irreversibly; logged.                      | Removed; audit row          | SS6 Audit Log        |
++----------------------+--------------------------+----------+----------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow             | Description                                                 | Origin         | Destination     | Frequency          |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Incoming Archive Rec. | Records from SS1 (rooms), SS2 (accounts), SS3 (payments),   | SS1-SS4        | Process 5.1     | ~15-25 / month     |
+|                       | SS4 (contracts + scans).                                    |                |                 |                    |
+| Report Query          | GM filter selection.                                        | GM             | Process 5.2     | On demand          |
+| Generated Report      | Filtered report data.                                       | Process 5.2    | GM              | On demand          |
+| Exported Report File  | CSV (archive list) or PDF (single archived contract).       | Process 5.3    | GM              | On demand          |
+| Archive Listing       | Filtered archive list.                                      | Process 5.4    | GM              | On demand          |
+| Restored Record       | Record returned to originating active DB.                   | Process 5.6    | Originating SS  | Rare               |
+| Deletion Log Entry    | Audit record of permanent deletion.                         | Process 5.7    | SS6 Audit Log   | Rare               |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Store             | Description                                  | Key Attributes                                                 | Frequency             |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Archive Database  | All archived records from SS1-SS4.           | Archive ID (PK), Original Record ID, Record Type, Source SS,   | ~15-25 / month        |
+|                   |                                              | Archive Reason, Date, Archived By, Restored (bool)             |                       |
+| Contract Scans    | Stored scan files linked to archived         | Scan Archive ID (PK), Archive ID (FK), Original Contract ID,   | ~5-8 / month          |
+|   Archive         | contract records.                            | File Name, Path, Upload Date, File Size                        |                       |
+| Report Logs       | Optional log of generated reports.           | Log ID (PK), Type, Filters, Generated By, Generated At,        | On demand             |
+|                   |                                              | Exported (bool)                                                |                       |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 5.1 — RECEIVE & STORE ARCHIVED RECORD
+- SS5 is always active. Records flow in automatically whenever SS1, SS2, SS3,
+  or SS4 flags a record. The originating active DB removes or hides the row;
+  SS5 keeps a retrievable copy.
+
+PROCESS 5.2 — GENERATE REPORT
+- GM picks a report type and applies filters: date range, floor, room
+  number, tenant, payment status.
+
+PROCESS 5.3 — FILTER & EXPORT REPORT
+- Generated reports can be exported as PDF or Excel.
+
+PROCESS 5.4 / 5.5 — VIEW ARCHIVED RECORDS / SCANNED CONTRACT
+- Archive module lists everything; scanned contracts open inline.
+
+PROCESS 5.6 — RESTORE RECORD
+- If a record was archived by mistake, GM restores it; the record returns to
+  the originating active DB.
+
+PROCESS 5.7 — PERMANENTLY DELETE RECORD
+- Irreversible. Logged with GM ID, record ID, type, timestamp.
+
+================================================================================
+SS6 — USER ACCESS AND AUTHENTICATION
+================================================================================
+
+ENTITIES
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Entity    | Description                                                  | Input Data Flows            | Output Data Flows           |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+| Tenant    | First-time activation via OTP, subsequent logins, password   | Temp Password, OTP, Login   | Session, OTP Response,      |
+|           | changes, session management.                                 | Credentials                 | Password Change Request     |
+| GM        | Logs in to manage subsystems. Exclusive access to audit log  | Credentials, Lockout Alerts | Session, Audit View,        |
+|           | and system settings.                                         |                             | Settings Updates            |
+| System    | Sends OTPs, locks accounts on failures, auto-unlocks,        | Login Attempts, Sessions,   | OTP Email, Lockout          |
+|           | times out sessions, writes audit log.                        | Status                      | Notification, Audit Entries |
++-----------+--------------------------------------------------------------+-----------------------------+-----------------------------+
+
+PROCESSES
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                               | Output                                             |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+| 6.1  | Send OTP                        | First-login + temp password         | OTP emailed with expiry                            |
+| 6.2  | Verify OTP & Activate           | OTP entered                         | Session opened; account Active                     |
+| 6.3  | Authenticate Normal Login       | Email + password                    | Session token                                      |
+| 6.4  | End Session / Logout            | POST /logout or inactivity timer    | Session invalidated; CSRF regenerated;             |
+|      |                                 |                                     | <em>logout</em> audited with actor + IP            |
+| 6.5  | Change Password                 | Old + new password                  | New hash saved; audit row                          |
+| 6.6  | Lock Account                    | 5 consecutive failures              | Account locked; GM alerted                         |
+| 6.7  | Auto-Unlock                     | 15-minute timer                     | Account unlocked                                   |
+| 6.8  | View Audit Log                  | GM request                          | System-wide event log shown                        |
+| 6.9  | Configure System Settings       | GM settings form                    | Settings persisted system-wide                     |
+| 6.10 | Activated-Account Gate    (NEW) | Every authenticated request         | Middleware EnsureAccountActivated: auto-unlocks,   |
+|      | (middleware)                    |                                     | blocks locked/archived (logout + redirect),        |
+|      |                                 |                                     | redirects pending → /otp/verify, forces            |
+|      |                                 |                                     | password change when must_change_password = true   |
+| 6.11 | Export Audit Log (CSV)    (NEW) | GM clicks Export CSV in Audit Log   | Filtered rows streamed as CSV;                     |
+|      |                                 |                                     | <em>audit_log_exported</em> audited                |
++------+---------------------------------+-------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++----------------------+--------------------------+--------------+-----------------------------------------------------+-----------------------------+----------------------+
+| Event                | Trigger                  | Source       | Activity                                            | Response                    | Destination          |
++----------------------+--------------------------+--------------+-----------------------------------------------------+-----------------------------+----------------------+
+| Send Temp Password   | Account created in SS2   | System       | Random password generated and emailed.              | Tenant receives email       | Tenant (email)       |
+| First Login + OTP    | Temp password used       | Tenant + Sys | OTP emailed; tenant enters.                         | Account activated           | Tenant               |
+| Normal Login         | Email + password         | Tenant / GM  | Credentials validated.                              | Session started             | Tenant / GM          |
+| Logout               | User clicks logout       | Tenant / GM  | Session token cleared.                              | Logged out                  | Tenant / GM          |
+| Change Password      | User request             | Tenant / GM  | Validation + hash + audit.                          | Password updated            | System               |
+| Account Locked       | 5 failed attempts        | System       | Account locked 15 min; GM alerted.                  | Lockout                     | GM (alert)           |
+| Auto-Unlock          | 15 min after lockout     | System       | Account unlocked.                                   | Login possible              | Tenant / GM          |
+| Session Timeout      | Inactivity period        | System       | Session ended.                                      | Logged out                  | Tenant / GM          |
+| View Audit Log       | GM opens log             | GM           | Retrieves all events system-wide.                   | Log displayed               | GM                   |
+| Configure Settings   | GM saves settings        | GM           | Settings persisted + applied.                       | Settings saved              | System               |
++----------------------+--------------------------+--------------+-----------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow             | Description                                                 | Origin         | Destination     | Frequency          |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| OTP Email             | One-time password emailed with expiry.                      | System         | Tenant (email)  | ~5-8 / month       |
+| OTP Entry             | Code entered by tenant.                                     | Tenant         | Process 6.2     | ~5-8 / month       |
+| Login Credentials     | Email + password.                                           | Tenant / GM    | Process 6.3     | Multiple daily     |
+| Session Token         | Per-login token granting access to SS3 + SS4.               | Process 6.3    | Browser         | Per login          |
+| Lockout Notification  | Alert sent to GM on lockout.                                | Process 6.6    | GM              | Rare               |
+| Audit Log Entry       | Every significant action recorded.                          | All processes  | Audit Log DB    | Continuous         |
+| Audit Log View        | GM read of audit log.                                       | Process 6.8    | GM              | On demand          |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Store             | Description                                  | Key Attributes                                                 | Frequency             |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| User Sessions     | Active session tokens; cleared on            | Session ID (PK), User ID (FK), Type, Token, Created At,        | Continuous            |
+|                   | logout / timeout.                            | Expires At, Last Active, IP                                    |                       |
+| OTP Records       | First-login OTPs; expire after a set time.   | OTP ID (PK), Tenant ID (FK), Code (hashed), Created, Expires,  | ~5-8 / month          |
+|                   |                                              | Used                                                           |                       |
+| Audit Log         | Complete system-wide event log.              | Log ID (PK), User ID (FK), Type, Action, Timestamp, IP, Notes  | Continuous            |
+| System Settings   | Session timeout, lockout threshold,          | Setting ID (PK), Name, Value, Last Updated By, Last Updated At | Rarely updated        |
+|                   | OTP expiry, penalty grace days + rate.       |                                                                |                       |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 6.1 — SEND OTP
+- On first login with temp password the system emails an OTP with a fixed
+  expiry window (from System Settings).
+
+PROCESS 6.2 — VERIFY OTP & ACTIVATE
+- On correct OTP entry, account flips to Active and the session opens.
+
+PROCESS 6.3 — AUTHENTICATE NORMAL LOGIN
+- Standard login by email + password; failed attempts feed the lockout
+  counter.
+
+PROCESS 6.4 — END SESSION
+- Either explicit logout or inactivity timeout ends the session.
+
+PROCESS 6.5 — CHANGE PASSWORD
+- User submits old + new; new password hashed and saved; change audited.
+
+PROCESS 6.6 — LOCK ACCOUNT
+- 5 consecutive failed logins -> account locked for 15 min; GM alerted.
+
+PROCESS 6.7 — AUTO-UNLOCK
+- 15 min after lockout the account auto-unlocks.
+
+PROCESS 6.8 — VIEW AUDIT LOG
+- GM-only read of the complete system-wide audit log.
+
+PROCESS 6.9 — CONFIGURE SYSTEM SETTINGS
+- GM updates session timeout, lockout threshold + duration, OTP expiry,
+  penalty grace + rate, room type card images, notification preferences.
+  Each change is audited.
+
+================================================================================
+SS7 — COMMUNICATIONS & NOTIFICATIONS
+================================================================================
+
+ENTITIES
++----------------+-------------+---------------------------------------------------------------+----------------------------+----------------------------+
+| Entity         | Alt. Name   | Description                                                   | Input Data Flows           | Output Data Flows          |
++----------------+-------------+---------------------------------------------------------------+----------------------------+----------------------------+
+| Tenant         | Holder      | Submits maintenance requests and complaints; receives alerts.  | Request, Complaint,        | Notification, Read         |
+|                |             |                                                               | Notification Acknowledgment|                            |
++----------------+-------------+---------------------------------------------------------------+----------------------------+----------------------------+
+| GM             | Admin       | Receives and responds to tenant requests; sends announcements. | Request, Reply, Announcement| Notification              |
++----------------+-------------+---------------------------------------------------------------+----------------------------+----------------------------+
+| System         | Automated   | Records communication events, delivers bell + email alerts,    | Request, Reply, Announcement| NotificationLog           |
+|                |             | and tracks notification read state.                            |                            |                            |
++----------------+-------------+---------------------------------------------------------------+----------------------------+----------------------------+
+
+PROCESSES
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| No.  | Process Name                    | Input                                        | Output                                             |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+| 7.1  | Submit Maintenance Request      | Tenant request form                          | Request row; GM bell + email                       |
+| 7.2  | Submit Complaint                | Tenant complaint form                        | Complaint row; GM bell + email                     |
+| 7.3  | Respond to Request              | GM reply form                                | Request status updated; tenant notified            |
+| 7.4  | Send Announcement               | GM compose + send                            | Announcement row; recipients bell + email          |
+| 7.5  | Audit-Log Comms Events  (NEW)   | Every comms event                            | AuditLog rows tagged SS7 for                       |
+|      |                                 |                                              | tenant_request_submitted, tenant_request_responded,|
+|      |                                 |                                              | announcement_sent                                  |
++------+---------------------------------+----------------------------------------------+----------------------------------------------------+
+
+EVENT TABLE
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+| Event                   | Trigger                 | Source        | Activity                                         | Response                    | Destination          |
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+| Submit Maint. Request   | Tenant submits form     | Tenant        | Request row created; GM bell + email logged.     | Request created             | GM                   |
+| Submit Complaint        | Tenant submits form     | Tenant        | Complaint row created; GM bell + email logged.   | Complaint created           | GM                   |
+| Respond to Request      | GM submits reply        | GM            | Status set; reply persisted; tenant notified.    | Tenant informed             | Tenant               |
+| Send Announcement       | GM publishes message    | GM            | Announcement row + bell + emails per recipient.  | Recipients notified         | Tenants              |
+| View Notification       | Tenant opens notification| Tenant       | Notification marked read; message displayed.     | Notification updated        | NotificationLog       |
++-------------------------+-------------------------+---------------+--------------------------------------------------+-----------------------------+----------------------+
+
+DATA FLOWS
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Data Flow             | Description                                                 | Origin         | Destination     | Frequency          |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+| Tenant Request        | Maintenance / complaint submissions.                        | Tenant         | DB + GM         | ~10-15 / month     |
+| GM Reply              | Response payload with status change.                        | GM             | Tenant          | ~10-15 / month     |
+| Announcement Payload  | Broadcast message + recipient list.                         | GM             | Tenants         | ~1-2 / month       |
+| Notification Delivery | Bell + email notification sent.                             | System         | Tenant / GM     | ~15-25 / month     |
+| Notification Read     | Tenant opens or clears a notification.                      | Tenant         | NotificationLog | ~10-20 / month     |
++-----------------------+-------------------------------------------------------------+----------------+-----------------+--------------------+
+
+DATA STORES
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Store             | Description                                  | Key Attributes                                                 | Frequency             |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+| Tenant Requests   | Maintenance + complaints + responses.        | Request ID (PK), Tenant ID (FK), Type, Body, Status, Reply,    | ~10-15 / month        |
+|                   |                                              | Replied At                                                     |                       |
+| Announcements    | Outbound broadcasts and history.             | Announcement ID (PK), Title, Body, Sent At, Recipient Count    | ~1-2 / month          |
+| Notification Log  | Bell + email events, source-tagged.          | Notification ID (PK), User ID (FK), Type, Message, Sent At,    | ~15-25 / month        |
+|                   |                                              | Source (SS7), Read Status                                      |                       |
++-------------------+----------------------------------------------+----------------------------------------------------------------+-----------------------+
+
+PROCESS DESCRIPTIONS
+
+PROCESS 7.1 / 7.2 — SUBMIT MAINTENANCE REQUEST / COMPLAINT
+- Tenant submits a request or complaint form; row written to tenant_requests.
+- System creates a bell + email notification for the GM.
+
+PROCESS 7.3 — RESPOND TO REQUEST
+- GM replies and sets status (open / in_progress / resolved).
+- Tenant receives a confirmation bell + email and can view the admin reply.
+
+PROCESS 7.4 — SEND ANNOUNCEMENT
+- GM composes a title + body and selects recipients.
+- System persists the announcement, sends bell + email per recipient, and logs the broadcast.
+
+================================================================================
+END OF DOCUMENT
+================================================================================
