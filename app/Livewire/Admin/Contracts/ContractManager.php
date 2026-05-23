@@ -337,8 +337,48 @@ class ContractManager extends Component
         }
 
         AuditLog::record('contract_terminated', auth()->id(), 'gm', 'SS4', "Contract #{$contract->id} terminated");
+
+        // Notify the tenant: bell (authoritative) + email (best-effort).
+        $this->notifyTenantOfTermination($contract, $this->terminateReason);
+
         $this->showTerminate = false;
-        session()->flash('success', 'Contract terminated and archived.');
+        session()->flash('success', 'Contract terminated and archived. Tenant notified via bell + email.');
+    }
+
+    /**
+     * Notify the tenant that their contract was terminated. Bell row always
+     * lands; email is best-effort and logged on failure (same delivery
+     * guarantee documented in SS7).
+     */
+    private function notifyTenantOfTermination(Contract $contract, string $reason): void
+    {
+        if (!$contract->tenant) return;
+
+        \App\Models\NotificationLog::create([
+            'user_id' => $contract->tenant_id,
+            'type'    => 'contract_terminated',
+            'source'  => 'SS4',
+            'message' => "Your contract for Room {$contract->room?->room_number} was terminated effective " . now()->format('M d, Y'),
+        ]);
+
+        if ($contract->tenant->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($contract->tenant->email)->send(
+                    new \App\Mail\ContractTerminatedMail(
+                        $contract->tenant->full_name,
+                        (string) ($contract->room?->room_number ?? '—'),
+                        now()->format('M d, Y'),
+                        $reason,
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('ContractTerminatedMail send failed', [
+                    'contract_id' => $contract->id,
+                    'error'       => $e->getMessage(),
+                ]);
+                // Bell already landed; email is best-effort.
+            }
+        }
     }
 
     public function renew(int $id)

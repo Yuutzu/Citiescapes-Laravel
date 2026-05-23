@@ -373,7 +373,36 @@ class BillingManager extends Component
 
         AuditLog::record('contract_terminated_arrears', auth()->id(), 'gm', 'SS3',
             "Contract #{$contract->id} terminated via eviction shortcut from bill #{$bill->id}");
-        session()->flash('success', "Contract #{$contract->id} terminated and archived. Room freed.");
+
+        // Bell + email notification (mirrors ContractManager::terminate()).
+        if ($contract->tenant) {
+            \App\Models\NotificationLog::create([
+                'user_id' => $contract->tenant_id,
+                'type'    => 'contract_terminated',
+                'source'  => 'SS4',
+                'message' => "Your contract for Room {$contract->room?->room_number} was terminated effective " . now()->format('M d, Y'),
+            ]);
+
+            if ($contract->tenant->email) {
+                try {
+                    \Illuminate\Support\Facades\Mail::to($contract->tenant->email)->send(
+                        new \App\Mail\ContractTerminatedMail(
+                            $contract->tenant->full_name,
+                            (string) ($contract->room?->room_number ?? '—'),
+                            now()->format('M d, Y'),
+                            $reason,
+                        )
+                    );
+                } catch (\Throwable $e) {
+                    \Log::error('ContractTerminatedMail (arrears) send failed', [
+                        'contract_id' => $contract->id,
+                        'error'       => $e->getMessage(),
+                    ]);
+                }
+            }
+        }
+
+        session()->flash('success', "Contract #{$contract->id} terminated and archived. Room freed. Tenant notified via bell + email.");
     }
 
     public function openOverride(int $billId)
