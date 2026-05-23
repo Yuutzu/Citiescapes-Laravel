@@ -412,7 +412,19 @@ class ContractManager extends Component
             ->paginate(15);
 
         $tenants = User::where('role', 'tenant')->whereIn('status', ['active', 'pending_activation'])->get();
-        $rooms = Room::orderBy('room_number')->get();
+
+        // Only available rooms can host a new contract, but when EDITING an
+        // existing contract its currently-linked room must stay in the list
+        // (even if that room is now 'occupied' — by this contract itself) so
+        // the dropdown can render the selected option.
+        $rooms = Room::where(function ($q) {
+                $q->where('status', 'available');
+                if ($this->editing && $this->room_id) {
+                    $q->orWhere('id', $this->room_id);
+                }
+            })
+            ->orderBy('room_number')
+            ->get();
 
         return view('livewire.admin.contracts.contract-manager', compact('contracts', 'tenants', 'rooms'));
     }

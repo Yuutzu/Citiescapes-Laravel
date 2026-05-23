@@ -68,9 +68,14 @@ class ContractView extends Component
             'activated_at'          => now(),
         ]);
 
-        // Link room to tenant
+        // Link room to tenant AND flip its status to occupied. Both fields
+        // must move together — see ContractManager::activate() for the parallel
+        // GM-side flow. Leaving status='available' here is what causes the room
+        // table to show a tenant linked but the row still flagged as vacant.
         $this->contract->room->update([
+            'status'             => 'occupied',
             'current_tenant_id'  => auth()->id(),
+            'last_status_update' => now(),
         ]);
 
         AuditLog::record('contract_step2_ack', auth()->id(), 'tenant', 'SS4', "Contract #{$this->contract->id} activated");
