@@ -1,7 +1,7 @@
-﻿<div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+<div>
+    <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-brand-900">Billing Management</h1>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex gap-2">
             <button wire:click="openInitial"
                 class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-700 ring-1 ring-brand-300 shadow-sm hover:bg-brand-50 transition">
                 <i class="fas fa-receipt text-[11px]"></i> Record Initial Fees
@@ -63,33 +63,33 @@
                     <tbody class="divide-y divide-gray-100">
                         @foreach($initialPayments as $ip)
                             <tr class="hover:bg-emerald-50/40">
-                                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $ip->tenant->full_name ?? 'â€”' }}</td>
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $ip->tenant->full_name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600">
-                                    Room {{ $ip->contract->room->room_number ?? 'â€”' }}
+                                    Room {{ $ip->contract->room->room_number ?? '—' }}
                                     <span class="text-xs text-gray-400">(#{{ $ip->contract_id }})</span>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $ip->date_received->format('M d, Y') }}</td>
                                 <td class="px-4 py-3 text-xs text-gray-600 leading-snug">
-                                    <div>Deposit: <span class="font-medium text-gray-800">â‚±{{ number_format($ip->deposit_amount, 2) }}</span></div>
-                                    <div>1st Rent: <span class="font-medium text-gray-800">â‚±{{ number_format($ip->first_month_rent, 2) }}</span></div>
-                                    <div>Key Fee: <span class="font-medium text-gray-800">â‚±{{ number_format($ip->room_key_fee, 2) }}</span></div>
-                                    <div>Amenities: <span class="font-medium text-gray-800">â‚±{{ number_format($ip->amenities_total, 2) }}</span></div>
+                                    <div>Deposit: <span class="font-medium text-gray-800">₱{{ number_format($ip->deposit_amount, 2) }}</span></div>
+                                    <div>1st Rent: <span class="font-medium text-gray-800">₱{{ number_format($ip->first_month_rent, 2) }}</span></div>
+                                    <div>Key Fee: <span class="font-medium text-gray-800">₱{{ number_format($ip->room_key_fee, 2) }}</span></div>
+                                    <div>Amenities: <span class="font-medium text-gray-800">₱{{ number_format($ip->amenities_total, 2) }}</span></div>
                                     @if(!empty($ip->amenities))
                                         <div class="mt-1 text-[11px] text-gray-500">
                                             @foreach($ip->amenities as $a)
-                                                <span class="inline-block bg-gray-100 rounded px-1.5 py-0.5 mr-1 mb-1">{{ $a['name'] }} â‚±{{ number_format((float) ($a['fee'] ?? 0), 2) }}</span>
+                                                <span class="inline-block bg-gray-100 rounded px-1.5 py-0.5 mr-1 mb-1">{{ $a['name'] }} ₱{{ number_format((float) ($a['fee'] ?? 0), 2) }}</span>
                                             @endforeach
                                         </div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-right text-sm font-bold text-emerald-700">â‚±{{ number_format($ip->total_collected, 2) }}</td>
+                                <td class="px-4 py-3 text-right text-sm font-bold text-emerald-700">₱{{ number_format($ip->total_collected, 2) }}</td>
                                 <td class="px-4 py-3 text-xs text-gray-600">
                                     {{ $ip->payment_method_label }}
                                     @if($ip->reference_number)
                                         <div class="text-[11px] text-gray-400">Ref: {{ $ip->reference_number }}</div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-xs text-gray-500">{{ $ip->recordedBy->full_name ?? 'â€”' }}</td>
+                                <td class="px-4 py-3 text-xs text-gray-500">{{ $ip->recordedBy->full_name ?? '—' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -110,7 +110,7 @@
                 <tr>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider cursor-pointer hover:text-white"
                         wire:click="sortBy('tenant_name')">
-                        Tenant @if($sortBy === 'tenant_name') @if($sortDirection === 'asc') â†‘ @else â†“ @endif @endif</th>
+                        Tenant @if($sortBy === 'tenant_name') @if($sortDirection === 'asc') ↑ @else ↓ @endif @endif</th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">Room
                     </th>
                     <th class="px-4 py-3.5 text-left text-xs font-semibold text-brand-200 uppercase tracking-wider">
@@ -131,13 +131,13 @@
                 @foreach($bills as $bill)
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm text-gray-900">{{ $bill->tenant->full_name }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->room?->room_number ?? 'â€”' }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->room?->room_number ?? '—' }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->billing_period }}</td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900">â‚±{{ number_format($bill->total_amount, 2) }}
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">₱{{ number_format($bill->total_amount, 2) }}
                         </td>
                         <td
                             class="px-4 py-3 text-sm {{ $bill->penalty_amount > 0 ? 'text-red-600 font-medium' : 'text-gray-400' }}">
-                            {{ $bill->penalty_amount > 0 ? 'â‚±' . number_format($bill->penalty_amount, 2) : 'â€”' }}
+                            {{ $bill->penalty_amount > 0 ? '₱' . number_format($bill->penalty_amount, 2) : '—' }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $bill->due_date->format('M d') }}</td>
                         <td class="px-4 py-3"><span
@@ -193,10 +193,10 @@
                     <div>
                         <label class="form-label">Select Contract *</label>
                         <select wire:model="genContractId" class="form-input">
-                            <option value="">â€” Select â€”</option>
+                            <option value="">— Select —</option>
                             @foreach($activeContracts as $c)
-                                <option value="{{ $c->id }}">{{ $c->tenant->full_name }} â€” Room {{ $c->room->room_number }}
-                                    (â‚±{{ number_format($c->base_rent_rate, 2) }}/mo)</option>
+                                <option value="{{ $c->id }}">{{ $c->tenant->full_name }} — Room {{ $c->room->room_number }}
+                                    (₱{{ number_format($c->base_rent_rate, 2) }}/mo)</option>
                             @endforeach
                         </select>
                         @error('genContractId') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -206,17 +206,17 @@
 
                     <div class="grid grid-cols-3 gap-3">
                         <div>
-                            <label class="form-label">Electricity (â‚±)</label>
+                            <label class="form-label">Electricity (₱)</label>
                             <input wire:model="genElectricity" type="number" step="0.01" min="0" class="form-input">
                             @error('genElectricity') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="form-label">Water (â‚±)</label>
+                            <label class="form-label">Water (₱)</label>
                             <input wire:model="genWater" type="number" step="0.01" min="0" class="form-input">
                             @error('genWater') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="form-label">WiFi (â‚±)</label>
+                            <label class="form-label">WiFi (₱)</label>
                             <input wire:model="genWifi" type="number" step="0.01" min="0" class="form-input">
                             @error('genWifi') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -247,10 +247,10 @@
                     <div>
                         <label class="form-label">Select Contract *</label>
                         <select wire:model.live="initContractId" class="form-input">
-                            <option value="">â€” Select â€”</option>
+                            <option value="">— Select —</option>
                             @foreach($contractsAwaitingInitial as $opt)
                                 <option value="{{ $opt->id }}">
-                                    {{ $opt->tenant->full_name }} â€” Room {{ $opt->room->room_number }} (Contract #{{ $opt->id }})
+                                    {{ $opt->tenant->full_name }} — Room {{ $opt->room->room_number }} (Contract #{{ $opt->id }})
                                 </option>
                             @endforeach
                         </select>
@@ -261,20 +261,20 @@
 
                     @if($c)
                         <div class="rounded-md bg-emerald-50 border border-emerald-200 p-3 space-y-2">
-                            <p class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold">From contract â€” read only</p>
+                            <p class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold">From contract — read only</p>
                             <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div><span class="text-gray-500">Security Deposit</span><div class="font-semibold">â‚±{{ number_format($c->deposit, 2) }}</div></div>
-                                <div><span class="text-gray-500">First Month Rent</span><div class="font-semibold">â‚±{{ number_format($firstRent, 2) }}</div></div>
-                                <div><span class="text-gray-500">Room Key Fee</span><div class="font-semibold">â‚±{{ number_format($c->room_key_fee, 2) }}</div></div>
-                                <div><span class="text-gray-500">Amenities</span><div class="font-semibold">â‚±{{ number_format($amenitiesTotal, 2) }}</div></div>
+                                <div><span class="text-gray-500">Security Deposit</span><div class="font-semibold">₱{{ number_format($c->deposit, 2) }}</div></div>
+                                <div><span class="text-gray-500">First Month Rent</span><div class="font-semibold">₱{{ number_format($firstRent, 2) }}</div></div>
+                                <div><span class="text-gray-500">Room Key Fee</span><div class="font-semibold">₱{{ number_format($c->room_key_fee, 2) }}</div></div>
+                                <div><span class="text-gray-500">Amenities</span><div class="font-semibold">₱{{ number_format($amenitiesTotal, 2) }}</div></div>
                             </div>
                             <div class="border-t border-emerald-200 pt-2 flex items-center justify-between text-sm">
                                 <span class="text-gray-600 font-medium">Total to collect</span>
-                                <span class="font-bold text-emerald-700 text-base">â‚±{{ number_format($total, 2) }}</span>
+                                <span class="font-bold text-emerald-700 text-base">₱{{ number_format($total, 2) }}</span>
                             </div>
                         </div>
 
-                        {{-- Amenities â€” prefilled from contract, editable here --}}
+                        {{-- Amenities — prefilled from contract, editable here --}}
                         <div class="rounded-md border border-gray-200 p-3 space-y-2">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -288,7 +288,7 @@
                                 <div class="grid grid-cols-12 gap-2 items-center" wire:key="init-amenity-{{ $i }}">
                                     <input wire:model.live="initAmenities.{{ $i }}.name" type="text" placeholder="e.g. Aircon"
                                         class="form-input col-span-7 text-sm">
-                                    <input wire:model.live="initAmenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (â‚±)"
+                                    <input wire:model.live="initAmenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (₱)"
                                         class="form-input col-span-4 text-sm">
                                     <button type="button" wire:click="removeInitAmenity({{ $i }})"
                                         class="col-span-1 text-red-500 hover:text-red-700 text-lg leading-none">&times;</button>
@@ -349,7 +349,7 @@
             <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4">Confirm Payment</h3>
                 <form wire:submit="confirmPayment" class="space-y-4">
-                    <div><label class="form-label">Amount (â‚±)</label><input wire:model="payAmount" type="number" step="0.01"
+                    <div><label class="form-label">Amount (₱)</label><input wire:model="payAmount" type="number" step="0.01"
                             class="form-input"></div>
                     <div>
                         <label class="form-label">Method</label>
@@ -377,7 +377,7 @@
             <div class="bg-white rounded-xl shadow-xl w-full max-h-[88vh] overflow-y-auto max-w-md mx-4 p-6 my-auto">
                 <h3 class="text-lg font-semibold mb-4">Override / Waive Penalty</h3>
                 <form wire:submit="saveOverride" class="space-y-4">
-                    <div><label class="form-label">New Penalty Amount (â‚±)</label><input wire:model="overrideAmount"
+                    <div><label class="form-label">New Penalty Amount (₱)</label><input wire:model="overrideAmount"
                             type="number" step="0.01" class="form-input">
                         <p class="text-xs text-gray-400 mt-1">Set to 0 to fully waive.</p>
                     </div>

@@ -1,5 +1,5 @@
-﻿<div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+<div>
+    <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold text-brand-900">My Requests & Complaints</h1>
             <p class="text-sm text-gray-500 mt-1">Submit issues or requests to the management</p>

@@ -1,5 +1,5 @@
-﻿<div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+<div>
+    <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-brand-900">Contract Management</h1>
         <button wire:click="create" class="btn-primary">+ Create Draft</button>
     </div>
@@ -51,8 +51,8 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $c->tenant->full_name }}</td>
                         <td class="px-4 py-3 text-sm text-gray-600">{{ $c->room->room_number }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">â‚±{{ number_format($c->base_rent_rate, 2) }}</td>
-                        <td class="px-4 py-3 text-xs text-gray-500">{{ $c->start_date->format('M d, Y') }} â€”
+                        <td class="px-4 py-3 text-sm text-gray-600">₱{{ number_format($c->base_rent_rate, 2) }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">{{ $c->start_date->format('M d, Y') }} —
                             {{ $c->end_date->format('M d, Y') }}</td>
                         <td class="px-4 py-3">
                             @if($c->status === 'active')
@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                             @else
-                                <span class="text-xs text-gray-400">â€”</span>
+                                <span class="text-xs text-gray-400">—</span>
                             @endif
                         </td>
                         <td class="px-4 py-3"><span
@@ -97,7 +97,7 @@
                                         </span>
                                     @endif
                                 </div>
-                            @else <span class="text-xs text-gray-400">â€”</span> @endif
+                            @else <span class="text-xs text-gray-400">—</span> @endif
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2 flex-wrap">
@@ -140,7 +140,7 @@
                         <div>
                             <label class="form-label">Tenant *</label>
                             <select wire:model="tenant_id" class="form-input">
-                                <option value="">â€” Select â€”</option>
+                                <option value="">— Select —</option>
                                 @foreach($tenants as $t)<option value="{{ $t->id }}">{{ $t->full_name }}</option>@endforeach
                             </select>
                             @error('tenant_id')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
@@ -148,10 +148,10 @@
                         <div>
                             <label class="form-label">Room *</label>
                             <select wire:model.live="room_id" class="form-input">
-                                <option value="">â€” Select â€”</option>
+                                <option value="">— Select —</option>
                                 @foreach($rooms as $r)
                                     <option value="{{ $r->id }}">
-                                        {{ $r->room_number }} ({{ ucfirst($r->room_type) }}) â€” â‚±{{ number_format($r->rate, 2) }}/mo
+                                        {{ $r->room_number }} ({{ ucfirst($r->room_type) }}) — ₱{{ number_format($r->rate, 2) }}/mo
                                     </option>
                                 @endforeach
                             </select>
@@ -159,17 +159,17 @@
                     </div>
                     <div class="grid grid-cols-3 gap-4">
                         <div>
-                            <label class="form-label">Rent (â‚±/mo) *</label>
+                            <label class="form-label">Rent (₱/mo) *</label>
                             <input wire:model="base_rent_rate" type="number" step="0.01" class="form-input">
                             <p class="text-[11px] text-gray-500 mt-1">Auto-filled from room price. Editable.</p>
                         </div>
-                        <div><label class="form-label">Deposit (â‚±)</label><input wire:model="deposit" type="number"
+                        <div><label class="form-label">Deposit (₱)</label><input wire:model="deposit" type="number"
                                 step="0.01" class="form-input"></div>
-                        <div><label class="form-label">Key Fee (â‚±)</label><input wire:model="room_key_fee" type="number"
+                        <div><label class="form-label">Key Fee (₱)</label><input wire:model="room_key_fee" type="number"
                                 step="0.01" class="form-input"></div>
                     </div>
 
-                    {{-- Requested Amenities â€” billed once at move-in via SS3 initial payment --}}
+                    {{-- Requested Amenities — billed once at move-in via SS3 initial payment --}}
                     <div class="rounded-md border border-gray-200 p-3 space-y-2">
                         <div class="flex items-center justify-between">
                             <div>
@@ -182,12 +182,12 @@
                         @forelse($amenities as $i => $a)
                             <div class="grid grid-cols-12 gap-2 items-center" wire:key="amenity-{{ $i }}">
                                 <select wire:model.live="amenities.{{ $i }}.name" class="form-input col-span-7 text-sm">
-                                    <option value="">â€” Select amenity â€”</option>
+                                    <option value="">— Select amenity —</option>
                                     @foreach(\App\Livewire\Admin\Contracts\ContractManager::AMENITY_CATALOG as $opt)
-                                        <option value="{{ $opt['name'] }}">{{ $opt['name'] }} â€” â‚±{{ number_format($opt['fee'], 2) }}</option>
+                                        <option value="{{ $opt['name'] }}">{{ $opt['name'] }} — ₱{{ number_format($opt['fee'], 2) }}</option>
                                     @endforeach
                                 </select>
-                                <input wire:model="amenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (â‚±)"
+                                <input wire:model="amenities.{{ $i }}.fee" type="number" step="0.01" min="0" placeholder="Fee (₱)"
                                     class="form-input col-span-4 text-sm">
                                 <button type="button" wire:click="removeAmenity({{ $i }})"
                                     class="col-span-1 text-red-500 hover:text-red-700 text-lg leading-none">&times;</button>
@@ -204,7 +204,7 @@
                                 class="form-input"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div><label class="form-label">Penalty (â‚±/day)</label><input wire:model="penalty_rate" type="number"
+                        <div><label class="form-label">Penalty (₱/day)</label><input wire:model="penalty_rate" type="number"
                                 step="0.01" class="form-input"></div>
                         <div><label class="form-label">Grace Days</label><input wire:model="penalty_grace_days"
                                 type="number" min="0" class="form-input"></div>
@@ -218,7 +218,7 @@
                             class="form-input text-sm">
                         <p class="text-[11px] text-gray-500 mt-1">PDF, image, or Word document (max 10 MB).</p>
                         <div wire:loading wire:target="scanFile" class="text-xs text-brand-600 mt-1">
-                            <i class="fas fa-spinner fa-spin"></i> Uploadingâ€¦
+                            <i class="fas fa-spinner fa-spin"></i> Uploading…
                         </div>
                         @error('scanFile') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -243,7 +243,7 @@
             <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl flex flex-col">
                 <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
                     <h3 class="text-base font-semibold text-gray-900">
-                        Signed Contract â€” {{ $scanContract->tenant->full_name }}
+                        Signed Contract — {{ $scanContract->tenant->full_name }}
                         <span class="text-xs text-gray-500 font-normal">(Room {{ $scanContract->room->room_number }})</span>
                     </h3>
                     <div class="flex items-center gap-2">
@@ -274,7 +274,7 @@
                 <p class="text-xs text-gray-500 mb-4">
                     {{ $scanDecisionAction === 'approve'
                         ? 'Approving will let the tenant view the signed contract scan in their portal.'
-                        : 'Denying will block tenant access. Provide a reason â€” the tenant will see it.' }}
+                        : 'Denying will block tenant access. Provide a reason — the tenant will see it.' }}
                 </p>
                 <form wire:submit="submitScanDecision" class="space-y-4">
                     <div>

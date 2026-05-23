@@ -1,5 +1,5 @@
-﻿<div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+<div>
+    <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-brand-900">Archive</h1>
         <div class="flex items-center gap-2">
             <button wire:click="exportCsv" type="button"
@@ -62,7 +62,7 @@
                     <td class="px-4 py-3">
                         @if($a->scan_file_path)
                             <a href="{{ asset('storage/' . $a->scan_file_path) }}" target="_blank" class="text-xs text-brand-600 hover:underline">View</a>
-                        @else â€” @endif
+                        @else — @endif
                     </td>
                     <td class="px-4 py-3 text-right">
                         <div class="flex items-center justify-end gap-2">

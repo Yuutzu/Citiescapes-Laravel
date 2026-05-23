@@ -1,5 +1,5 @@
-﻿<div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+<div>
+    <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-brand-900">Tenant Management</h1>
         <button wire:click="create" class="btn-primary">+ Create Tenant</button>
     </div>
@@ -42,9 +42,9 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $t->full_name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-600">{{ $t->email }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->contact_number ?: 'â€”' }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate" title="{{ $t->address }}">{{ $t->address ?: 'â€”' }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->emergency_contact ?: 'â€”' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->contact_number ?: '—' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate" title="{{ $t->address }}">{{ $t->address ?: '—' }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ $t->emergency_contact ?: '—' }}</td>
                     <td class="px-4 py-3">
                         <span class="badge {{ match($t->status) { 'active' => 'bg-green-100 text-green-800', 'pending_activation' => 'bg-amber-100 text-amber-800', 'archived' => 'bg-gray-100 text-gray-600', 'locked' => 'bg-red-100 text-red-800', default => 'bg-gray-100 text-gray-600' } }}">
                             {{ str_replace('_', ' ', ucfirst($t->status)) }}
