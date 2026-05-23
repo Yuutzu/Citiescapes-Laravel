@@ -135,6 +135,7 @@
 <tr><td><span class="scn-feat">Occupancy Dashboard:</span> A tenant cannot reach the admin dashboard.</td><td>403 Forbidden / redirected away from the admin route.</td><td>Access blocked.</td><td class="res passed">Passed</td><td></td></tr>
 <tr><td><span class="scn-feat">Archive Room:</span> Clear a room — archive snapshot + reset to available.</td><td>Room snapshot archived; tenant + contract archived if present; room reset to Available; <em>room_cleared</em> audited.</td><td>Room cleared and reset.</td><td class="res passed">Passed</td><td></td></tr>
 <tr><td><span class="scn-feat">Permanently Delete Room:</span> Remove a room entirely from inventory.</td><td>Room force-deleted; <em>room_deleted</em> audited.</td><td>Room deleted; audited.</td><td class="res passed">Passed</td><td></td></tr>
+<tr><td><span class="scn-feat">Permanently Delete Room:</span> Refuse when contracts or archive rows reference the room.</td><td>Guard counts <code>contracts</code> + <code>archives</code> pointing at this room id; if either is &gt; 0, refuse with a flash error pointing the GM to <em>Archive</em> instead so cascading FK doesn't wipe bills + payments.</td><td>Deletion refused; financial history preserved.</td><td class="res passed">Passed</td><td></td></tr>
 <tr><td><span class="scn-feat">Audit-Log Room Events:</span> Room actions all write audit rows.</td><td>Each room-affecting action writes an audit_logs row tagged SS1.</td><td>Audit rows verified.</td><td class="res passed">Passed</td><td></td></tr>
 </tbody>
 </table>
