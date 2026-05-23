@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -76,6 +77,12 @@ class WipeDatabaseForTesting extends Command
             // accumulate references to deleted upload files).
             $this->resetTestableSystemSettings();
 
+            // Wipe admin-uploaded card photos from disk so the public landing
+            // page and the SS1 editor both start from an empty set on the
+            // next render. Without this, the DB is clean but orphaned files
+            // linger in storage/room-type-cards/ until manually removed.
+            $this->wipeDynamicPhotos();
+
             // Re-enable foreign key checks
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
@@ -144,6 +151,31 @@ class WipeDatabaseForTesting extends Command
         $deleted = DB::table('system_settings')->where('key', 'room_type_cards')->delete();
         if ($deleted > 0) {
             $this->line('  ✓ Reset room_type_cards (will rebuild from defaults on next load)');
+        }
+    }
+
+    /**
+     * Wipe admin-uploaded "dynamic" photos from disk:
+     *   - storage/room-type-cards/   (SS1 public landing card photos)
+     *   - storage/app/private/livewire-tmp/  (transient upload buffers)
+     *
+     * Static media in storage/building/ and storage/payment-methods/ is left
+     * untouched — those ship with the repo and are the system's defaults.
+     */
+    private function wipeDynamicPhotos(): void
+    {
+        $targets = [
+            storage_path('room-type-cards')         => 'room-type-cards',
+            storage_path('app/private/livewire-tmp') => 'livewire-tmp uploads',
+        ];
+
+        foreach ($targets as $dir => $label) {
+            if (!is_dir($dir)) continue;
+            $files = File::files($dir);                    // top-level files only, ignores subdirs
+            $count = count($files);
+            if ($count === 0) continue;
+            foreach ($files as $f) @unlink($f->getPathname());
+            $this->line("  ✓ Deleted {$count} {$label} file(s) from disk");
         }
     }
 
