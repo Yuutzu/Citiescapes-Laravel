@@ -29,7 +29,6 @@ yarn-error.log
 *.sql
 
 # Local-only — not part of the repo
-/docs/
 test.ps1
 run-tests.bat
 run-tests.ps1
