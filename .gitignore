@@ -41,3 +41,8 @@ run-tests.ps1
 /storage/app/private/livewire-tmp/
 /storage/livewire-tmp/
 /storage/room-type-cards/
+
+# Testbed manifest is generated output of `php artisan testbed:seed` — re-created
+# every run, no source-of-truth value.
+/storage/app/private/testbed-manifest.json
+/storage/app/testbed-manifest.json
