@@ -289,7 +289,6 @@ class SeedTestbed extends Command
                 'status'             => 'available',
                 'description'        => self::TAG . ' anchor room',
                 'amenities'          => ['WiFi', 'Aircon'],
-                'photos'             => [],
                 'last_updated_by'    => $this->gm->id,
                 'last_status_update' => now(),
                 'deleted_at'         => null,
@@ -346,7 +345,6 @@ class SeedTestbed extends Command
             'status'             => 'available',
             'description'        => self::TAG . ' ' . $suffix,
             'amenities'          => ['WiFi'],
-            'photos'             => [],
             'last_updated_by'    => $this->gm->id,
             'last_status_update' => now(),
         ], $overrides));

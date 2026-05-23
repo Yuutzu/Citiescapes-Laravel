@@ -73,7 +73,6 @@ class AdminOnlySeeder extends Seeder
                         'max_occupants' => $type === 'compact' ? 3 : 4,
                         'status'        => 'available',
                         'description'   => ucfirst($type) . " room on floor {$floor}",
-                        'photos'        => [],
                     ]
                 );
             }

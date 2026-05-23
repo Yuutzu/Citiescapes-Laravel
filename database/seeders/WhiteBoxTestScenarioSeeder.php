@@ -169,7 +169,6 @@ class WhiteBoxTestScenarioSeeder extends Seeder
                 'status' => 'available',
                 'amenities' => ['Air Conditioning', 'WiFi', 'Shared Bathroom'],
                 'description' => '[WB] Compact test room for contract branch scenarios',
-                'photos' => [],
             ]
         );
 
@@ -183,7 +182,6 @@ class WhiteBoxTestScenarioSeeder extends Seeder
                 'status' => 'available',
                 'amenities' => ['Air Conditioning', 'WiFi', 'Private Bathroom', 'Mini Fridge'],
                 'description' => '[WB] Spacious test room for contract branch scenarios',
-                'photos' => [],
             ]
         );
 
@@ -341,7 +339,6 @@ class WhiteBoxTestScenarioSeeder extends Seeder
                 'status' => 'available',
                 'amenities' => ['Air Conditioning', 'WiFi', 'Shared Bathroom'],
                 'description' => '[WB] Compact test room for billing branch scenarios',
-                'photos' => [],
             ]
         );
 

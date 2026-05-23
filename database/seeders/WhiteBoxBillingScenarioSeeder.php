@@ -68,7 +68,6 @@ class WhiteBoxBillingScenarioSeeder extends Seeder
                 'status'             => 'occupied',
                 'current_tenant_id'  => $tenant->id,
                 'amenities'          => ['Air Conditioning', 'WiFi'],
-                'photos'             => [],
                 'description'        => "WBT scenario {$id}: {$label}",
             ]);
 

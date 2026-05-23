@@ -230,7 +230,6 @@ class BlackBoxTestScenarioSeeder extends Seeder
                 'status' => 'occupied',
                 'amenities' => ['Air Conditioning', 'WiFi', 'Private Bathroom'],
                 'description' => '[BB] Spacious test room (occupied) for black-box scenarios',
-                'photos' => [],
             ]
         );
 
@@ -245,7 +244,6 @@ class BlackBoxTestScenarioSeeder extends Seeder
                 'status' => 'under_maintenance',
                 'amenities' => ['WiFi'],
                 'description' => '[BB] Compact test room (maintenance) for black-box scenarios',
-                'photos' => [],
             ]
         );
 
