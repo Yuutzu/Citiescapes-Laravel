@@ -90,10 +90,10 @@ class RoomManager extends Component
                     ['icon' => 'fa-table',     'label' => 'Tables'],
                     ['icon' => 'fa-chair',     'label' => 'Chairs'],
                 ],
-                'photos' => [
-                    'room-type-cards/compact-cover.jpg',
-                    'room-type-cards/compact-1.jpg',
-                ],
+                // Empty by default — admin uploads via the SS1 editor. Pre-populated
+                // entries here would show as broken thumbnails on a fresh install
+                // because the seed files no longer ship with the repo.
+                'photos' => [],
             ],
             'spacious' => [
                 'title' => 'Spacious Room',
@@ -108,10 +108,7 @@ class RoomManager extends Component
                     ['icon' => 'fa-layer-group', 'label' => 'Extra Double Deck Frame'],
                     ['icon' => 'fa-bed',         'label' => 'Extra Mattress'],
                 ],
-                'photos' => [
-                    'room-type-cards/spacious-cover.jpg',
-                    'room-type-cards/spacious-1.jpg',
-                ],
+                'photos' => [],
             ],
         ];
     }
