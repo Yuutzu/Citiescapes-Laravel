@@ -68,6 +68,6 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created GM account (gm@citiescapes.test / password) and 22 rooms.');
+        $this->command->info('Created GM account (citiescapes2017@gmail.com / password) and 22 rooms.');
     }
 }

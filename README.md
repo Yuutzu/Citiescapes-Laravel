@@ -69,7 +69,7 @@ php artisan migrate --seed
 
 This creates:
 
-- **GM account**: `gm@citiescapes.test` / `password`
+- **GM account**: `citiescapes2017@gmail.com` / `password` (change immediately after first login)
 - **22 rooms** across 3 floors (6 + 8 + 8)
 
 ### 7. Create storage symlink
@@ -109,9 +109,9 @@ http://localhost/citiescapes/public
 
 ## Default Accounts
 
-| Role            | Email                 | Password   |
-| --------------- | --------------------- | ---------- |
-| General Manager | `gm@citiescapes.test` | `password` |
+| Role            | Email                         | Password   |
+| --------------- | ----------------------------- | ---------- |
+| General Manager | `citiescapes2017@gmail.com`   | `password` |
 
 Tenant accounts are created by the GM through **Tenant Management**. A temporary password is emailed (check `storage/logs/laravel.log` since MAIL_MAILER=log by default).
 
