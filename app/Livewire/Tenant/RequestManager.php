@@ -68,9 +68,14 @@ class RequestManager extends Component
             ]);
 
             if ($gm->email) {
-                Mail::to($gm->email)->send(
-                    new TenantRequestMail(auth()->user()->full_name, $this->type, $this->subject, $this->body),
-                );
+                try {
+                    Mail::to($gm->email)->send(
+                        new TenantRequestMail(auth()->user()->full_name, $this->type, $this->subject, $this->body),
+                    );
+                } catch (\Throwable $e) {
+                    \Log::error('TenantRequestMail send failed', ['gm_id' => $gm->id, 'error' => $e->getMessage()]);
+                    // Request row + bell notification still land; only the email is best-effort.
+                }
             }
         }
 

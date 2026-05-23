@@ -51,12 +51,23 @@ class TenantManager extends Component
             'must_change_password' => true,
         ]);
 
-        Mail::to($tenant->email)->send(new TempPasswordMail($tenant->full_name, $tenant->email, $tempPassword));
+        $mailOk = true;
+        try {
+            Mail::to($tenant->email)->send(new TempPasswordMail($tenant->full_name, $tenant->email, $tempPassword));
+        } catch (\Throwable $e) {
+            $mailOk = false;
+            \Log::error('TempPasswordMail send failed', ['tenant_id' => $tenant->id, 'error' => $e->getMessage()]);
+        }
 
-        AuditLog::record('tenant_created', auth()->id(), 'gm', 'SS2', "Created tenant: {$tenant->full_name} ({$tenant->email})");
+        AuditLog::record('tenant_created', auth()->id(), 'gm', 'SS2',
+            "Created tenant: {$tenant->full_name} ({$tenant->email})" . ($mailOk ? '' : ' — EMAIL FAILED, password not delivered'));
 
         $this->showCreate = false;
-        session()->flash('success', "Tenant account created. Temporary password sent to {$tenant->email}.");
+        if ($mailOk) {
+            session()->flash('success', "Tenant account created. Temporary password sent to {$tenant->email}.");
+        } else {
+            session()->flash('error', "Tenant account created, but the temporary-password email failed to send. Reset the password via the user record so the tenant can log in.");
+        }
     }
 
     public function archiveTenant(int $id)

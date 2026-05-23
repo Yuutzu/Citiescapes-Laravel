@@ -70,9 +70,14 @@ class BillingView extends Component
                 'message' => 'Payment-plan request from ' . auth()->user()->full_name . ": {$subject}",
             ]);
             if ($gm->email) {
-                Mail::to($gm->email)->send(
-                    new TenantRequestMail(auth()->user()->full_name, 'request', $subject, $body),
-                );
+                try {
+                    Mail::to($gm->email)->send(
+                        new TenantRequestMail(auth()->user()->full_name, 'request', $subject, $body),
+                    );
+                } catch (\Throwable $e) {
+                    \Log::error('Payment-plan TenantRequestMail send failed', ['gm_id' => $gm->id, 'error' => $e->getMessage()]);
+                    // Bell notification still lands; email is best-effort.
+                }
             }
         }
 

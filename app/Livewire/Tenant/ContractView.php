@@ -14,6 +14,14 @@ class ContractView extends Component
 {
     public ?Contract $contract = null;
 
+    /**
+     * Number of days an approved scan-view grant stays active before the
+     * system auto-revokes it. Tenant must request again to view past this.
+     * Kept in code (not config) since the value is part of the documented
+     * SS4 use case.
+     */
+    public const SCAN_VIEW_WINDOW_DAYS = 7;
+
     public function mount()
     {
         $this->contract = Contract::with('room')
@@ -21,6 +29,32 @@ class ContractView extends Component
             ->whereIn('status', ['draft', 'active'])
             ->latest()
             ->first();
+
+        $this->autoRevokeScanIfExpired();
+    }
+
+    /**
+     * Lazy auto-revoke: if the scan-view approval is older than the configured
+     * window (default 7 days), flip its status to 'revoked', clear the decision
+     * timestamp, and emit an audit row. Runs on every page load — no cron
+     * dependency. Idempotent: a second visit after revoke is a no-op.
+     */
+    private function autoRevokeScanIfExpired(): void
+    {
+        if (!$this->contract) return;
+        if ($this->contract->scan_view_status !== 'approved') return;
+        if (!$this->contract->scan_view_decided_at) return;
+
+        $expiresAt = $this->contract->scan_view_decided_at->copy()->addDays(self::SCAN_VIEW_WINDOW_DAYS);
+        if (now()->lt($expiresAt)) return; // still inside the window
+
+        $this->contract->update([
+            'scan_view_status'        => 'revoked',
+            'scan_view_decision_note' => 'Auto-revoked after ' . self::SCAN_VIEW_WINDOW_DAYS . '-day access window expired.',
+        ]);
+        AuditLog::record('contract_scan_view_auto_revoked', auth()->id(), 'system', 'SS4',
+            "Contract #{$this->contract->id} — scan access auto-revoked after " . self::SCAN_VIEW_WINDOW_DAYS . '-day window expired');
+        $this->contract->refresh();
     }
 
     /**

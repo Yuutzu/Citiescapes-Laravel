@@ -57,9 +57,13 @@ class OtpVerify extends Component
             'expires_at' => now()->addMinutes($expiry),
         ]);
 
-        Mail::to($user->email)->send(new OtpMail($user->full_name, $code, $expiry));
-
-        session()->flash('success', 'A new OTP has been sent to your email.');
+        try {
+            Mail::to($user->email)->send(new OtpMail($user->full_name, $code, $expiry));
+            session()->flash('success', 'A new OTP has been sent to your email.');
+        } catch (\Throwable $e) {
+            \Log::error('OtpMail resend failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            session()->flash('error', 'Could not send the OTP email. Please contact the General Manager.');
+        }
     }
 
     public function render()

@@ -363,6 +363,22 @@ class RoomManager extends Component
     {
         $room = Room::findOrFail($id);
         $num = $room->room_number;
+
+        // Refuse if any contracts/bills/archives still reference this room.
+        // The contracts FK uses cascadeOnDelete (→ bills + payments), so a
+        // forceDelete here would silently nuke the financial audit trail.
+        $contractCount = \App\Models\Contract::where('room_id', $room->id)->count();
+        $archiveCount  = \App\Models\Archive::where('record_type', 'room')
+            ->where('original_record_id', $room->id)->count();
+
+        if ($contractCount > 0 || $archiveCount > 0) {
+            session()->flash('error',
+                "Cannot permanently delete Room {$num}: {$contractCount} contract(s) and {$archiveCount} archive row(s) reference it. " .
+                "Use Archive (soft-delete) instead so the financial history is preserved."
+            );
+            return;
+        }
+
         $room->forceDelete();
         AuditLog::record('room_deleted', auth()->id(), 'gm', 'SS1', "Room {$num} permanently deleted");
         session()->flash('success', 'Room permanently deleted.');

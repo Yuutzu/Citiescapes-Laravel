@@ -56,12 +56,18 @@ class InquiryManager extends Component
             return;
         }
 
-        Mail::to($inq->email)->send(new InquiryReplyMail(
-            $inq->sender_name,
-            $this->emailSubject,
-            $this->emailBody,
-            auth()->user()->full_name,
-        ));
+        try {
+            Mail::to($inq->email)->send(new InquiryReplyMail(
+                $inq->sender_name,
+                $this->emailSubject,
+                $this->emailBody,
+                auth()->user()->full_name,
+            ));
+        } catch (\Throwable $e) {
+            \Log::error('InquiryReplyMail send failed', ['inquiry_id' => $inq->id, 'error' => $e->getMessage()]);
+            session()->flash('error', 'Could not send the reply email. The inquiry status was NOT updated. Try again or check SMTP settings.');
+            return;
+        }
 
         $inq->update([
             'status'       => 'responded',

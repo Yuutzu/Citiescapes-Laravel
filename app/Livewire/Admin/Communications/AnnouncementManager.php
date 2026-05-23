@@ -68,9 +68,14 @@ class AnnouncementManager extends Component
             ]);
 
             if ($tenant->email) {
-                Mail::to($tenant->email)->send(
-                    new AnnouncementMail($tenant->full_name, $this->title, $this->body)
-                );
+                try {
+                    Mail::to($tenant->email)->send(
+                        new AnnouncementMail($tenant->full_name, $this->title, $this->body)
+                    );
+                } catch (\Throwable $e) {
+                    \Log::error('AnnouncementMail send failed', ['tenant_id' => $tenant->id, 'error' => $e->getMessage()]);
+                    // Bell notification still landed; keep iterating the rest of the batch.
+                }
             }
         }
 

@@ -70,15 +70,20 @@ class RequestViewer extends Component
             ]);
 
             if ($request->tenant?->email) {
-                Mail::to($request->tenant->email)->send(
-                    new RequestResponseMail(
-                        $request->tenant->full_name,
-                        $request->type,
-                        $request->subject,
-                        $this->newStatus,
-                        $this->adminReply ?: ''
-                    )
-                );
+                try {
+                    Mail::to($request->tenant->email)->send(
+                        new RequestResponseMail(
+                            $request->tenant->full_name,
+                            $request->type,
+                            $request->subject,
+                            $this->newStatus,
+                            $this->adminReply ?: ''
+                        )
+                    );
+                } catch (\Throwable $e) {
+                    \Log::error('RequestResponseMail send failed', ['request_id' => $request->id, 'error' => $e->getMessage()]);
+                    // Bell notification still landed; status update already persisted.
+                }
             }
 
         AuditLog::record('tenant_request_responded', auth()->id(), 'gm', 'SS7',

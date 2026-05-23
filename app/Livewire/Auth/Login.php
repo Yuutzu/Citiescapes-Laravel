@@ -106,7 +106,12 @@ class Login extends Component
             'expires_at' => now()->addMinutes($expiry),
         ]);
 
-        Mail::to($user->email)->send(new OtpMail($user->full_name, $code, $expiry));
+        try {
+            Mail::to($user->email)->send(new OtpMail($user->full_name, $code, $expiry));
+        } catch (\Throwable $e) {
+            \Log::error('OtpMail send failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            session()->flash('error', 'Could not send the OTP email. Please contact the General Manager.');
+        }
     }
 
     public function render()
