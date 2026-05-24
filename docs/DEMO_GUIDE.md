@@ -46,6 +46,21 @@ php artisan testbed:seed --subsystem=SS3
 php artisan testbed:seed --list
 ```
 
+### Convenience demo commands
+
+For client/grader demos, eight `demo:*` commands wrap the testbed scenarios into focused per-subsystem seeds. Each prints a checklist of what to click after seeding:
+
+| Command | Demos |
+|---|---|
+| `php artisan demo:rooms` | Room statuses + inquiries |
+| `php artisan demo:tenant-lifecycle` | Pending / OTP / active / archived tenants |
+| `php artisan demo:contract-lifecycle` | Draft → ack → active → expired → terminated |
+| `php artisan demo:billing-statuses` | All 7 bill statuses + initial payment + override |
+| `php artisan demo:comms` | Requests, complaints, announcements, bell |
+| `php artisan demo:auth` | Lockout, auto-unlock, forced password change |
+| `php artisan demo:archive` | All 4 archive types + restore guard |
+| `php artisan demo:everything` | Wipes DB then runs all 7 above in one shot |
+
 **Reset the testbed without touching the GM/22-room base:**
 ```bash
 php artisan db:wipe-test --no-confirm
