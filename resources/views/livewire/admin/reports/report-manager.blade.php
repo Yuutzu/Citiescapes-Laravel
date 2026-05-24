@@ -56,7 +56,22 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm text-gray-600">#{{ $a->original_record_id }}</td>
                     <td class="px-4 py-3"><span class="badge bg-gray-100 text-gray-700">{{ str_replace('_',' ',ucfirst($a->record_type)) }}</span></td>
-                    <td class="px-4 py-3 text-sm text-gray-600">{{ $a->source_subsystem }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">
+                        {{-- Friendly subsystem label instead of bare 'SS#' code. The DB still
+                             stores 'SS1'..'SS7' for filter compatibility; this is display-only. --}}
+                        @php
+                            $subsystemLabel = [
+                                'SS1' => 'Rooms',
+                                'SS2' => 'Tenants',
+                                'SS3' => 'Billing',
+                                'SS4' => 'Contracts',
+                                'SS5' => 'Reports & Archive',
+                                'SS6' => 'Authentication',
+                                'SS7' => 'Communications',
+                            ][$a->source_subsystem] ?? $a->source_subsystem;
+                        @endphp
+                        {{ $subsystemLabel }}
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{{ $a->archive_reason }}</td>
                     <td class="px-4 py-3 text-xs text-gray-500">{{ $a->created_at->format('M d, Y') }}</td>
                     <td class="px-4 py-3">
