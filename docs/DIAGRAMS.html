@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Citiescapes — System Diagrams</title>
+<style>
+  /* Print-ready / web-friendly styling. Warm-brown theme to match the rest of
+     the system's documentation set. All SVGs are inline so the file is
+     self-contained (no external assets, no CDN). */
+  @page { size: A4; margin: 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #faf7f2;
+    color: #2a140b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.55;
+  }
+  .container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
+  .doc-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28pt; font-weight: 700;
+    color: #2a140b;
+    margin: 0 0 6px;
+    text-align: center;
+  }
+  .doc-sub {
+    text-align: center;
+    color: #7a3b21;
+    font-size: 11pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0 0 36px;
+  }
+  .marigold-divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #f5b94e 50%, transparent 100%);
+    margin: 0 0 40px;
+  }
+
+  /* Diagram section frame */
+  section.diagram {
+    background: #ffffff;
+    border: 1px solid #e8d9c8;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(94, 40, 24, 0.08);
+    padding: 28px 32px;
+    margin: 0 0 36px;
+  }
+  section.diagram > h2 {
+    font-family: Georgia, serif;
+    font-size: 20pt;
+    color: #2a140b;
+    margin: 0 0 4px;
+    border-left: 5px solid #f5b94e;
+    padding-left: 14px;
+  }
+  section.diagram > .caption {
+    color: #7a3b21;
+    font-size: 11pt;
+    margin: 0 0 18px;
+    padding-left: 19px;
+  }
+  section.diagram > .legend {
+    background: #faf3e3;
+    border: 1px solid #f5b94e;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 18px 0 0;
+    font-size: 10pt;
+    color: #5e3322;
+  }
+  section.diagram > .legend strong { color: #2a140b; }
+  section.diagram > .narrative {
+    margin: 18px 0 0;
+    font-size: 10.5pt;
+    color: #3d1d10;
+  }
+  section.diagram > .narrative ol { padding-left: 22px; margin: 6px 0; }
+  section.diagram > .narrative li { margin: 0 0 4px; }
+
+  /* SVG centering wrapper */
+  .svg-wrap {
+    text-align: center;
+    background: #faf7f2;
+    border-radius: 10px;
+    padding: 20px 10px;
+    overflow-x: auto;          /* wide diagrams scroll on narrow screens */
+  }
+  .svg-wrap svg {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+  }
+
+  /* Print niceties */
+  @media print {
+    body { background: #ffffff; }
+    section.diagram {
+      page-break-inside: avoid;
+      box-shadow: none;
+      border: 1px solid #e8d9c8;
+    }
+    .container { max-width: none; margin: 0; padding: 0; }
+  }
+
+  /* TOC nav */
+  .toc {
+    background: #ffffff;
+    border: 1px solid #e8d9c8;
+    border-radius: 12px;
+    padding: 16px 22px;
+    margin: 0 0 36px;
+  }
+  .toc h3 {
+    margin: 0 0 8px;
+    font-size: 12pt;
+    color: #2a140b;
+    font-family: Georgia, serif;
+  }
+  .toc ol { margin: 0; padding-left: 22px; color: #5e3322; }
+  .toc a { color: #7a3b21; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1 class="doc-title">Citiescapes — System Diagrams</h1>
+  <p class="doc-sub">Context · Diagram 0 · Per-Subsystem ERDs</p>
+  <div class="marigold-divider"></div>
+
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#context">Context Diagram</a></li>
+      <li><a href="#diagram0">Diagram 0 — Top-Level Process Decomposition</a></li>
+      <li><em>ERDs per subsystem (SS1 – SS7) — added in follow-up revisions</em></li>
+    </ol>
+  </div>
+
+  <!-- ====================================================================
+       CONTEXT DIAGRAM
+       Shows Citiescapes as a single process with the four external actors
+       it exchanges data with. No internal detail.
+       ==================================================================== -->
+  <section class="diagram" id="context">
+    <h2>1. Context Diagram</h2>
+    <p class="caption">Citiescapes Apartment Rental Management System and its four external actors. Arrows show data flow, not control flow.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 980 620" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Context diagram for Citiescapes system">
+        <!-- Arrow markers shared across the SVG -->
+        <defs>
+          <marker id="arrow-brown" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#7a3b21"/>
+          </marker>
+        </defs>
+
+        <!-- Central system node — rounded square, warm brown -->
+        <circle cx="490" cy="310" r="120"
+                fill="#2a140b" stroke="#f5b94e" stroke-width="4"/>
+        <text x="490" y="298" text-anchor="middle"
+              font-family="Georgia, serif" font-size="22" fill="#ffffff" font-weight="700">
+          Citiescapes
+        </text>
+        <text x="490" y="322" text-anchor="middle"
+              font-family="Georgia, serif" font-size="14" fill="#f5b94e">
+          Apartment Rental
+        </text>
+        <text x="490" y="342" text-anchor="middle"
+              font-family="Georgia, serif" font-size="12" fill="#f5b94e">
+          Management System
+        </text>
+
+        <!-- TOP-LEFT actor: Public Visitor -->
+        <rect x="60" y="60" width="220" height="80" rx="8"
+              fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+        <text x="170" y="92" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="14" fill="#2a140b" font-weight="700">
+          Public Visitor
+        </text>
+        <text x="170" y="112" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          (Unauthenticated browser)
+        </text>
+        <text x="170" y="128" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          Reads listings, submits inquiries
+        </text>
+
+        <!-- Flows: Public Visitor <-> System -->
+        <line x1="280" y1="100" x2="395" y2="240"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="295" y="160" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">inquiry · view rooms</text>
+
+        <line x1="395" y1="280" x2="280" y2="135"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="310" y="205" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">listings · confirmation</text>
+
+        <!-- TOP-RIGHT actor: Tenant -->
+        <rect x="700" y="60" width="220" height="80" rx="8"
+              fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+        <text x="810" y="92" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="14" fill="#2a140b" font-weight="700">
+          Tenant
+        </text>
+        <text x="810" y="112" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          (Authenticated portal user)
+        </text>
+        <text x="810" y="128" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          Views contract, bills, requests
+        </text>
+
+        <!-- Flows: Tenant <-> System -->
+        <line x1="700" y1="100" x2="585" y2="240"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="650" y="160" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">login · ack · request</text>
+
+        <line x1="585" y1="280" x2="700" y2="135"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="615" y="205" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">dashboard · bills · email</text>
+
+        <!-- BOTTOM-LEFT actor: General Manager -->
+        <rect x="60" y="480" width="220" height="80" rx="8"
+              fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+        <text x="170" y="512" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="14" fill="#2a140b" font-weight="700">
+          General Manager
+        </text>
+        <text x="170" y="532" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          (Admin role, role=gm)
+        </text>
+        <text x="170" y="548" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          Operates the entire system
+        </text>
+
+        <!-- Flows: GM <-> System -->
+        <line x1="280" y1="500" x2="395" y2="380"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="295" y="455" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">create/edit/respond</text>
+
+        <line x1="395" y1="340" x2="280" y2="475"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="310" y="410" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">reports · alerts · audit</text>
+
+        <!-- BOTTOM-RIGHT actor: Scheduled System Jobs -->
+        <rect x="700" y="480" width="220" height="80" rx="8"
+              fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+        <text x="810" y="512" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="14" fill="#2a140b" font-weight="700">
+          Scheduler / Cron
+        </text>
+        <text x="810" y="532" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          (System actor)
+        </text>
+        <text x="810" y="548" text-anchor="middle"
+              font-family="'Segoe UI', sans-serif" font-size="10" fill="#5e3322">
+          Nightly penalties, warnings, archive
+        </text>
+
+        <!-- Flows: Scheduler -> System -->
+        <line x1="700" y1="500" x2="585" y2="380"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="615" y="455" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">tick · trigger jobs</text>
+
+        <line x1="585" y1="340" x2="700" y2="475"
+              stroke="#7a3b21" stroke-width="2" marker-end="url(#arrow-brown)"/>
+        <text x="610" y="410" font-family="'Segoe UI', sans-serif"
+              font-size="10" fill="#3d1d10">audit log · sent mail</text>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> Boxes are external entities (actors outside the system).
+      The circle is the system as a single process. Arrows show the direction of data
+      flow; the labels next to each arrow name the data exchanged.
+    </div>
+
+    <div class="narrative">
+      <strong>Actors:</strong>
+      <ol>
+        <li><strong>Public Visitor</strong> — anonymous browser user. Reads the public landing page; submits inquiries via the contact form. Cannot log in.</li>
+        <li><strong>Tenant</strong> — authenticated tenant user (<code>role = 'tenant'</code>). Accesses the tenant portal: dashboard, contract, bills, requests, profile.</li>
+        <li><strong>General Manager (GM)</strong> — authenticated admin (<code>role = 'gm'</code>). Operates every administrative function: rooms, tenants, billing, contracts, archive, audit log, communications, settings.</li>
+        <li><strong>Scheduler / Cron</strong> — automated system actor. Runs three nightly jobs: <code>billing:apply-penalties</code>, <code>contracts:send-warnings</code>, <code>contracts:auto-archive</code>.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       DIAGRAM 0
+       Decomposes the single Citiescapes process from the context diagram
+       into seven top-level processes (one per subsystem), with the data
+       stores they share.
+       ==================================================================== -->
+  <section class="diagram" id="diagram0">
+    <h2>2. Diagram 0 — Top-Level Process Decomposition</h2>
+    <p class="caption">Decomposes the system into its seven subsystems (SS1 – SS7) and the seven core data stores they share. Each numbered process corresponds to one Livewire module group in <code>app/Livewire/</code>.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1080 760" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Diagram 0 — process decomposition">
+        <defs>
+          <marker id="arrow-grey" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#7a3b21"/>
+          </marker>
+          <marker id="arrow-marigold" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#a14d2b"/>
+          </marker>
+        </defs>
+
+        <!-- ============ Processes (numbered circles) ============ -->
+        <!-- 1. Room Operations -->
+        <g>
+          <circle cx="180" cy="120" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="180" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">1.0</text>
+          <text x="180" y="132" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Room</text>
+          <text x="180" y="146" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Operations</text>
+        </g>
+
+        <!-- 2. Tenant Management -->
+        <g>
+          <circle cx="380" cy="120" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="380" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">2.0</text>
+          <text x="380" y="132" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Tenant</text>
+          <text x="380" y="146" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Management</text>
+        </g>
+
+        <!-- 3. Billing & Collections -->
+        <g>
+          <circle cx="580" cy="120" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="580" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">3.0</text>
+          <text x="580" y="132" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Billing &amp;</text>
+          <text x="580" y="146" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Collections</text>
+        </g>
+
+        <!-- 4. Contract & Lease -->
+        <g>
+          <circle cx="780" cy="120" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="780" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">4.0</text>
+          <text x="780" y="132" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Contract &amp;</text>
+          <text x="780" y="146" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Lease</text>
+        </g>
+
+        <!-- 5. Reports & Archive (center-bottom) -->
+        <g>
+          <circle cx="280" cy="430" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="280" y="422" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">5.0</text>
+          <text x="280" y="442" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Reports &amp;</text>
+          <text x="280" y="456" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Archive</text>
+        </g>
+
+        <!-- 6. Authentication -->
+        <g>
+          <circle cx="540" cy="430" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="540" y="422" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">6.0</text>
+          <text x="540" y="442" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Auth &amp; Access</text>
+          <text x="540" y="456" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Control</text>
+        </g>
+
+        <!-- 7. Communications -->
+        <g>
+          <circle cx="800" cy="430" r="58" fill="#2a140b" stroke="#f5b94e" stroke-width="3"/>
+          <text x="800" y="422" text-anchor="middle" font-family="Georgia, serif" font-size="14" font-weight="700" fill="#ffffff">7.0</text>
+          <text x="800" y="442" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">Communications</text>
+          <text x="800" y="456" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="10" fill="#f5b94e">&amp; Notifications</text>
+        </g>
+
+        <!-- ============ Data Stores (parallel lines on right) ============ -->
+        <g font-family="'Segoe UI', sans-serif" font-size="10" fill="#2a140b">
+          <!-- D1 rooms -->
+          <line x1="930" y1="80" x2="1050" y2="80" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="110" x2="1050" y2="110" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="98">D1  rooms</text>
+
+          <!-- D2 users -->
+          <line x1="930" y1="160" x2="1050" y2="160" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="190" x2="1050" y2="190" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="178">D2  users</text>
+
+          <!-- D3 bills + payments -->
+          <line x1="930" y1="240" x2="1050" y2="240" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="270" x2="1050" y2="270" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="258">D3  bills, payments</text>
+
+          <!-- D4 contracts -->
+          <line x1="930" y1="320" x2="1050" y2="320" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="350" x2="1050" y2="350" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="338">D4  contracts</text>
+
+          <!-- D5 archives -->
+          <line x1="930" y1="400" x2="1050" y2="400" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="430" x2="1050" y2="430" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="418">D5  archives</text>
+
+          <!-- D6 audit_logs -->
+          <line x1="930" y1="480" x2="1050" y2="480" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="510" x2="1050" y2="510" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="498">D6  audit_logs</text>
+
+          <!-- D7 notifications_log + announcements -->
+          <line x1="930" y1="560" x2="1050" y2="560" stroke="#7a3b21" stroke-width="2"/>
+          <line x1="930" y1="590" x2="1050" y2="590" stroke="#7a3b21" stroke-width="2"/>
+          <text x="940" y="578">D7  notifications, announcements</text>
+        </g>
+
+        <!-- ============ External actors on the left edge ============ -->
+        <g>
+          <rect x="20" y="280" width="120" height="60" rx="6"
+                fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+          <text x="80" y="305" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#2a140b">Public Visitor</text>
+          <text x="80" y="322" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#5e3322">/landing, /inquire</text>
+
+          <rect x="20" y="360" width="120" height="60" rx="6"
+                fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+          <text x="80" y="385" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#2a140b">Tenant</text>
+          <text x="80" y="402" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#5e3322">/tenant/*</text>
+
+          <rect x="20" y="600" width="120" height="60" rx="6"
+                fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+          <text x="80" y="625" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#2a140b">GM (Admin)</text>
+          <text x="80" y="642" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#5e3322">/admin/*</text>
+
+          <rect x="20" y="680" width="120" height="60" rx="6"
+                fill="#faf3e3" stroke="#7a3b21" stroke-width="2"/>
+          <text x="80" y="705" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#2a140b">Scheduler</text>
+          <text x="80" y="722" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#5e3322">cron / artisan</text>
+        </g>
+
+        <!-- ============ Key data flows (selective, not exhaustive) ============ -->
+        <!-- Public Visitor -> Process 1 (view rooms / inquiry) -->
+        <line x1="140" y1="295" x2="135" y2="170"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+        <text x="58" y="225" font-family="'Segoe UI', sans-serif" font-size="9" fill="#3d1d10">inquiry data</text>
+
+        <!-- Tenant -> Process 6 (auth) -->
+        <line x1="140" y1="390" x2="485" y2="425"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+        <text x="270" y="403" font-family="'Segoe UI', sans-serif" font-size="9" fill="#3d1d10">credentials · OTP</text>
+
+        <!-- GM -> Process 1 -->
+        <line x1="140" y1="615" x2="170" y2="178"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+
+        <!-- GM -> Process 2 -->
+        <line x1="140" y1="620" x2="345" y2="170"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+
+        <!-- GM -> Process 3 -->
+        <line x1="140" y1="625" x2="540" y2="172"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+
+        <!-- GM -> Process 4 -->
+        <line x1="140" y1="630" x2="735" y2="172"
+              stroke="#7a3b21" stroke-width="1.5" marker-end="url(#arrow-grey)"/>
+
+        <!-- Scheduler -> Process 3 (apply penalties) -->
+        <line x1="140" y1="700" x2="552" y2="178"
+              stroke="#a14d2b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-marigold)"/>
+
+        <!-- Scheduler -> Process 4 (auto-archive / warnings) -->
+        <line x1="140" y1="710" x2="745" y2="178"
+              stroke="#a14d2b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-marigold)"/>
+
+        <!-- Process 1 <-> D1 rooms -->
+        <line x1="238" y1="120" x2="930" y2="95"
+              stroke="#7a3b21" stroke-width="1.5"/>
+
+        <!-- Process 2 <-> D2 users -->
+        <line x1="438" y1="120" x2="930" y2="175"
+              stroke="#7a3b21" stroke-width="1.5"/>
+
+        <!-- Process 3 <-> D3 bills + D4 contracts -->
+        <line x1="638" y1="120" x2="930" y2="255"
+              stroke="#7a3b21" stroke-width="1.5"/>
+        <line x1="635" y1="135" x2="930" y2="335"
+              stroke="#7a3b21" stroke-width="1.5"/>
+
+        <!-- Process 4 <-> D4 contracts + D1 rooms -->
+        <line x1="838" y1="120" x2="930" y2="335"
+              stroke="#7a3b21" stroke-width="1.5"/>
+
+        <!-- Process 5 <-> D5 archives -->
+        <line x1="338" y1="430" x2="930" y2="415"
+              stroke="#7a3b21" stroke-width="1.5"/>
+
+        <!-- Every process -> D6 audit_logs (representative line from process 6) -->
+        <line x1="595" y1="450" x2="930" y2="495"
+              stroke="#7a3b21" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="700" y="478" font-family="'Segoe UI', sans-serif" font-size="9" fill="#5e3322" font-style="italic">audit (all processes)</text>
+
+        <!-- Process 7 <-> D7 -->
+        <line x1="858" y1="430" x2="930" y2="575"
+              stroke="#7a3b21" stroke-width="1.5"/>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong>
+      Circles = processes (one per subsystem); double-line bars = data stores;
+      rectangles = external entities. Solid arrows = synchronous user-driven flows;
+      dashed marigold arrows = scheduler-driven flows. The dashed grey line shows
+      that every process writes to <code>audit_logs</code> (drawn from process 6 only
+      to avoid visual clutter).
+    </div>
+
+    <div class="narrative">
+      <strong>Process catalog.</strong>
+      <ol>
+        <li><strong>1.0 Room Operations</strong> — public listings, GM room CRUD, inquiries, occupancy dashboard, public room-type cards. Reads/writes D1 (rooms), reads D2 (users) for tenant linkage.</li>
+        <li><strong>2.0 Tenant Management</strong> — tenant account creation, first-login activation flow, self-profile, manual + auto archive. Reads/writes D2 (users).</li>
+        <li><strong>3.0 Billing &amp; Collections</strong> — initial &amp; monthly billing, penalty escalation cron, payment confirmation, deposit-to-arrears credit, eviction shortcut. Reads/writes D3 (bills + payments), reads D4 (contracts).</li>
+        <li><strong>4.0 Contract &amp; Lease Management</strong> — drafts, two-step tenant acknowledgement, scan upload + access control, renewals, terminations, expiry warning + auto-archive crons. Reads/writes D4 (contracts), updates D1 (rooms) on activate/terminate.</li>
+        <li><strong>5.0 Reports &amp; Archive</strong> — passive receiver of snapshots from SS1/SS2/SS3/SS4; provides browse, filter, CSV/PDF export, restore (tenant_account only), permanent delete. Reads/writes D5 (archives).</li>
+        <li><strong>6.0 Authentication &amp; Access Control</strong> — login, lockout, OTP, password change, role enforcement, system settings, audit log viewer. Reads D2 (users), writes D6 (audit_logs) on every privileged action.</li>
+        <li><strong>7.0 Communications &amp; Notifications</strong> — tenant requests, complaints, announcements, in-app bell, email fan-out. Reads/writes D7 (notifications + announcements), reads D2 (users) to resolve recipients.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p style="text-align:center;font-size:9.5pt;color:#7a3b21;margin:40px 0 20px;">
+    &copy; 2026 Citiescapes Apartment Rental Management System &nbsp;·&nbsp;
+    Diagrams 1–2 of 9 &nbsp;·&nbsp; ERDs SS1–SS7 to follow
+  </p>
+</div>
+</body>
+</html>
