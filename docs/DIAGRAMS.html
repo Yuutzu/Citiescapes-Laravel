@@ -111,7 +111,13 @@
     <ol>
       <li><a href="#context">Context Diagram</a></li>
       <li><a href="#diagram0">Diagram 0 &mdash; Top-Level Process Decomposition</a></li>
-      <li><em>ERDs per subsystem (SS1 &ndash; SS7) &mdash; added in follow-up revisions</em></li>
+      <li><a href="#erd-ss1">ERD &mdash; SS1 Room Operations</a></li>
+      <li><a href="#erd-ss2">ERD &mdash; SS2 Tenant Management</a></li>
+      <li><a href="#erd-ss3">ERD &mdash; SS3 Billing &amp; Collections</a></li>
+      <li><a href="#erd-ss4">ERD &mdash; SS4 Contract &amp; Lease Management</a></li>
+      <li><a href="#erd-ss5">ERD &mdash; SS5 Reports &amp; Archive</a></li>
+      <li><a href="#erd-ss6">ERD &mdash; SS6 Authentication &amp; Access Control</a></li>
+      <li><a href="#erd-ss7">ERD &mdash; SS7 Communications &amp; Notifications</a></li>
     </ol>
   </div>
 
@@ -478,9 +484,733 @@
     </div>
   </section>
 
+  <!-- ====================================================================
+       ERD SS1 — Room Operations
+       Tables: rooms, inquiries (+ FK to users)
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss1">
+    <h2>3. ERD &mdash; SS1 Room Operations</h2>
+    <p class="caption">Tables owned or primarily managed by the Room Operations subsystem and their relationships to <code>users</code>.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1000 540" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS1 Room Operations">
+        <defs>
+          <marker id="erd-arrow1" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- users entity (left) -->
+        <g>
+          <rect x="40" y="40" width="240" height="220" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="40" width="240" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="160" y="58" text-anchor="middle" font-size="13" font-weight="700">users</text>
+          <text x="50" y="84" font-size="10">PK  id</text>
+          <text x="50" y="100" font-size="10">    full_name</text>
+          <text x="50" y="116" font-size="10">    email  (UNIQUE)</text>
+          <text x="50" y="132" font-size="10">    role  (gm | tenant)</text>
+          <text x="50" y="148" font-size="10">    status</text>
+          <text x="50" y="164" font-size="10">    contact_number</text>
+          <text x="50" y="180" font-size="10">    address</text>
+          <text x="50" y="196" font-size="10">    activated_at</text>
+          <text x="50" y="212" font-size="10">    archived_at</text>
+          <text x="50" y="228" font-size="10">FK  archived_by &rarr; users.id</text>
+          <text x="50" y="244" font-size="10">    deleted_at  (soft delete)</text>
+        </g>
+
+        <!-- rooms entity (center) -->
+        <g>
+          <rect x="370" y="40" width="280" height="270" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="370" y="40" width="280" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="510" y="58" text-anchor="middle" font-size="13" font-weight="700">rooms</text>
+          <text x="380" y="84" font-size="10">PK  id</text>
+          <text x="380" y="100" font-size="10">    room_number  (UNIQUE)</text>
+          <text x="380" y="116" font-size="10">    floor_level</text>
+          <text x="380" y="132" font-size="10">    room_type  (compact | spacious)</text>
+          <text x="380" y="148" font-size="10">    amenities  (JSON)</text>
+          <text x="380" y="164" font-size="10">    rate  (decimal 10,2)</text>
+          <text x="380" y="180" font-size="10">    max_occupants</text>
+          <text x="380" y="196" font-size="10">    status  (available|occupied|under_maintenance)</text>
+          <text x="380" y="212" font-size="10">    description</text>
+          <text x="380" y="228" font-size="10">FK  current_tenant_id &rarr; users.id</text>
+          <text x="380" y="244" font-size="10">FK  last_updated_by &rarr; users.id</text>
+          <text x="380" y="260" font-size="10">    last_status_update</text>
+          <text x="380" y="276" font-size="10">    deleted_at  (soft delete)</text>
+        </g>
+
+        <!-- inquiries entity (right) -->
+        <g>
+          <rect x="730" y="40" width="240" height="240" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="730" y="40" width="240" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="850" y="58" text-anchor="middle" font-size="13" font-weight="700">inquiries</text>
+          <text x="740" y="84" font-size="10">PK  id</text>
+          <text x="740" y="100" font-size="10">    sender_name</text>
+          <text x="740" y="116" font-size="10">    contact_number</text>
+          <text x="740" y="132" font-size="10">    email  (nullable)</text>
+          <text x="740" y="148" font-size="10">    preferred_room_type</text>
+          <text x="740" y="164" font-size="10">    message</text>
+          <text x="740" y="180" font-size="10">    status  (pending|responded|closed)</text>
+          <text x="740" y="196" font-size="10">    gm_notes</text>
+          <text x="740" y="212" font-size="10">    responded_at</text>
+          <text x="740" y="228" font-size="10">FK  responded_by &rarr; users.id</text>
+        </g>
+
+        <!-- Relationships -->
+        <!-- users (1) — (0..1) rooms.current_tenant_id -->
+        <line x1="280" y1="220" x2="370" y2="228" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow1)"/>
+        <text x="290" y="216" font-size="9" font-style="italic">1 : 0..1  (occupies)</text>
+
+        <!-- users (1) — (0..*) rooms.last_updated_by -->
+        <line x1="280" y1="244" x2="370" y2="244" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow1)"/>
+        <text x="290" y="240" font-size="9" font-style="italic">1 : 0..*  (last edited)</text>
+
+        <!-- users (1) — (0..*) inquiries.responded_by -->
+        <line x1="280" y1="100" x2="730" y2="228" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow1)"/>
+        <text x="500" y="130" font-size="9" font-style="italic">1 : 0..*  (replies to)</text>
+
+        <!-- Legend block -->
+        <g>
+          <rect x="40" y="380" width="920" height="120" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="402" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="422" font-size="10">&bull; rooms.current_tenant_id is nullable. ON DELETE SET NULL &mdash; an archived tenant leaves the room linked but without an owner.</text>
+          <text x="50" y="438" font-size="10">&bull; rooms uses SoftDeletes for permanent-delete safety; the new "Archive Room" action snapshots in place (does NOT soft-delete).</text>
+          <text x="50" y="454" font-size="10">&bull; rooms.amenities is a JSON array (e.g. ["WiFi","Air Conditioning"]); always cast as array by the Eloquent model.</text>
+          <text x="50" y="470" font-size="10">&bull; inquiries.email is nullable because the public form lets visitors submit a contact number only.</text>
+          <text x="50" y="486" font-size="10">&bull; The fixed 22-room inventory is seeded once by AdminOnlySeeder / DatabaseSeeder; subsequent runs are idempotent (firstOrCreate).</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> Boxed entities are tables. <strong>PK</strong> = primary key; <strong>FK</strong> = foreign key (arrow points to the referenced table). Cardinality labels (<em>1 : 0..*</em>, etc.) sit on the relationship line.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS2 — Tenant Management
+       Tables: users (with archived_by self-reference)
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss2">
+    <h2>4. ERD &mdash; SS2 Tenant Management</h2>
+    <p class="caption">SS2 owns the <code>users</code> table. The diagram shows the self-referencing <code>archived_by</code> relationship and lists the columns SS2 actually manages (creation, activation, archival, status).</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS2 Tenant Management">
+        <defs>
+          <marker id="erd-arrow2" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- users entity (center, taller) -->
+        <g>
+          <rect x="300" y="40" width="400" height="380" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="300" y="40" width="400" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="500" y="58" text-anchor="middle" font-size="13" font-weight="700">users</text>
+
+          <text x="310" y="84" font-size="10">PK  id</text>
+          <text x="310" y="100" font-size="10">    full_name</text>
+          <text x="310" y="116" font-size="10">    email  (UNIQUE)</text>
+          <text x="310" y="132" font-size="10">    contact_number  (nullable)</text>
+          <text x="310" y="148" font-size="10">    address  (nullable)</text>
+          <text x="310" y="164" font-size="10">    emergency_contact  (nullable)</text>
+          <text x="310" y="180" font-size="10">    email_verified_at  (nullable)</text>
+          <text x="310" y="196" font-size="10">    password  (bcrypt hashed)</text>
+          <text x="310" y="212" font-size="10">    role  ENUM(gm | tenant)</text>
+          <text x="310" y="228" font-size="10">    status  ENUM(pending_activation | active</text>
+          <text x="310" y="244" font-size="10">                  | archived | deleted | locked)</text>
+          <text x="310" y="260" font-size="10">    must_change_password  (boolean)</text>
+          <text x="310" y="276" font-size="10">    activated_at</text>
+          <text x="310" y="292" font-size="10">    archived_at</text>
+          <text x="310" y="308" font-size="10">FK  archived_by &rarr; users.id  (self-reference)</text>
+          <text x="310" y="324" font-size="10">    failed_login_attempts</text>
+          <text x="310" y="340" font-size="10">    locked_until</text>
+          <text x="310" y="356" font-size="10">    last_login_at</text>
+          <text x="310" y="372" font-size="10">    remember_token</text>
+          <text x="310" y="388" font-size="10">    timestamps + deleted_at</text>
+        </g>
+
+        <!-- Self-reference loop -->
+        <path d="M 700 308 Q 800 308 800 230 Q 800 152 700 152"
+              stroke="#000000" stroke-width="1.4" fill="none" marker-end="url(#erd-arrow2)"/>
+        <text x="710" y="232" font-size="9" font-style="italic">self  (GM who archived)</text>
+
+        <!-- Legend / notes -->
+        <g>
+          <rect x="40" y="440" width="920" height="60" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="462" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="480" font-size="10">&bull; archived_by is a foreign key into users itself &mdash; the GM who clicked Archive. ON DELETE SET NULL.</text>
+          <text x="50" y="494" font-size="10">&bull; Status transitions: pending_activation &rarr; active (via OTP) &rarr; archived (by GM) &rarr; deleted (forceDelete). locked is a temporary state during a 15-min lockout.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> The users table is shared with every subsystem that needs to identify an actor (GM or tenant); SS2 is the owner that defines its lifecycle.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS3 — Billing & Collections
+       Tables: bills, payments, penalty_overrides, initial_payments
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss3">
+    <h2>5. ERD &mdash; SS3 Billing &amp; Collections</h2>
+    <p class="caption">Four billing tables with their foreign keys to <code>users</code>, <code>contracts</code>, and <code>rooms</code>. <code>bills</code> is the spine; <code>payments</code> and <code>penalty_overrides</code> hang off each bill.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS3 Billing and Collections">
+        <defs>
+          <marker id="erd-arrow3" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- bills (center) -->
+        <g>
+          <rect x="380" y="40" width="320" height="340" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="380" y="40" width="320" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="540" y="58" text-anchor="middle" font-size="13" font-weight="700">bills</text>
+          <text x="390" y="84" font-size="10">PK  id</text>
+          <text x="390" y="100" font-size="10">FK  tenant_id &rarr; users.id</text>
+          <text x="390" y="116" font-size="10">FK  contract_id &rarr; contracts.id</text>
+          <text x="390" y="132" font-size="10">FK  room_id &rarr; rooms.id</text>
+          <text x="390" y="148" font-size="10">    type  (initial | monthly)</text>
+          <text x="390" y="164" font-size="10">    billing_period  (YYYY-MM)</text>
+          <text x="390" y="180" font-size="10">    base_rent  (decimal)</text>
+          <text x="390" y="196" font-size="10">    utilities  (decimal)</text>
+          <text x="390" y="212" font-size="10">    electricity, water, wifi</text>
+          <text x="390" y="228" font-size="10">    deposit_amount, room_key_fee</text>
+          <text x="390" y="244" font-size="10">    penalty_amount</text>
+          <text x="390" y="260" font-size="10">    total_amount</text>
+          <text x="390" y="276" font-size="10">    due_date  (DATE)</text>
+          <text x="390" y="292" font-size="10">    status  ENUM(unpaid|grace|overdue</text>
+          <text x="390" y="308" font-size="10">                  |delinquent|eviction|paid|archived)</text>
+          <text x="390" y="324" font-size="10">    days_overdue, paid_at</text>
+          <text x="390" y="340" font-size="10">    timestamps + deleted_at</text>
+        </g>
+
+        <!-- payments (top-right) -->
+        <g>
+          <rect x="780" y="40" width="280" height="180" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="780" y="40" width="280" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="920" y="58" text-anchor="middle" font-size="13" font-weight="700">payments</text>
+          <text x="790" y="84" font-size="10">PK  id</text>
+          <text x="790" y="100" font-size="10">FK  bill_id &rarr; bills.id</text>
+          <text x="790" y="116" font-size="10">FK  tenant_id &rarr; users.id</text>
+          <text x="790" y="132" font-size="10">    amount  (decimal)</text>
+          <text x="790" y="148" font-size="10">    payment_method</text>
+          <text x="790" y="164" font-size="10">    reference_number</text>
+          <text x="790" y="180" font-size="10">    notes</text>
+          <text x="790" y="196" font-size="10">FK  confirmed_by &rarr; users.id</text>
+          <text x="790" y="212" font-size="10">    confirmed_at</text>
+        </g>
+
+        <!-- penalty_overrides (bottom-right) -->
+        <g>
+          <rect x="780" y="260" width="280" height="140" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="780" y="260" width="280" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="920" y="278" text-anchor="middle" font-size="13" font-weight="700">penalty_overrides</text>
+          <text x="790" y="304" font-size="10">PK  id</text>
+          <text x="790" y="320" font-size="10">FK  bill_id &rarr; bills.id</text>
+          <text x="790" y="336" font-size="10">FK  overridden_by &rarr; users.id</text>
+          <text x="790" y="352" font-size="10">    original_penalty</text>
+          <text x="790" y="368" font-size="10">    adjusted_penalty</text>
+          <text x="790" y="384" font-size="10">    reason</text>
+        </g>
+
+        <!-- initial_payments (bottom-left) -->
+        <g>
+          <rect x="40" y="40" width="300" height="220" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="40" width="300" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="190" y="58" text-anchor="middle" font-size="13" font-weight="700">initial_payments</text>
+          <text x="50" y="84" font-size="10">PK  id</text>
+          <text x="50" y="100" font-size="10">FK  tenant_id &rarr; users.id</text>
+          <text x="50" y="116" font-size="10">FK  contract_id &rarr; contracts.id  (UNIQUE)</text>
+          <text x="50" y="132" font-size="10">    deposit_amount</text>
+          <text x="50" y="148" font-size="10">    first_month_rent</text>
+          <text x="50" y="164" font-size="10">    room_key_fee</text>
+          <text x="50" y="180" font-size="10">    amenities  (JSON)</text>
+          <text x="50" y="196" font-size="10">    amenities_total</text>
+          <text x="50" y="212" font-size="10">    total_collected</text>
+          <text x="50" y="228" font-size="10">    date_received, payment_method</text>
+          <text x="50" y="244" font-size="10">FK  recorded_by &rarr; users.id</text>
+        </g>
+
+        <!-- Relationships -->
+        <!-- bills 1 — 0..* payments -->
+        <line x1="700" y1="100" x2="780" y2="100" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow3)"/>
+        <text x="708" y="92" font-size="9" font-style="italic">1 : 0..*</text>
+
+        <!-- bills 1 — 0..* penalty_overrides -->
+        <line x1="700" y1="320" x2="780" y2="320" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow3)"/>
+        <text x="708" y="312" font-size="9" font-style="italic">1 : 0..*</text>
+
+        <!-- contracts 1 — 0..1 initial_payments  (drawn down to a contract reference label) -->
+        <text x="50" y="280" font-size="9" font-style="italic">FK contract_id is UNIQUE &rarr; at most one initial payment per contract.</text>
+
+        <!-- Notes -->
+        <g>
+          <rect x="40" y="440" width="1020" height="220" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="462" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="480" font-size="10">&bull; All decimals use precision (10, 2). PHP-side accessors (Bill::balance, Bill::is_fully_paid) compute the outstanding amount from confirmed payments.</text>
+          <text x="50" y="496" font-size="10">&bull; bills.status escalation: unpaid &rarr; grace (1&ndash;3 days overdue) &rarr; overdue (day 4+) &rarr; delinquent (day 14+) &rarr; eviction (day 30+); managed by the billing:apply-penalties cron.</text>
+          <text x="50" y="512" font-size="10">&bull; payments.payment_method includes a special value "deposit_applied" written by BillingManager::applyDepositToArrears so the audit trail stays clean.</text>
+          <text x="50" y="528" font-size="10">&bull; penalty_overrides keeps the original penalty for audit; the bill's penalty_amount is updated to the adjusted value at the same time.</text>
+          <text x="50" y="544" font-size="10">&bull; initial_payments has a UNIQUE constraint on contract_id, so the system prevents the GM from recording move-in fees twice for the same contract.</text>
+          <text x="50" y="560" font-size="10">&bull; ON DELETE CASCADE on bills &rarr; payments &rarr; penalty_overrides ensures consistency if a bill is force-deleted (rare).</text>
+          <text x="50" y="582" font-size="11" font-weight="700">Cascade chain</text>
+          <text x="50" y="600" font-size="10">&bull; rooms (force-delete) &rarr; contracts &rarr; bills &rarr; payments &nbsp;&middot;&nbsp; penalty_overrides &nbsp; (CASCADE)</text>
+          <text x="50" y="616" font-size="10">&bull; The Room Manager's deleteRoom() guards against this by refusing force-delete if any contracts/archives reference the room.</text>
+          <text x="50" y="638" font-size="10">&bull; Sources: app/Livewire/Admin/Billing/BillingManager.php, app/Console/Commands/ApplyBillingPenalties.php.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> Foreign keys point to the referenced table. The UNIQUE constraint on <code>initial_payments.contract_id</code> enforces one-and-only-one initial payment per contract.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS4 — Contract & Lease Management
+       Table: contracts (with FKs to users + rooms; many lifecycle columns)
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss4">
+    <h2>6. ERD &mdash; SS4 Contract &amp; Lease Management</h2>
+    <p class="caption">The contracts table is the centerpiece of SS4. It links a tenant to a room for a fixed lease period and tracks the full lifecycle: draft &rarr; two-step acknowledgement &rarr; active &rarr; terminated or expired.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1100 720" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS4 Contract and Lease Management">
+        <defs>
+          <marker id="erd-arrow4" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- contracts (center, tall) -->
+        <g>
+          <rect x="320" y="40" width="460" height="540" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="320" y="40" width="460" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="550" y="58" text-anchor="middle" font-size="13" font-weight="700">contracts</text>
+
+          <text x="330" y="84" font-size="10">PK  id</text>
+          <text x="330" y="100" font-size="10">FK  tenant_id &rarr; users.id  (CASCADE)</text>
+          <text x="330" y="116" font-size="10">FK  room_id &rarr; rooms.id  (CASCADE)</text>
+          <text x="330" y="132" font-size="10">    base_rent_rate</text>
+          <text x="330" y="148" font-size="10">    deposit, deposit_applied_amount, deposit_applied_at</text>
+          <text x="330" y="164" font-size="10">    first_month_rent, room_key_fee</text>
+          <text x="330" y="180" font-size="10">    requested_amenities  (JSON)</text>
+          <text x="330" y="196" font-size="10">    start_date, end_date</text>
+          <text x="330" y="212" font-size="10">    status  ENUM(draft | active | expired | terminated)</text>
+          <text x="330" y="228" font-size="10">    penalty_rate, penalty_grace_days</text>
+          <text x="330" y="244" font-size="10">    house_rules, penalty_schedule</text>
+          <text x="330" y="270" font-size="11" font-weight="700">Scan upload + access control</text>
+          <text x="330" y="286" font-size="10">    scan_file_path, scan_file_name</text>
+          <text x="330" y="302" font-size="10">    scan_view_status  (pending | approved | denied | revoked)</text>
+          <text x="330" y="318" font-size="10">    scan_view_requested_at</text>
+          <text x="330" y="334" font-size="10">    scan_view_decided_at</text>
+          <text x="330" y="350" font-size="10">FK  scan_view_decided_by &rarr; users.id</text>
+          <text x="330" y="366" font-size="10">    scan_view_decision_note</text>
+          <text x="330" y="392" font-size="11" font-weight="700">Tenant acknowledgement (two-step)</text>
+          <text x="330" y="408" font-size="10">    step1_acknowledged_at</text>
+          <text x="330" y="424" font-size="10">    step2_acknowledged_at</text>
+          <text x="330" y="440" font-size="10">    activated_at</text>
+          <text x="330" y="466" font-size="11" font-weight="700">Termination + expiry</text>
+          <text x="330" y="482" font-size="10">    terminated_at, termination_reason</text>
+          <text x="330" y="498" font-size="10">    warning_30_sent, warning_7_sent  (boolean flags)</text>
+          <text x="330" y="514" font-size="10">FK  created_by &rarr; users.id</text>
+          <text x="330" y="530" font-size="10">    timestamps + deleted_at</text>
+        </g>
+
+        <!-- users (left) -->
+        <g>
+          <rect x="40" y="80" width="240" height="100" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="80" width="240" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="160" y="98" text-anchor="middle" font-size="13" font-weight="700">users</text>
+          <text x="50" y="124" font-size="10">PK  id</text>
+          <text x="50" y="140" font-size="10">    role  (gm | tenant)</text>
+          <text x="50" y="156" font-size="10">    status</text>
+          <text x="50" y="172" font-size="10">    (see SS2 ERD for full list)</text>
+        </g>
+
+        <!-- rooms (right) -->
+        <g>
+          <rect x="820" y="80" width="240" height="100" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="820" y="80" width="240" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="940" y="98" text-anchor="middle" font-size="13" font-weight="700">rooms</text>
+          <text x="830" y="124" font-size="10">PK  id</text>
+          <text x="830" y="140" font-size="10">    room_number</text>
+          <text x="830" y="156" font-size="10">    status  (available|occupied|under_maintenance)</text>
+          <text x="830" y="172" font-size="10">    (see SS1 ERD for full list)</text>
+        </g>
+
+        <!-- Relationships -->
+        <!-- users 1 — 0..* contracts.tenant_id -->
+        <line x1="280" y1="110" x2="320" y2="110" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow4)"/>
+        <text x="284" y="105" font-size="9" font-style="italic">tenant_id</text>
+
+        <!-- users 1 — 0..* contracts.created_by -->
+        <line x1="280" y1="150" x2="320" y2="514" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow4)"/>
+        <text x="200" y="450" font-size="9" font-style="italic">created_by (GM)</text>
+
+        <!-- users 1 — 0..* contracts.scan_view_decided_by -->
+        <line x1="280" y1="170" x2="320" y2="350" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow4)"/>
+        <text x="200" y="265" font-size="9" font-style="italic">scan_view_decided_by</text>
+
+        <!-- rooms 1 — 0..* contracts.room_id -->
+        <line x1="780" y1="116" x2="820" y2="116" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow4)"/>
+        <text x="784" y="111" font-size="9" font-style="italic">room_id</text>
+
+        <!-- Notes -->
+        <g>
+          <rect x="40" y="610" width="1020" height="100" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="632" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="650" font-size="10">&bull; CASCADE on tenant_id + room_id: archiving a tenant or force-deleting a room removes related contracts. The Room Manager prevents force-delete when contracts exist.</text>
+          <text x="50" y="666" font-size="10">&bull; Two-step acknowledgement: the tenant must hit Step 1 (read &amp; understood) before Step 2 (penalty acceptance); Step 2 flips status to active and stamps activated_at.</text>
+          <text x="50" y="682" font-size="10">&bull; Scan access auto-revokes after 7 days: ContractView::mount() lazily flips scan_view_status from approved &rarr; revoked when scan_view_decided_at is older than 7 days.</text>
+          <text x="50" y="698" font-size="10">&bull; Source: app/Livewire/Admin/Contracts/ContractManager.php and app/Livewire/Tenant/ContractView.php.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> The wide vertical contracts entity reflects how the table groups three concerns: financial terms, scan access workflow, and tenant acknowledgement + expiry lifecycle.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS5 — Reports & Archive
+       Table: archives (polymorphic-ish via record_type)
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss5">
+    <h2>7. ERD &mdash; SS5 Reports &amp; Archive</h2>
+    <p class="caption">SS5 owns one table: <code>archives</code>. It stores a JSON snapshot of any record from any upstream subsystem, identified by <code>record_type</code> and <code>source_subsystem</code>.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS5 Reports and Archive">
+        <defs>
+          <marker id="erd-arrow5" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- archives entity (center) -->
+        <g>
+          <rect x="280" y="40" width="440" height="260" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="280" y="40" width="440" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="500" y="58" text-anchor="middle" font-size="13" font-weight="700">archives</text>
+
+          <text x="290" y="84" font-size="10">PK  id</text>
+          <text x="290" y="100" font-size="10">    original_record_id  (id from upstream table)</text>
+          <text x="290" y="116" font-size="10">    record_type  (room | tenant_account | contract | payment)</text>
+          <text x="290" y="132" font-size="10">    source_subsystem  (SS1 | SS2 | SS3 | SS4)</text>
+          <text x="290" y="148" font-size="10">    archive_reason  (text)</text>
+          <text x="290" y="164" font-size="10">    data  (JSON)  &mdash; full snapshot of original row</text>
+          <text x="290" y="180" font-size="10">    scan_file_path  (preserved for contract archives)</text>
+          <text x="290" y="196" font-size="10">FK  archived_by &rarr; users.id</text>
+          <text x="290" y="212" font-size="10">    restored  (boolean)</text>
+          <text x="290" y="228" font-size="10">    restored_at</text>
+          <text x="290" y="244" font-size="10">    timestamps</text>
+          <text x="290" y="276" font-size="10" font-style="italic">Note: original_record_id is NOT a FK constraint &mdash; the upstream</text>
+          <text x="290" y="290" font-size="10" font-style="italic">row may be force-deleted while the archive snapshot persists.</text>
+        </g>
+
+        <!-- users (left) -->
+        <g>
+          <rect x="40" y="80" width="200" height="80" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="80" width="200" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="140" y="98" text-anchor="middle" font-size="13" font-weight="700">users</text>
+          <text x="50" y="124" font-size="10">PK  id  (GM who archived)</text>
+          <text x="50" y="140" font-size="10">FK from archives.archived_by</text>
+        </g>
+
+        <!-- Relationship -->
+        <line x1="240" y1="120" x2="280" y2="196" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow5)"/>
+        <text x="242" y="155" font-size="9" font-style="italic">archived_by</text>
+
+        <!-- Upstream sources (right) -->
+        <g>
+          <rect x="760" y="40" width="220" height="280" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="760" y="40" width="220" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="870" y="58" text-anchor="middle" font-size="13" font-weight="700">Upstream sources (logical)</text>
+          <text x="770" y="84" font-size="10">SS1.rooms        &rarr; record_type=room</text>
+          <text x="770" y="106" font-size="10">SS2.users        &rarr; record_type=tenant_account</text>
+          <text x="770" y="128" font-size="10">SS3.bills        &rarr; record_type=payment</text>
+          <text x="770" y="150" font-size="10">SS4.contracts    &rarr; record_type=contract</text>
+          <text x="770" y="180" font-size="10" font-style="italic">No DB-level FK &mdash; the link is by</text>
+          <text x="770" y="194" font-size="10" font-style="italic">(record_type, original_record_id).</text>
+          <text x="770" y="216" font-size="10" font-style="italic">The data JSON column stores the</text>
+          <text x="770" y="230" font-size="10" font-style="italic">full row as a self-contained snapshot,</text>
+          <text x="770" y="244" font-size="10" font-style="italic">so the archive is queryable forever</text>
+          <text x="770" y="258" font-size="10" font-style="italic">even after the original row is deleted.</text>
+        </g>
+
+        <!-- Logical relationship line -->
+        <line x1="720" y1="120" x2="760" y2="120" stroke="#000000" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#erd-arrow5)"/>
+        <text x="715" y="112" font-size="9" font-style="italic">logical (no FK)</text>
+
+        <!-- Notes -->
+        <g>
+          <rect x="40" y="360" width="940" height="180" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="382" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="400" font-size="10">&bull; Restore is only meaningful for record_type=tenant_account. The button is hidden and the controller rejects other types.</text>
+          <text x="50" y="416" font-size="10">&bull; Archive Room (SS1) is now a snapshot-in-place operation: the rooms row stays in inventory; an archives row is still written for audit.</text>
+          <text x="50" y="432" font-size="10">&bull; Archive Contract (SS4) preserves the scan_file_path so the PDF export still works after the upstream contract row is deleted.</text>
+          <text x="50" y="448" font-size="10">&bull; Permanent delete writes the audit row BEFORE removing the archive row, so the trace survives.</text>
+          <text x="50" y="464" font-size="10">&bull; Filters: filterType (record_type), filterSubsystem (source_subsystem), dateFrom / dateTo. notRestored() scope hides restored rows by default.</text>
+          <text x="50" y="490" font-size="11" font-weight="700">Exports</text>
+          <text x="50" y="508" font-size="10">&bull; exportCsv() &mdash; UTF-8 CSV of the filtered list (even when empty &mdash; still audits with count=0).</text>
+          <text x="50" y="524" font-size="10">&bull; exportContractPdf(id) &mdash; rejects non-contract record_types with a flash error.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> The dashed arrow indicates a logical relationship that is enforced in application code, not by a DB foreign-key constraint &mdash; the snapshot persists even if the upstream row is deleted.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS6 — Authentication & Access Control
+       Tables: users (auth columns), otp_records, system_settings, audit_logs
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss6">
+    <h2>8. ERD &mdash; SS6 Authentication &amp; Access Control</h2>
+    <p class="caption">Four tables back the authentication and audit layer. <code>users</code> is shared with SS2; the auth-specific columns are emphasized below. <code>audit_logs</code> is written to by every privileged action across all subsystems.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1100 680" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS6 Authentication">
+        <defs>
+          <marker id="erd-arrow6" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- users (top-left, auth columns highlighted) -->
+        <g>
+          <rect x="40" y="40" width="320" height="240" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="40" width="320" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="200" y="58" text-anchor="middle" font-size="13" font-weight="700">users  (auth subset)</text>
+          <text x="50" y="84" font-size="10">PK  id</text>
+          <text x="50" y="100" font-size="10">    email  (UNIQUE)</text>
+          <text x="50" y="116" font-size="10">    password  (bcrypt, BCRYPT_ROUNDS=12)</text>
+          <text x="50" y="132" font-size="10">    role  ENUM(gm | tenant)</text>
+          <text x="50" y="148" font-size="10">    status  (pending_activation | active | locked | archived)</text>
+          <text x="50" y="164" font-size="10">    must_change_password</text>
+          <text x="50" y="180" font-size="10">    activated_at</text>
+          <text x="50" y="196" font-size="10">    failed_login_attempts</text>
+          <text x="50" y="212" font-size="10">    locked_until</text>
+          <text x="50" y="228" font-size="10">    last_login_at</text>
+          <text x="50" y="244" font-size="10">    remember_token</text>
+          <text x="50" y="260" font-size="10">    email_verified_at</text>
+        </g>
+
+        <!-- otp_records (top-right) -->
+        <g>
+          <rect x="420" y="40" width="280" height="160" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="420" y="40" width="280" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="560" y="58" text-anchor="middle" font-size="13" font-weight="700">otp_records</text>
+          <text x="430" y="84" font-size="10">PK  id</text>
+          <text x="430" y="100" font-size="10">FK  user_id &rarr; users.id  (CASCADE)</text>
+          <text x="430" y="116" font-size="10">    code  (bcrypt hashed)</text>
+          <text x="430" y="132" font-size="10">    expires_at</text>
+          <text x="430" y="148" font-size="10">    used  (boolean)</text>
+          <text x="430" y="164" font-size="10">    timestamps</text>
+        </g>
+
+        <!-- system_settings (right) -->
+        <g>
+          <rect x="760" y="40" width="280" height="160" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="760" y="40" width="280" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="900" y="58" text-anchor="middle" font-size="13" font-weight="700">system_settings</text>
+          <text x="770" y="84" font-size="10">PK  id</text>
+          <text x="770" y="100" font-size="10">    key  (UNIQUE)</text>
+          <text x="770" y="116" font-size="10">    value  (text/JSON)</text>
+          <text x="770" y="132" font-size="10">FK  updated_by &rarr; users.id</text>
+          <text x="770" y="148" font-size="10">    timestamps</text>
+        </g>
+
+        <!-- audit_logs (bottom, wide) -->
+        <g>
+          <rect x="40" y="340" width="1000" height="200" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="340" width="1000" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="540" y="358" text-anchor="middle" font-size="13" font-weight="700">audit_logs</text>
+          <text x="50" y="384" font-size="10">PK  id</text>
+          <text x="50" y="400" font-size="10">FK  user_id &rarr; users.id  (SET NULL)  &mdash; nullable so 'system' / cron entries can record null actor</text>
+          <text x="50" y="416" font-size="10">    user_type  (gm | tenant | system)</text>
+          <text x="50" y="432" font-size="10">    action  (e.g. login, failed_login, room_archived, payment_confirmed, contract_terminated)</text>
+          <text x="50" y="448" font-size="10">    subsystem  (SS1 | SS2 | ... | SS7)</text>
+          <text x="50" y="464" font-size="10">    details  (free-text description; varies by action)</text>
+          <text x="50" y="480" font-size="10">    ip_address</text>
+          <text x="50" y="496" font-size="10">    timestamps</text>
+          <text x="50" y="518" font-size="10" font-style="italic">Indexes: (user_id, action) for filtering by actor + action; (created_at) for date-range queries.</text>
+        </g>
+
+        <!-- Relationships -->
+        <!-- users 1 — 0..* otp_records -->
+        <line x1="360" y1="100" x2="420" y2="100" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow6)"/>
+        <text x="368" y="92" font-size="9" font-style="italic">user_id</text>
+
+        <!-- users 1 — 0..* system_settings.updated_by -->
+        <line x1="360" y1="132" x2="760" y2="132" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow6)"/>
+        <text x="540" y="124" font-size="9" font-style="italic">updated_by</text>
+
+        <!-- users 1 — 0..* audit_logs (nullable) -->
+        <line x1="200" y1="280" x2="200" y2="340" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow6)"/>
+        <text x="207" y="312" font-size="9" font-style="italic">user_id (nullable for system)</text>
+
+        <!-- Notes -->
+        <g>
+          <rect x="40" y="568" width="1000" height="100" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="588" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="606" font-size="10">&bull; Account lockout: after 5 consecutive failed_login_attempts the user is locked for 15 minutes (locked_until = now + 15min); auto-unlock on next valid attempt.</text>
+          <text x="50" y="622" font-size="10">&bull; OTP: 6-digit code, expires in 10 minutes (citiescapes.auth.otp_expiry_minutes); ONE active record per user, used=true once consumed.</text>
+          <text x="50" y="638" font-size="10">&bull; system_settings stores configurable knobs (penalty_grace_days, otp_expiry, lockout_threshold, room_type_cards JSON); SS6 settings page edits these.</text>
+          <text x="50" y="654" font-size="10">&bull; audit_logs.user_id is SET NULL on user deletion &mdash; the trace persists; user_type=system entries (from cron) always have user_id=null.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> <code>audit_logs</code> is shared by every subsystem; SS6 is shown as its owner because the audit-log viewer UI and the lockout/OTP behaviors are scoped here.
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       ERD SS7 — Communications & Notifications
+       Tables: tenant_requests, announcements, notifications_log
+       ==================================================================== -->
+  <section class="diagram" id="erd-ss7">
+    <h2>9. ERD &mdash; SS7 Communications &amp; Notifications</h2>
+    <p class="caption">Three tables back the tenant-GM communications layer. <code>notifications_log</code> is the in-app bell store and is shared with other subsystems that fan out user-targeted messages.</p>
+
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1100 640" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="ERD for SS7 Communications">
+        <defs>
+          <marker id="erd-arrow7" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#000000"/>
+          </marker>
+        </defs>
+
+        <!-- users (left) -->
+        <g>
+          <rect x="40" y="80" width="240" height="100" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="40" y="80" width="240" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="160" y="98" text-anchor="middle" font-size="13" font-weight="700">users</text>
+          <text x="50" y="124" font-size="10">PK  id</text>
+          <text x="50" y="140" font-size="10">    role  (gm | tenant)</text>
+          <text x="50" y="156" font-size="10">    email</text>
+          <text x="50" y="172" font-size="10">    (see SS2 ERD for full list)</text>
+        </g>
+
+        <!-- tenant_requests (top-right) -->
+        <g>
+          <rect x="380" y="40" width="320" height="200" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="380" y="40" width="320" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="540" y="58" text-anchor="middle" font-size="13" font-weight="700">tenant_requests</text>
+          <text x="390" y="84" font-size="10">PK  id</text>
+          <text x="390" y="100" font-size="10">FK  tenant_id &rarr; users.id  (CASCADE)</text>
+          <text x="390" y="116" font-size="10">    type  ENUM(request | complaint)</text>
+          <text x="390" y="132" font-size="10">    subject  (max 150)</text>
+          <text x="390" y="148" font-size="10">    body  (max 3000)</text>
+          <text x="390" y="164" font-size="10">    status  (pending | in_progress | resolved)</text>
+          <text x="390" y="180" font-size="10">    admin_response</text>
+          <text x="390" y="196" font-size="10">FK  responded_by &rarr; users.id</text>
+          <text x="390" y="212" font-size="10">    responded_at</text>
+          <text x="390" y="228" font-size="10">    timestamps</text>
+        </g>
+
+        <!-- announcements (middle-right) -->
+        <g>
+          <rect x="380" y="280" width="320" height="180" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="380" y="280" width="320" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="540" y="298" text-anchor="middle" font-size="13" font-weight="700">announcements</text>
+          <text x="390" y="324" font-size="10">PK  id</text>
+          <text x="390" y="340" font-size="10">    title</text>
+          <text x="390" y="356" font-size="10">    body</text>
+          <text x="390" y="372" font-size="10">    recipient_type  ENUM(all | specific)</text>
+          <text x="390" y="388" font-size="10">FK  recipient_id &rarr; users.id  (SET NULL, nullable)</text>
+          <text x="390" y="404" font-size="10">FK  sent_by &rarr; users.id  (CASCADE)</text>
+          <text x="390" y="420" font-size="10">    email_sent  (boolean)</text>
+          <text x="390" y="436" font-size="10">    timestamps</text>
+        </g>
+
+        <!-- notifications_log (right, tall) -->
+        <g>
+          <rect x="760" y="40" width="300" height="220" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <rect x="760" y="40" width="300" height="26" fill="#ffffff" stroke="#000000" stroke-width="1.8"/>
+          <text x="910" y="58" text-anchor="middle" font-size="13" font-weight="700">notifications_log</text>
+          <text x="770" y="84" font-size="10">PK  id</text>
+          <text x="770" y="100" font-size="10">FK  user_id &rarr; users.id  (CASCADE)</text>
+          <text x="770" y="116" font-size="10">    type  (announcement | request | new_inquiry</text>
+          <text x="770" y="132" font-size="10">           | grace_reminder | delinquent_notice</text>
+          <text x="770" y="148" font-size="10">           | eviction_notice | account_locked</text>
+          <text x="770" y="164" font-size="10">           | contract_terminated | etc.)</text>
+          <text x="770" y="180" font-size="10">    source  (SS1 .. SS7)</text>
+          <text x="770" y="196" font-size="10">    message  (text)</text>
+          <text x="770" y="212" font-size="10">    is_read  (boolean, default false)</text>
+          <text x="770" y="228" font-size="10">    timestamps</text>
+          <text x="770" y="248" font-size="10" font-style="italic">Index on (user_id, is_read) for bell badge.</text>
+        </g>
+
+        <!-- Relationships -->
+        <!-- users 1 — 0..* tenant_requests.tenant_id -->
+        <line x1="280" y1="120" x2="380" y2="100" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow7)"/>
+        <text x="290" y="110" font-size="9" font-style="italic">tenant_id</text>
+
+        <!-- users 1 — 0..* tenant_requests.responded_by -->
+        <line x1="280" y1="160" x2="380" y2="196" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow7)"/>
+        <text x="290" y="186" font-size="9" font-style="italic">responded_by</text>
+
+        <!-- users 1 — 0..* announcements.sent_by -->
+        <line x1="280" y1="170" x2="380" y2="404" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow7)"/>
+        <text x="290" y="290" font-size="9" font-style="italic">sent_by</text>
+
+        <!-- users 1 — 0..1 announcements.recipient_id -->
+        <line x1="280" y1="178" x2="380" y2="388" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow7)"/>
+        <text x="290" y="310" font-size="9" font-style="italic">recipient_id (specific only)</text>
+
+        <!-- users 1 — 0..* notifications_log.user_id -->
+        <line x1="280" y1="100" x2="760" y2="100" stroke="#000000" stroke-width="1.4" marker-end="url(#erd-arrow7)"/>
+        <text x="500" y="92" font-size="9" font-style="italic">user_id (recipient of bell)</text>
+
+        <!-- Notes -->
+        <g>
+          <rect x="40" y="480" width="1020" height="140" fill="#ffffff" stroke="#000000" stroke-width="1"/>
+          <text x="50" y="502" font-size="11" font-weight="700">Notes</text>
+          <text x="50" y="520" font-size="10">&bull; Delivery guarantee: the bell row (notifications_log) is the authoritative channel. Email is best-effort and wrapped in try/catch &mdash; an SMTP failure is logged but never rolls back the in-app notification.</text>
+          <text x="50" y="536" font-size="10">&bull; tenant_requests + announcements fan out to bell + email at write time. Announcement recipients are resolved through users where role=tenant and status=active.</text>
+          <text x="50" y="552" font-size="10">&bull; Resolved tenant_requests are locked: GM cannot respond again (state-transition guard).</text>
+          <text x="50" y="568" font-size="10">&bull; notifications_log.type strings are free-form across subsystems &mdash; the source column tells you which subsystem wrote them.</text>
+          <text x="50" y="584" font-size="10">&bull; Mark-all-read scopes by user_id &mdash; one user's read action never affects another's unread count.</text>
+          <text x="50" y="600" font-size="10">&bull; Sources: app/Livewire/Tenant/RequestManager.php, app/Livewire/Admin/Communications/{RequestViewer,AnnouncementManager}.php, livewire-notification-bell.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <strong>Legend.</strong> <code>notifications_log</code> is shared by every subsystem that emits a bell to a tenant or GM; SS7 owns the read/write logic (open, markAllRead) and the announcement broadcasting flow.
+    </div>
+  </section>
+
   <p style="text-align:center;font-size:9.5pt;color:#000000;margin:40px 0 20px;">
     &copy; 2026 Citiescapes Apartment Rental Management System &nbsp;&middot;&nbsp;
-    Diagrams 1 &ndash; 2 of 9 &nbsp;&middot;&nbsp; ERDs SS1 &ndash; SS7 to follow
+    9 diagrams &mdash; Context, Diagram 0, ERDs SS1 &ndash; SS7
   </p>
 </div>
 </body>
