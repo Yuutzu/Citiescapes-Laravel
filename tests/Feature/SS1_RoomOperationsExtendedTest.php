@@ -288,11 +288,14 @@ class SS1_RoomOperationsExtendedTest extends TestCase
         Livewire::actingAs($this->gm)->test(RoomManager::class)
             ->call('archiveRoom', $r->id);
 
+        // Archive Room is now a snapshot-only operation: the room stays in
+        // active inventory while a record_type=room row is written to SS5
+        // for audit/history. Soft-delete was removed in the same change.
         $this->assertDatabaseHas('archives', [
             'record_type'      => 'room',
             'source_subsystem' => 'SS1',
         ]);
-        $this->assertSoftDeleted('rooms', ['id' => $r->id]);
+        $this->assertDatabaseHas('rooms', ['id' => $r->id, 'deleted_at' => null]);
         $this->assertDatabaseHas('audit_logs', [
             'action'    => 'room_archived',
             'subsystem' => 'SS1',

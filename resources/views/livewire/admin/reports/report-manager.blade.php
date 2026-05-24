@@ -72,8 +72,13 @@
                                     <i class="fas fa-file-pdf text-[10px]"></i> PDF
                                 </button>
                             @endif
-                            @if($a->record_type !== 'contract')
-                                <button wire:click="restore({{ $a->id }})" wire:confirm="Restore this record?"
+                            {{-- Restore is meaningful only for tenant_account archives.
+                                 Rooms are now snapshotted in place (the room stays in inventory),
+                                 contracts are immutable historical snapshots, and bills/payments
+                                 are part of the financial trail. Showing Restore on those types
+                                 would mislead the GM into thinking the action does something. --}}
+                            @if($a->record_type === 'tenant_account')
+                                <button wire:click="restore({{ $a->id }})" wire:confirm="Restore this tenant account?"
                                     class="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition">
                                     <i class="fas fa-rotate-left text-[10px]"></i> Restore
                                 </button>

@@ -28,27 +28,30 @@ class ReportManager extends Component
     {
         $archive = Archive::findOrFail($id);
 
-        // Contracts are immutable historical snapshots — restoring would collide
-        // with room occupancy, billing cycles, and the penalty scheduler. To
-        // re-issue a contract scenario, the GM should create a fresh draft from
-        // the archived data via SS4 instead.
-        if ($archive->record_type === 'contract') {
-            session()->flash('error',
-                'Contracts cannot be restored — they are historical snapshots. ' .
-                'Create a fresh contract draft in Contract Management instead.'
-            );
+        // Restore is meaningful only for tenant_account archives. Rooms are
+        // snapshotted in place by RoomManager::archiveRoom (the room never
+        // leaves inventory), contracts are immutable historical snapshots,
+        // and payments are part of the financial trail. The UI hides the
+        // button for those types; this guard is defense-in-depth in case
+        // someone calls the method via tinker or a stale page.
+        if ($archive->record_type !== 'tenant_account') {
+            $explanation = match ($archive->record_type) {
+                'contract' => 'Contracts cannot be restored — they are historical snapshots. Create a fresh contract draft in Contract Management instead.',
+                'room'     => 'Room snapshots cannot be restored — the room itself was never removed from inventory.',
+                'payment'  => 'Bills and payments are part of the financial trail and cannot be restored.',
+                default    => "Restore is only available for tenant_account archives (this row is record_type={$archive->record_type}).",
+            };
+            session()->flash('error', $explanation);
             return;
         }
 
-        if ($archive->record_type === 'tenant_account') {
-            $user = User::find($archive->original_record_id);
-            if ($user) {
-                $user->update([
-                    'status'      => 'active',
-                    'archived_at' => null,
-                    'archived_by' => null,
-                ]);
-            }
+        $user = User::find($archive->original_record_id);
+        if ($user) {
+            $user->update([
+                'status'      => 'active',
+                'archived_at' => null,
+                'archived_by' => null,
+            ]);
         }
 
         $archive->update(['restored' => true, 'restored_at' => now()]);

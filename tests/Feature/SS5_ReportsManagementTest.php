@@ -72,7 +72,15 @@ class SS5_ReportsManagementTest extends TestCase
     #[Test] // BBT_SS5_REP_004 — EP: restore marks archive restored=true (hidden from default view)
     public function restore_marks_archive_restored_and_hides_it(): void
     {
-        $a = $this->makeArchive('room', 'SS1', 'To Restore');
+        // Restore now only operates on tenant_account archives (rooms are
+        // snapshotted in place; contracts/payments are immutable).
+        $u = \App\Models\User::create([
+            'full_name' => 'Restorable Tenant', 'email' => 'restorable@x.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('p'),
+            'role' => 'tenant', 'status' => 'archived',
+        ]);
+        $a = $this->makeArchive('tenant_account', 'SS2', 'To Restore');
+        $a->update(['original_record_id' => $u->id]);
 
         Livewire::actingAs($this->gm)->test(ReportManager::class)
             ->call('restore', $a->id);

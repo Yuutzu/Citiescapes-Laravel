@@ -25,7 +25,10 @@ class DemoBbtSs3Bill015 extends Command
     {
         $this->newLine();
         $this->info('🎬 BBT_SS3_BILL_015 — Apply Penalty (Day 4)');
-        $this->line('   Precondition: Bill 4 days overdue, contract penalty_rate=100, grace_days=3');
+        $this->line('   Precondition: Bill 4 days overdue, contract penalty_rate=50 (testbed default), grace_days=3');
+        $this->line('   Note: the BBT doc specifies rate=100 as the system default. The testbed seeder');
+        $this->line('         uses rate=50 for visual variety, so the visible penalty in the table is');
+        $this->line('         (4 − 3 grace) × 50 = ₱50. The escalation logic and audit trail are identical.');
         $this->newLine();
 
         // Seed via the testbed's own bill.overdue_day4 scenario (same precondition).
@@ -39,8 +42,8 @@ class DemoBbtSs3Bill015 extends Command
         $this->info('✅ Ready to record. Open http://citiescapes.test and:');
         $this->line('   • Log in as GM → Billing Management');
         $this->line('   • Find the seeded bill (4 days overdue) → status badge shows "Overdue" (orange)');
-        $this->line('   • Penalty Amount column shows ₱100.00 (1 day past 3-day grace × ₱100 rate)');
-        $this->line('   • Total Amount = base_rent + utilities + ₱100 penalty');
+        $this->line('   • Penalty Amount column shows ₱50.00 ((4 − 3 grace) × ₱50 testbed rate)');
+        $this->line('   • Total Amount = base_rent + utilities + ₱50 penalty');
         $this->line('   • Audit Log → look for billing:apply-penalties cron output');
         $this->newLine();
         $this->line('   Wipe between recordings: php artisan db:wipe-test --no-confirm');

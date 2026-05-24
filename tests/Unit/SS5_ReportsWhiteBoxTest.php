@@ -43,7 +43,10 @@ class SS5_ReportsWhiteBoxTest extends TestCase
     #[Test] // WBT_SS5_REP_001 — restore() flips restored=true AND sets restored_at
     public function restore_sets_both_flag_and_timestamp(): void
     {
-        $a = $this->makeArchive();
+        // Restore now ONLY applies to tenant_account archives. Seed accordingly.
+        $u = User::create(['full_name' => 'T', 'email' => 'restorable@x.com',
+            'password' => Hash::make('p'), 'role' => 'tenant', 'status' => 'archived']);
+        $a = $this->makeArchive(['record_type' => 'tenant_account', 'original_record_id' => $u->id]);
 
         Livewire::actingAs($this->gm)->test(ReportManager::class)
             ->call('restore', $a->id);
@@ -56,7 +59,9 @@ class SS5_ReportsWhiteBoxTest extends TestCase
     #[Test] // WBT_SS5_REP_002 — restore() writes an audit log entry
     public function restore_writes_audit_log(): void
     {
-        $a = $this->makeArchive();
+        $u = User::create(['full_name' => 'T', 'email' => 'restorable2@x.com',
+            'password' => Hash::make('p'), 'role' => 'tenant', 'status' => 'archived']);
+        $a = $this->makeArchive(['record_type' => 'tenant_account', 'original_record_id' => $u->id]);
 
         Livewire::actingAs($this->gm)->test(ReportManager::class)
             ->call('restore', $a->id);

@@ -343,17 +343,50 @@ class RoomManager extends Component
     public function archiveRoom(int $id)
     {
         $room = Room::findOrFail($id);
-        Archive::create([
+        // Snapshot the room's current state to SS5 for the audit trail. The
+        // room itself stays in inventory — Archive Room is a record-keeping
+        // operation, not a delete. (Use Permanently Delete Room for removal.)
+        $archive = Archive::create([
             'original_record_id' => $room->id,
             'record_type'        => 'room',
             'source_subsystem'   => 'SS1',
-            'archive_reason'     => 'Removed from active inventory by management',
+            'archive_reason'     => 'Snapshot taken by management (room kept in inventory)',
             'data'               => $room->toArray(),
             'archived_by'        => auth()->id(),
         ]);
-        $room->delete();
-        AuditLog::record('room_archived', auth()->id(), 'gm', 'SS1', "Room {$room->room_number} archived");
-        session()->flash('success', 'Room archived.');
+
+        // Occupancy handling. If a tenant currently occupies this room, we
+        // protect their lease: snapshot is created but we DO NOT free the room
+        // while the contract is still active. Once the contract ends (auto-
+        // archive cron handles that), the room frees up the normal way.
+        $note = "Room {$room->room_number} snapshotted to SS5 archive #{$archive->id}";
+
+        if ($room->current_tenant_id) {
+            $activeContract = \App\Models\Contract::where('room_id', $room->id)
+                ->where('tenant_id', $room->current_tenant_id)
+                ->where('status', 'active')
+                ->whereDate('end_date', '>=', now())
+                ->first();
+
+            if ($activeContract) {
+                $note .= " — tenant kept linked (contract #{$activeContract->id} still active until {$activeContract->end_date->format('Y-m-d')})";
+            } else {
+                // Tenant exists on the room but no live contract — safe to detach.
+                $room->update([
+                    'current_tenant_id'  => null,
+                    'status'             => 'available',
+                    'last_status_update' => now(),
+                ]);
+                $note .= ' — room freed (no active contract on file)';
+            }
+        }
+
+        AuditLog::record('room_archived', auth()->id(), 'gm', 'SS1', $note);
+        session()->flash('success',
+            $room->current_tenant_id
+                ? "Room {$room->room_number} snapshotted. Tenant lease is still active — room stays occupied."
+                : "Room {$room->room_number} snapshotted to archive."
+        );
     }
 
     public function deleteRoom(int $id)

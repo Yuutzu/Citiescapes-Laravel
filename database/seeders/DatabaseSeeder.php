@@ -13,33 +13,38 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── GM account ─────────────────────────────────
-        $gm = User::create([
-            'full_name' => 'Florie A. Quibod',
-            'email' => 'citiescapes2017@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'gm',
-            'status' => 'active',
-            'must_change_password' => false,
-            'activated_at' => now(),
-            'email_verified_at' => now(),
-        ]);
+        // ── GM account (idempotent — safe to re-run) ───
+        // firstOrCreate prevents UNIQUE-constraint crashes on `php artisan
+        // migrate --seed` re-runs. Same pattern for the demo tenant + rooms
+        // below so the seeder behaves correctly on Hostinger redeploys.
+        $gm = User::firstOrCreate(
+            ['email' => 'citiescapes2017@gmail.com'],
+            [
+                'full_name'            => 'Florie A. Quibod',
+                'password'             => Hash::make('password'),
+                'role'                 => 'gm',
+                'status'               => 'active',
+                'must_change_password' => false,
+                'activated_at'         => now(),
+                'email_verified_at'    => now(),
+            ]
+        );
 
         // ── Demo tenant (active, no contract) ──────────
-        // For first-deploy login testing. The GM can issue a contract through
-        // the admin UI to walk through the full move-in flow.
-        User::create([
-            'full_name'            => 'Demo Tenant',
-            'email'                => 'demo.tenant@citiescapes.test',
-            'contact_number'       => '09171234567',
-            'address'              => 'Bajada, Davao City',
-            'password'             => Hash::make('password'),
-            'role'                 => 'tenant',
-            'status'               => 'active',
-            'must_change_password' => false,
-            'activated_at'         => now(),
-            'email_verified_at'    => now(),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'demo.tenant@citiescapes.test'],
+            [
+                'full_name'            => 'Demo Tenant',
+                'contact_number'       => '09171234567',
+                'address'              => 'Bajada, Davao City',
+                'password'             => Hash::make('password'),
+                'role'                 => 'tenant',
+                'status'               => 'active',
+                'must_change_password' => false,
+                'activated_at'         => now(),
+                'email_verified_at'    => now(),
+            ]
+        );
 
         // ── Public room-type cards (SS1) ───────────────
         // Seed system_settings.room_type_cards with the original photo set
@@ -70,16 +75,18 @@ class DatabaseSeeder extends Seeder
             for ($i = 1; $i <= $count; $i++) {
                 $roomNum = $floor . str_pad($i, 2, '0', STR_PAD_LEFT);
 
-                Room::create([
-                    'room_number' => $roomNum,
-                    'floor_level' => $floor,
-                    'room_type' => $type,
-                    'amenities' => $type === 'compact' ? $amenities_compact : $amenities_spacious,
-                    'rate' => $type === 'compact' ? 3500.00 : 5000.00,
-                    'max_occupants' => $type === 'compact' ? 3 : 4,
-                    'status' => 'available',
-                    'description' => ucfirst($type) . " room on floor {$floor}",
-                ]);
+                Room::firstOrCreate(
+                    ['room_number' => $roomNum],
+                    [
+                        'floor_level'   => $floor,
+                        'room_type'     => $type,
+                        'amenities'     => $type === 'compact' ? $amenities_compact : $amenities_spacious,
+                        'rate'          => $type === 'compact' ? 3500.00 : 5000.00,
+                        'max_occupants' => $type === 'compact' ? 3 : 4,
+                        'status'        => 'available',
+                        'description'   => ucfirst($type) . " room on floor {$floor}",
+                    ]
+                );
             }
         }
 
