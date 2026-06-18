@@ -2,10 +2,10 @@
 
 **CS12L Major Project** | Laravel 11 + Livewire 3 + Tailwind CSS
 
-> Covers all 7 subsystems: Room Operations (SS1), Tenant Management (SS2),
-> Billing & Collections (SS3), Contract & Lease Management (SS4),
-> Report and Archive Management (SS5), User Access and Authentication (SS6),
 > Communications & Notifications (SS7).
+
+12:30 AM
+A full-scale apartment rental management system covering all seven subsystems: Room Operations, Tenant Management, Billing & Collections, Contract & Lease Management, Report and Archive Management, User Access and Authentication, and Communications & Notifications.
 
 ---
 
